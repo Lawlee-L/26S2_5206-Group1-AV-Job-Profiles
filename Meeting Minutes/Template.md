@@ -1,0 +1,40 @@
+# Meeting Minutes
+
+**Meeting Type:** Facilitator / Client / Team  
+**Date:** DD-MM-YYYY  
+**Time:** HH:MM - HH:MM
+**Recorded by:** Name  
+
+## Attendees
+- Name
+- Name
+- Name
+
+## Discussion
+### Topic 1:
+  - Key points discussed
+  - Additional notes
+
+### Topic 2:
+  - Key points discussed
+  - Additional notes
+
+## Key Decisions
+**Decision 1:**
+**Decision 2:**
+
+## Action Items
+
+| Task | Owner | Due Date |
+|------|-------|----------|
+| | | |
+| | | |
+
+## Follow-up / Next Meeting Agenda
+- Items requiring further discussion
+- Questions to clarify
+- Pending decisions
+- Issues requiring follow-up
+
+## Next Meeting
+**Date:** YYYY-MM-DD
