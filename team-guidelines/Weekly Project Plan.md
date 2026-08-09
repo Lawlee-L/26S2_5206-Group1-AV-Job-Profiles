@@ -221,7 +221,7 @@ Most team members are also still becoming familiar with using GitHub to document
   **Owner:** Sunjol Singh Paul
 
 - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.  
-  **Owner:** Sunjol Singh Paul and selected client representatives
+  **Owner:** Team
 
 - [ ] Allocate the four sections of the group deliverable among team members.  
   **Owner:** Team  
