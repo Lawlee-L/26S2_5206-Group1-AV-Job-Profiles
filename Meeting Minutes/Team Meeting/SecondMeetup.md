@@ -62,3 +62,23 @@ Hi everyone, here is a summary of what we discussed in today’s meeting.
 - [ ] Review which companies should stay in/out of scope.
 - [ ] Prepare our proposed MVP and discussion points for Monday’s facilitator meeting.
 - [ ] After facilitator feedback, confirm the MVP with the client.
+---
+# ADD BY LI
+# Meeting Minutes
+
+**Meeting Type:**  Group
+**Date:** 08-08-2026  
+**Time:** 12:00 - 13:00
+**Recorded by:** Thushamini Chathusika Hewa Pathegamage  
+
+## Attendance
+### Attendees
+- Client: Adrian Boeing
+- Thushamini Chathusika Hewa Pathegamage
+- Seonjeong Jeong
+- Li Luo
+
+### Apologies
+- Nyx Chen — unable to attend due to a misunderstanding regarding the meeting time.
+- Leon Nel Nel - unable to attend due to work
+- Sunjol Singh Paul - unable to attend
