@@ -25,99 +25,15 @@ It will be reviewed and updated during regular team meetings. Detailed tasks and
 
 - [x] Attend the first facilitator meeting with Dr Sumayyah.  
   **Date:** 3 August 2026  
-  **Evidence/Link:** [Add facilitator meeting minutes link]
 
 - [x] Complete and send the facilitator meeting minutes.  
-  **Owner:** Thushamini and Li Luo  
-  **Evidence/Link:** [Add meeting minutes link]
+  **Owner:** Seonjeong and Li Luo  
 
-- [ ] Complete the Week 3 work summary.  
+- [x] Complete the Week 3 work summary.  
   **Owner:** All team members  
   **Location:** Microsoft Teams — Team Shared
 
-- [ ] Upload the completed Week 3 work summary to the **CITS5206 Channel**.  
-  **Owner:** Li Luo  
-  **Due:** 7:00 PM, Sunday, 9 August 2026
-
-### 2. Weekly Project Goals
-
-- [x] Establish the initial team structure and working arrangements.
-- [ ] Complete the initial investigation of all assigned company careers websites.
-- [ ] Record the website investigation results in GitHub for discussion at the next facilitator meeting.
-- [ ] Prepare the team to evaluate feasible data collection methods and define the proposed MVP.
-
-### 3. Internal Task Allocation
-
-- [x] Assign the initial team roles.  
-  **Owner:** Team  
-  **Evidence/Link:** [Add meeting minutes link]
-
-- [x] Prepare the Team Lead rotation plan.  
-  **Owner:** Li Luo  
-  **Evidence/Link:** [Add Group Operating Guidelines link]
-
-- [x] Prepare the meeting minutes rotation schedule.  
-  **Owner:** Li Luo  
-  **Evidence/Link:** [Add CITS5206 Meeting Minutes Rotation link]
-
-- [x] Create and update the Group Operating Guidelines.  
-  **Owner:** Li Luo  
-  **Evidence/Link:** [Add Group Operating Guidelines link]
-
-- [ ] Investigate the assigned careers websites and record the findings in GitHub Issues.  
-  **Owner:** All team members  
-  **Due:** 12:00 PM, Sunday, 9 August 2026  
-  **Evidence/Link:** [Add GitHub Issues link]
-
-- [ ] Review the Group Operating Guidelines and suggest any changes.  
-  **Owner:** All team members  
-  **Due:** Team meeting on Monday, 10 August 2026
-
-- [ ] Complete the assigned section of the Week 3 work summary.  
-  **Owner:** All team members  
-  **Due:** Before 7:00 PM, Sunday, 9 August 2026  
-  **Location:** Microsoft Teams — Team Shared
-
----
-
-### Expected Weekly Outcomes
-
-- Team roles and leadership rotation are documented.
-- Group Operating Guidelines are available on GitHub.
-- Initial website investigation results are available for discussion.
-- Weekly contribution records are completed.
-
-### Risks or Blockers
-
-- Some websites may not provide an accessible API.
-- Website investigation results may be inconsistent if members use different formats.
-- Late task updates may affect preparation for the facilitator meeting.
-
----
-# Weekly Project Plan
-
-**Status:** Active  
-**Last Updated:** 9 August 2026
-
----
-
-## Week 3 — 3 August to 9 August 2026
-
-### 1. School Deliverables and Meetings
-
-- [x] Attend the first facilitator meeting with Dr Sumayyah.  
-  **Date:** 3 August 2026  
-  **Evidence/Link:** [Add facilitator meeting minutes link]
-
-- [x] Complete and send the facilitator meeting minutes.  
-  **Owner:** Thushamini and Li Luo  
-  **Evidence/Link:** [Add meeting minutes link]
-
-- [ ] Complete the Week 3 work summary.  
-  **Owner:** All team members  
-  **Location:** Microsoft Teams — Team Shared
-
-- [ ] Upload the completed Week 3 work summary to the **CITS5206 Channel**.  
+- [x] Upload the completed Week 3 work summary to the **CITS5206 Channel**.  
   **Owner:** Li Luo  
   **Due:** 7:00 PM, Sunday, 9 August 2026
 
@@ -172,6 +88,14 @@ It will be reviewed and updated during regular team meetings. Detailed tasks and
 - Some websites may not provide an accessible API.
 - Website investigation results may be inconsistent if members use different formats.
 - Late task updates may affect preparation for the facilitator meeting.
+
+### Week3 Summary
+
+During Week 3, the team established its initial roles, leadership rotation, meeting-minutes rotation, Group Operating Guidelines, and Weekly Project Plan. The company careers websites were divided among team members, who began investigating available APIs, ATS platforms, and other possible job-data collection methods.
+
+Some members were unable to attend meetings, and several task updates were submitted later than expected. This affected coordination and reduced the time available to review the website findings before the facilitator meeting, resulting in some delays to the planned progress.
+
+Most team members are also still becoming familiar with using GitHub to document tasks and manage the project workflow. In the coming week, the team will provide additional guidance on GitHub, follow up on tasks earlier, and maintain clearer deadlines and progress updates to improve coordination and meeting preparation.
 
 ---
 
@@ -222,6 +146,10 @@ It will be reviewed and updated during regular team meetings. Detailed tasks and
 - [ ] Prepare the main content and supporting evidence for the group deliverable due on 18 August 2026.
 
 ### 3. Internal Task Allocation
+
+- [ ] Review the Group Operating Guidelines and suggest any changes.  
+  **Owner:** All team members  
+  **Due:** Team meeting on Monday, 10 August 2026
 
 - [ ] Review all website investigation results before the facilitator meeting.  
   **Owner:** All team members  
