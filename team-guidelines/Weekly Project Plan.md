@@ -241,8 +241,7 @@ Most team members are also still becoming familiar with using GitHub to document
 
 #### Li Luo
 
-- [ ] Prepare and send the facilitator meeting agenda.
-- [ ] Organise the proposed MVP scope before the facilitator meeting.
+- [x] Prepare and send the facilitator meeting agenda.
 - [ ] Lead the team discussion about the MVP scope.
 - [ ] Record the internally agreed MVP scope.
 - [ ] Send the facilitator meeting minutes to Dr Sumayyah.
@@ -253,18 +252,14 @@ Most team members are also still becoming familiar with using GitHub to document
 
 #### Nyx Chen
 
-- [ ] Review the proposed MVP before the facilitator meeting.
 - [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Attend the client meeting.
 - [ ] Complete the client meeting minutes.
 - [ ] Upload the client meeting minutes to GitHub.
-- [ ] Provide the completed client meeting minutes to Sunjol Singh Paul.
 - [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
 #### Seonjeong Jeong
 
-- [ ] Review the proposed MVP before the facilitator meeting.
 - [ ] Contribute to the MVP discussion and scope decision.
 - [ ] Review the final MVP proposal before it is presented to the client.
 - [ ] Draft the assigned section of the group deliverable.
@@ -272,21 +267,16 @@ Most team members are also still becoming familiar with using GitHub to document
 
 #### Sunjol Singh Paul
 
-- [ ] Review the proposed MVP before the facilitator meeting.
 - [ ] Contribute to the MVP discussion and scope decision.
 - [ ] Contact the client and schedule the MVP confirmation meeting.
-- [ ] Coordinate the client meeting arrangements.
-- [ ] Attend the client meeting and support confirmation of the final MVP.
 - [ ] Send the completed client meeting minutes to the client.
-- [ ] Obtain the client's written confirmation of the agreed MVP.
-- [ ] Store the written confirmation as project evidence.
+- [ ] Obtain the client's written confirmation of the agreed MVP, Store the written confirmation as project evidence.
 - [ ] Complete the group meeting minutes and upload them to GitHub.
 - [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
 #### Thushamini Chathusika Hewa Pathegamage
 
-- [ ] Review the proposed MVP before the facilitator meeting.
 - [ ] Contribute to the MVP discussion and scope decision.
 - [ ] Review the final MVP proposal before it is presented to the client.
 - [ ] Draft the assigned section of the group deliverable.
@@ -294,12 +284,8 @@ Most team members are also still becoming familiar with using GitHub to document
 
 #### Leon Nel
 
-- [ ] Review the proposed MVP before the facilitator meeting.
 - [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Complete the facilitator meeting minutes.
-- [ ] Upload the facilitator meeting minutes to GitHub.
-- [ ] Provide the completed facilitator meeting minutes to Li Luo.
-- [ ] Review the final MVP proposal before it is presented to the client.
+- [ ] Complete the facilitator meeting minutes, Upload the facilitator meeting minutes to GitHub.
 - [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
