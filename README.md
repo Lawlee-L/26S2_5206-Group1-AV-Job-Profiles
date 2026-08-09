@@ -1,7 +1,17 @@
 # CITS5206 Group 1 — AV Job Profiles
 
 This repository is the central workspace for the CITS5206 Group 1 project. It is used to organise meeting records, team planning documents, project tasks, and data-collection work.
+## Team Members
 
+| Name | Student ID | GitHub Username | Role |
+|---|---:|---|---|
+| Li Luo | 24250049 | `Lawlee-L` | Current Team Lead and Facilitator Liaison |
+| Nyx Chen | 24290498 | `hot-tofu-curd` | Future Team Lead and Team Member |
+| Seonjeong Jeong | 24732339 | `seon-jeongx2` | Future Team Lead and Team Member |
+| Sunjol Singh Paul | 24433446 | `sunjol` | Client Liaison and Team Member |
+| Thushamini Chathusika Hewa Pathegamage | 24562882 | `Chathushika2000` | Team Member |
+| Leon Nel Nel | 24268801 | `DemionNeo1` | Team Member |
+The Team Lead role will rotate from **Li Luo** to **Nyx Chen** and then to **Seonjeong Jeong** during the project.
 ## Repository Structure
 
 ```text
