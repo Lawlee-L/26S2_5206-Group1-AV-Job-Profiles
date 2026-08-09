@@ -67,7 +67,7 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 
 ### 4. Quick Check
 #### Li Luo
-
+Attend to meeting : 2/2
 - [x] Coordinate communication with the facilitator and organise the meeting invitation.
 - [x] Set up and organise the team GitHub repository.
 - [x] Prepare the team roles and leadership rotation record.
@@ -79,34 +79,34 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 - [x] Upload the completed Week 3 work summary to the CITS5206 Channel.
 
 #### Nyx Chen
-
+Attend to meeting : 1/2
 - [ ] Complete the investigation of the assigned careers websites.
 - [ ] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
 
 #### Seonjeong Jeong
-
+Attend to meeting : 2/2
 - [x] Prepare the facilitator meeting minutes and upload them to GitHub.
 - [x] Complete the investigation of the assigned careers websites.
 - [x] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
 
 #### Sunjol Singh Paul
-
+Attend to meeting : 1/2
 - [x] Take on the role of primary Client Liaison.
 - [x] Complete the investigation of the assigned careers websites.
 - [x] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
 
 #### Thushamini Chathusika Hewa Pathegamage
-
+Attend to meeting : 2/2
 - [x] Prepare the group meeting minutes and upload them to GitHub.
 - [x] Complete the investigation of the assigned careers websites.
 - [x] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
 
 #### Leon Nel Nel
-
+Attend to meeting : 1/2
 - [ ] Complete the investigation of the assigned careers websites.
 - [ ] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
