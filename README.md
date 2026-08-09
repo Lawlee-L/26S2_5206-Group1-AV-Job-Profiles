@@ -11,6 +11,7 @@ This repository is the central workspace for the CITS5206 Group 1 project. It is
 | Sunjol Singh Paul | 24433446 | `sunjol` | Client Liaison and Team Member |
 | Thushamini Chathusika Hewa Pathegamage | 24562882 | `Chathushika2000` | Team Member |
 | Leon Nel Nel | 24268801 | `DemionNeo1` | Team Member |
+
 The Team Lead role will rotate from **Li Luo** to **Nyx Chen** and then to **Seonjeong Jeong** during the project.
 ## Repository Structure
 
