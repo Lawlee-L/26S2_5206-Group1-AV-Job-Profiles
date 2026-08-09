@@ -61,7 +61,7 @@ It will be reviewed and updated during regular team meetings. Team members shoul
   **Due:** 12:00 PM, Sunday, 9 August 2026  
 
 ### 4. Quick Check
-### Li Luo
+#### Li Luo
 
 - [x] Coordinate communication with the facilitator and organise the meeting invitation.
 - [x] Set up and organise the team GitHub repository.
@@ -73,52 +73,52 @@ It will be reviewed and updated during regular team meetings. Team members shoul
 - [x] Record the website findings in the relevant GitHub Issues.
 - [x] Upload the completed Week 3 work summary to the CITS5206 Channel.
 
-### Nyx Chen
+#### Nyx Chen
 
 - [ ] Complete the investigation of the assigned careers websites.
 - [ ] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
 
-### Seonjeong Jeong
+#### Seonjeong Jeong
 
 - [x] Prepare the facilitator meeting minutes and upload them to GitHub.
 - [x] Complete the investigation of the assigned careers websites.
 - [x] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
 
-### Sunjol Singh Paul
+#### Sunjol Singh Paul
 
 - [x] Take on the role of primary Client Liaison.
 - [x] Complete the investigation of the assigned careers websites.
 - [x] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
 
-### Thushamini Chathusika Hewa Pathegamage
+#### Thushamini Chathusika Hewa Pathegamage
 
 - [x] Prepare the group meeting minutes and upload them to GitHub.
 - [x] Complete the investigation of the assigned careers websites.
 - [x] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
 
-### Leon Nel Nel
+#### Leon Nel Nel
 
 - [ ] Complete the investigation of the assigned careers websites.
 - [ ] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
-### Expected Weekly Outcomes
+### 5. Expected Weekly Outcomes
 
 - Team roles and leadership rotation are documented.
 - Group Operating Guidelines are available on GitHub.
 - Initial website investigation results are available for discussion.
 - Weekly contribution records are completed.
 
-### Risks or Blockers
+### 6. Risks or Blockers
 
 - Some websites may not provide an accessible API.
 - Website investigation results may be inconsistent if members use different formats.
 - Late task updates may affect preparation for the facilitator meeting.
 
-### Week3 Summary
+### 7. Week3 Summary
 
 During Week 3, the team established its initial roles, leadership rotation, meeting-minutes rotation, Group Operating Guidelines, and Weekly Project Plan. The company careers websites were divided among team members, who began investigating available APIs, ATS platforms, and other possible job-data collection methods.
 
@@ -289,7 +289,7 @@ Most team members are also still becoming familiar with using GitHub to document
 - [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
-### Expected Weekly Outcomes
+### 5. Expected Weekly Outcomes
 
 - The team agrees on a realistic proposed MVP scope.
 - The proposed MVP is presented to the client.
@@ -300,7 +300,7 @@ Most team members are also still becoming familiar with using GitHub to document
 - Initial drafts of the four report sections are prepared.
 - Weekly contribution records are completed.
 
-### Risks or Blockers
+### 6. Risks or Blockers
 
 - The team may not reach agreement on a realistic MVP scope during the facilitator meeting.
 - The client meeting may not be scheduled before the submission deadline.
@@ -308,7 +308,7 @@ Most team members are also still becoming familiar with using GitHub to document
 - Delayed meeting minutes or written client approval may affect the group deliverable.
 - Delayed allocation of report sections may reduce the time available for drafting and review.
 
-### Week 4 Summary
+### 7. Week 4 Summary
 
 To be completed at the end of Week 4.
 
