@@ -130,196 +130,200 @@ Most team members are also still becoming familiar with using GitHub to document
 
 ## Week 4 — 10 August to 16 August 2026
 
-## 1. School Deliverables and Meetings
+### 1. School Deliverables and Meetings
 
-- [ ] Prepare and send the facilitator meeting agenda.  
+- [x] Prepare and send the facilitator meeting agenda.  
   **Owner:** Li Luo  
   **Due:** Before the facilitator meeting
 
 - [ ] Attend the facilitator meeting with Dr Sumayyah.  
   **Owner:** All team members  
-  **Date:** Monday, 10 August 2026
+  **Date:** 10 August 2026
 
-- [ ] Complete and send the facilitator meeting minutes.  
-  **Owner:** Assigned minute-taker and Li Luo  
+- [ ] Complete the facilitator meeting minutes and upload them to GitHub.  
+  **Owner:** Leon Nel  
   **Due:** After the facilitator meeting
 
-- [ ] Schedule a client meeting to discuss and confirm the proposed MVP.  
-  **Owner:** Sunjol Singh Paul  
-  **Due:** To be confirmed
+- [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
+  **Owner:** Li Luo  
+  **Due:** After the minutes are completed
 
-- [ ] Attend the client meeting and present the proposed MVP.  
-  **Owner:** Selected client representatives  
+- [ ] Schedule the client meeting to discuss and confirm the proposed MVP.  
+  **Owner:** Sunjol Singh Paul  
   **Date:** To be confirmed
 
-- [ ] Obtain and document the client's confirmation of the agreed MVP.  
-  **Owner:** Sunjol Singh Paul and selected client representatives  
-  **Due:** Before the group deliverable is finalised
+- [ ] Attend the client meeting and confirm the final MVP scope.  
+  **Owner:** All team members  
+  **Date:** To be confirmed
+
+- [ ] Complete the client meeting minutes and upload them to GitHub.  
+  **Owner:** Nyx Chen  
+  **Due:** After the client meeting
+
+- [ ] Send the client meeting minutes to the client and obtain written confirmation of the agreed MVP.  
+  **Owner:** Sunjol Singh Paul  
+  **Due:** After the client meeting minutes are completed
+
+- [ ] Attend the weekly group meeting.  
+  **Owner:** All team members  
+  **Date:** 15 August 2026
+
+- [ ] Complete the group meeting minutes and upload them to GitHub.  
+  **Owner:** Sunjol Singh Paul  
+  **Due:** After the group meeting
 
 - [ ] Complete the Week 4 work summary.  
   **Owner:** All team members  
   **Location:** Microsoft Teams — Team Shared
 
-- [ ] Upload the completed Week 4 work summary to the **CITS5206 Channel**.  
+- [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.  
   **Owner:** Li Luo  
   **Due:** 7:00 PM, Sunday, 16 August 2026
 
 ### 2. Weekly Project Goals
 
-- [ ] Review and compare all company careers website investigation results.
-- [ ] Identify the feasible job-data collection methods for the project.
-- [ ] Agree on the proposed MVP scope and key deliverables.
-- [ ] Confirm the proposed MVP with the client.
-- [ ] Complete the initial risk and technology assessments.
-- [ ] Prepare the main content and supporting evidence for the group deliverable due on 18 August 2026.
+- [ ] Review and compare the website investigation results.
+- [ ] Evaluate the feasible job-data collection methods.
+- [ ] Agree on the proposed MVP scope during the facilitator meeting.
+- [ ] Present the proposed MVP to the client.
+- [ ] Confirm the final MVP scope with the client.
+- [ ] Obtain written evidence of the client's MVP approval.
+- [ ] Begin drafting the four sections of the group deliverable.
 
 ### 3. Internal Task Allocation
 
 - [ ] Review the Group Operating Guidelines and suggest any changes.  
   **Owner:** All team members  
-  **Due:** Team meeting on Monday, 10 August 2026
+  **Due:** Facilitator meeting on 10 August 2026
 
-- [ ] Review all website investigation results before the facilitator meeting.  
+- [ ] Review and discuss the website investigation results.  
   **Owner:** All team members  
-  **Due:** Before the facilitator meeting on Monday, 10 August 2026  
+  **Due:** Facilitator meeting on 10 August 2026
 
-- [ ] Present and discuss the assigned website findings during the facilitator meeting.  
-  **Owner:** All team members  
-  **Due:** Facilitator meeting on Monday, 10 August 2026
+- [ ] Evaluate the available APIs, ATS platforms, structured data, and alternative collection methods.  
+  **Owner:** Team
 
-- [ ] Compare the available APIs, ATS platforms, structured data, and alternative collection methods.  
+- [ ] Define the proposed MVP scope, core features, and exclusions.  
   **Owner:** Team  
+  **Due:** During the facilitator meeting
 
-- [ ] Identify common job-data fields and data requirements.  
+- [ ] Prepare the proposed MVP for the client meeting.  
   **Owner:** Team  
-
-- [ ] Identify websites or data sources that may be unavailable, restricted, or technically difficult to access.  
-  **Owner:** Team  
-
-- [ ] Prepare the proposed MVP, including core features, key deliverables, and out-of-scope items.  
-  **Owner:** Team  
-  **Due:** Before the client meeting  
+  **Due:** Before the client meeting
 
 - [ ] Prepare the questions and confirmation points for the client meeting.  
   **Owner:** Team  
-  **Due:** Before the client meeting  
+  **Due:** Before the client meeting
 
 - [ ] Coordinate the client meeting arrangements.  
-  **Owner:** Sunjol Singh Paul  
-  **Due:** [Add date]
+  **Owner:** Sunjol Singh Paul
 
-- [ ] Clarify any relevant intellectual property, website access, and data-use constraints with the client.  
-  **Owner:** Selected client representatives  
-  **Due:** During the client meeting  
+- [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.  
+  **Owner:** Sunjol Singh Paul and selected client representatives
+
+- [ ] Allocate the four sections of the group deliverable among team members.  
+  **Owner:** Team  
+  **Due:** During the group meeting on 15 August 2026
 
 - [ ] Draft the Problem Statement section of the group deliverable.  
-  **Owner:** [Add assigned member]  
+  **Owner:** [Add assigned member]
 
 - [ ] Draft the Client Communication and MVP Agreement section.  
-  **Owner:** [Add assigned member]  
+  **Owner:** [Add assigned member]
 
 - [ ] Draft the Project Planning and Management section.  
-  **Owner:** [Add assigned member]  
+  **Owner:** [Add assigned member]
 
 - [ ] Draft the Risk and Technology Assessments section.  
-  **Owner:** [Add assigned member]  
+  **Owner:** [Add assigned member]
 
-- [ ] Check that the facilitator has access to the GitHub repository, Microsoft Teams area, meeting minutes, project plan, and other linked resources.  
-  **Owner:** Li Luo and Team  
-  **Due:** Before the group deliverable is finalised
+### 4. Quick Check
 
-- [ ] Record how AI was used during the preparation of the project and report.  
-  **Owner:** All team members  
-
-- [ ] Complete the assigned section of the Week 4 work summary.  
-  **Owner:** All team members  
-  **Due:** Before 7:00 PM, Sunday, 16 August 2026  
-  **Location:** Microsoft Teams — Team Shared
-### 4.Quick Check
-### Li Luo
+#### Li Luo
 
 - [ ] Prepare and send the facilitator meeting agenda.
-- [ ] Coordinate the facilitator meeting arrangements.
-- [ ] Review the Group Operating Guidelines with the team.
-- [ ] Review and present the assigned website investigation results.
-- [ ] Contribute to the proposed MVP.
-- [ ] Coordinate the allocation of the four report sections.
-- [ ] Check the project evidence links and access permissions.
+- [ ] Organise the proposed MVP scope before the facilitator meeting.
+- [ ] Lead the team discussion about the MVP scope.
+- [ ] Record the internally agreed MVP scope.
+- [ ] Send the facilitator meeting minutes to Dr Sumayyah.
+- [ ] Coordinate the allocation of the group deliverable sections.
+- [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
 
-### Nyx Chen
+#### Nyx Chen
 
-- [ ] Review the Group Operating Guidelines.
-- [ ] Complete any unfinished website investigation tasks.
-- [ ] Review and present the assigned website findings.
-- [ ] Contribute to the comparison of data collection methods.
-- [ ] Contribute to the proposed MVP.
-- [ ] Complete the assigned section of the group deliverable.
+- [ ] Review the proposed MVP before the facilitator meeting.
+- [ ] Contribute to the MVP discussion and scope decision.
+- [ ] Attend the client meeting.
+- [ ] Complete the client meeting minutes.
+- [ ] Upload the client meeting minutes to GitHub.
+- [ ] Provide the completed client meeting minutes to Sunjol Singh Paul.
+- [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
-### Seonjeong Jeong
+#### Seonjeong Jeong
 
-- [ ] Review the Group Operating Guidelines.
-- [ ] Complete any unfinished website investigation tasks.
-- [ ] Review and present the assigned website findings.
-- [ ] Contribute to the comparison of data collection methods.
-- [ ] Contribute to the proposed MVP.
-- [ ] Complete the assigned section of the group deliverable.
+- [ ] Review the proposed MVP before the facilitator meeting.
+- [ ] Contribute to the MVP discussion and scope decision.
+- [ ] Review the final MVP proposal before it is presented to the client.
+- [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
-### Sunjol Singh Paul
+#### Sunjol Singh Paul
 
-- [ ] Review the Group Operating Guidelines.
-- [ ] Complete any unfinished website investigation tasks.
-- [ ] Review and present the assigned website findings.
+- [ ] Review the proposed MVP before the facilitator meeting.
+- [ ] Contribute to the MVP discussion and scope decision.
+- [ ] Contact the client and schedule the MVP confirmation meeting.
 - [ ] Coordinate the client meeting arrangements.
-- [ ] Prepare the client meeting questions and MVP confirmation points with the team.
-- [ ] Obtain and document the client's confirmation of the agreed MVP.
-- [ ] Clarify relevant intellectual-property and data-use constraints with the client.
-- [ ] Complete the assigned section of the group deliverable.
+- [ ] Attend the client meeting and support confirmation of the final MVP.
+- [ ] Send the completed client meeting minutes to the client.
+- [ ] Obtain the client's written confirmation of the agreed MVP.
+- [ ] Store the written confirmation as project evidence.
+- [ ] Complete the group meeting minutes and upload them to GitHub.
+- [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
-### Thushamini Chathusika Hewa Pathegamage
+#### Thushamini Chathusika Hewa Pathegamage
 
-- [ ] Review the Group Operating Guidelines.
-- [ ] Complete any unfinished website investigation tasks.
-- [ ] Review and present the assigned website findings.
-- [ ] Contribute to the project risk assessment.
-- [ ] Contribute to the proposed MVP.
-- [ ] Complete the assigned section of the group deliverable.
+- [ ] Review the proposed MVP before the facilitator meeting.
+- [ ] Contribute to the MVP discussion and scope decision.
+- [ ] Review the final MVP proposal before it is presented to the client.
+- [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
-### Leon Nel
+#### Leon Nel
 
-- [ ] Review the Group Operating Guidelines.
-- [ ] Complete any unfinished website investigation tasks.
-- [ ] Review and present the assigned website findings.
-- [ ] Contribute to the project risk assessment.
-- [ ] Contribute to the proposed MVP.
-- [ ] Complete the assigned section of the group deliverable.
+- [ ] Review the proposed MVP before the facilitator meeting.
+- [ ] Contribute to the MVP discussion and scope decision.
+- [ ] Complete the facilitator meeting minutes.
+- [ ] Upload the facilitator meeting minutes to GitHub.
+- [ ] Provide the completed facilitator meeting minutes to Li Luo.
+- [ ] Review the final MVP proposal before it is presented to the client.
+- [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
-
 
 ### Expected Weekly Outcomes
 
-- All website investigation results have been reviewed and compared.
-- Feasible data collection methods have been identified.
-- The proposed MVP and its boundaries are clearly documented.
-- The client has confirmed the agreed MVP.
-- Initial risk and technology assessments are completed.
-- Each section of the group deliverable has an assigned owner and an initial draft.
-- Evidence links and access permissions are ready for the report.
+- The team agrees on a realistic proposed MVP scope.
+- The proposed MVP is presented to the client.
+- The client confirms the final MVP scope.
+- Written evidence of the client's MVP approval is obtained.
+- Facilitator, client, and group meeting records are completed.
+- The four sections of the group deliverable are allocated.
+- Initial drafts of the four report sections are prepared.
 - Weekly contribution records are completed.
 
 ### Risks or Blockers
 
-- Missing or inconsistent website investigation results may delay technical decisions.
-- Some websites may not provide accessible APIs or reliable structured data.
-- Website terms, access restrictions, or intellectual property requirements may affect the proposed MVP.
-- Delayed client confirmation may affect completion of the group deliverable.
-- Unclear task ownership may delay preparation of individual report sections.
-- Broken links or missing access permissions may prevent the facilitator from reviewing supporting evidence.
+- The team may not reach agreement on a realistic MVP scope during the facilitator meeting.
+- The client meeting may not be scheduled before the submission deadline.
+- The client may request changes to the proposed MVP.
+- Delayed meeting minutes or written client approval may affect the group deliverable.
+- Delayed allocation of report sections may reduce the time available for drafting and review.
+
+### Week 4 Summary
+
+To be completed at the end of Week 4.
 
 ---
-
