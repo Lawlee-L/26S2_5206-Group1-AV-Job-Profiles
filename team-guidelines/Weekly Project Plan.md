@@ -247,38 +247,34 @@ Most team members are also still becoming familiar with using GitHub to document
 - [ ] Send the facilitator meeting minutes to Dr Sumayyah.
 - [ ] Coordinate the allocation of the group deliverable sections.
 - [ ] Draft the assigned section of the group deliverable.
-- [ ] Complete the assigned section of the Week 4 work summary.
 - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
 
 #### Nyx Chen
 
 - [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Complete the client meeting minutes.
-- [ ] Upload the client meeting minutes to GitHub.
+- [ ] Complete the client meeting minutes, Upload the client meeting minutes to GitHub.
 - [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
 #### Seonjeong Jeong
 
 - [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Review the final MVP proposal before it is presented to the client.
 - [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
 #### Sunjol Singh Paul
 
 - [ ] Contribute to the MVP discussion and scope decision.
+- [ ] Draft the assigned section of the group deliverable.
+- [ ] Complete the assigned section of the Week 4 work summary.
 - [ ] Contact the client and schedule the MVP confirmation meeting.
 - [ ] Send the completed client meeting minutes to the client.
 - [ ] Obtain the client's written confirmation of the agreed MVP, Store the written confirmation as project evidence.
 - [ ] Complete the group meeting minutes and upload them to GitHub.
-- [ ] Draft the assigned section of the group deliverable.
-- [ ] Complete the assigned section of the Week 4 work summary.
 
 #### Thushamini Chathusika Hewa Pathegamage
 
 - [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Review the final MVP proposal before it is presented to the client.
 - [ ] Draft the assigned section of the group deliverable.
 - [ ] Complete the assigned section of the Week 4 work summary.
 
@@ -443,8 +439,6 @@ To be completed at the end of Week 4.
 
 #### Sunjol Singh Paul
 
-- [ ] Obtain and store the client's written confirmation of the agreed MVP.
-- [ ] Provide the client communication records for the report.
 - [ ] Complete the assigned section of the group report.
 - [ ] Review the report against the marking rubric.
 - [ ] Proofread the final report.
@@ -452,8 +446,7 @@ To be completed at the end of Week 4.
 
 #### Thushamini Chathusika Hewa Pathegamage
 
-- [ ] Complete the facilitator meeting minutes.
-- [ ] Upload the facilitator meeting minutes to GitHub.
+- [ ] Complete the facilitator meeting minutes, Upload the facilitator meeting minutes to GitHub.
 - [ ] Complete the assigned section of the group report.
 - [ ] Review the report against the marking rubric.
 - [ ] Proofread the final report.
