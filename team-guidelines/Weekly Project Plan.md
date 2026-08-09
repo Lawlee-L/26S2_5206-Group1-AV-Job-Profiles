@@ -48,6 +48,9 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 - [ ] Prepare the team to evaluate feasible data collection methods and define the proposed MVP.
 
 ### 3. Internal Task Allocation
+- [x] Weekly Group Meeting
+  **Date:** 08/08/2026
+  **Attend:** 3/6
 
 - [x] Assign the initial team roles.  
   **Owner:** Team  
