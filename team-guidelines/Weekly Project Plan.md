@@ -95,7 +95,7 @@ It will be reviewed and updated during regular team meetings. Team members shoul
 
 #### Thushamini Chathusika Hewa Pathegamage
 
-- [ ] Prepare the group meeting minutes and upload them to GitHub.
+- [x] Prepare the group meeting minutes and upload them to GitHub.
 - [x] Complete the investigation of the assigned careers websites.
 - [x] Record the website findings in the relevant GitHub Issues.
 - [x] Complete the assigned section of the Week 3 work summary.
