@@ -29,6 +29,7 @@ The Team Lead is responsible for:
 - Coordinating team activities and meetings.
 - Monitoring project progress and deadlines.
 - Supporting task allocation and follow-up.
+- Maintaining task allocation records and the meeting minutes rotation schedule.
 - Encouraging all team members to participate actively.
 - Identifying project blockers and escalating them when necessary.
 - Ensuring that important plans, decisions, and changes are documented.
@@ -92,6 +93,7 @@ These roles do not restrict any member to a single area of work. All members are
 - Regular team meetings will be held every Saturday from 12:00 PM to 1:00 PM.
 - Meeting agendas should be prepared before scheduled meetings where possible.
 - Every team member will take turns preparing meeting minutes during the project. Completed minutes will be stored in GitHub.
+- The minute-taking schedule can be found in the **CITS5206 Meeting Minutes Rotation** document in the **Meeting Minutes** folder.
 - Attendance and absences should be recorded in the meeting minutes.
 - If a team member is unable to attend a meeting, they should notify the team in advance.
 - Members who miss a meeting should watch the meeting recording or review the meeting minutes and follow up on relevant decisions and assigned action items.
