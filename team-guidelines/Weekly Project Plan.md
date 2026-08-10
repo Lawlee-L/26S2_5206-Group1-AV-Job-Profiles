@@ -22,23 +22,21 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 
 ### 1. School Deliverables and Meetings
 
-- [x] First facilitator meeting with Dr Sumayyah.  
+- First facilitator meeting with Dr Sumayyah.  
   **Date:** 3 August 2026  
+  - [x] Complete and send the facilitator meeting minutes.  
+        **Owner:** Seonjeong and Li Luo
+  - [x] Prepare and send the facilitator meeting agenda before the meeting.  
+        **Owner:** Li Luo  
+        **Due:** Before the next bfacilitator meeting  
 
-- [x] Complete and send the facilitator meeting minutes.  
-  **Owner:** Seonjeong and Li Luo
-
-- [x] Prepare and send the facilitator meeting agenda before the meeting.  
-  **Owner:** Li Luo  
-  **Due:** Before the next bfacilitator meeting  
-
-- [x] Complete the Week 3 work summary.  
-  **Owner:** All team members  
-  **Location:** Microsoft Teams — Team Shared
-
-- [x] Upload the completed Week 3 work summary to the **CITS5206 Channel**.  
-  **Owner:** Li Luo  
-  **Due:** 7:00 PM, Sunday, 9 August 2026
+- Week 3 work summary.
+  - [x] Complete the Week 3 work summary.
+        **Owner:** All team members  
+        **Location:** Microsoft Teams — Team Shared
+  - [x] Upload the completed Week 3 work summary to the **CITS5206 Channel**.  
+        **Owner:** Li Luo  
+        **Due:** 7:00 PM, Sunday, 9 August 2026
 
 ### 2. Weekly Project Goals
 
@@ -51,6 +49,8 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 - [x] Weekly Group Meeting
   **Date:** 08/08/2026
   **Attend:** 3/6
+  - [x] Complete the group meeting minutes and upload them to GitHub.
+        **Owner:** Thushamini
 
 - [x] Assign the initial team roles.  
   **Owner:** Team  
@@ -61,55 +61,75 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 - [x] Create and update the Group Operating Guidelines.  
   **Owner:** Li Luo  
 
-- [ ] Investigate the assigned careers websites and record the findings in GitHub Issues.  
+- [ ] Investigate the assigned careers websites and record the findings in GitHub Issues.
+  Completed: 3/6 - 12pm 09/08/2026  
   **Owner:** All team members  
   **Due:** 12:00 PM, Sunday, 9 August 2026  
 
 ### 4. Quick Check
 #### Li Luo
 Attend to meeting : 2/2
-- [x] Coordinate communication with the facilitator and organise the meeting invitation.
-- [x] Set up and organise the team GitHub repository.
-- [x] Prepare the team roles and leadership rotation record.
-- [x] Create the Meeting Minutes Rotation.
-- [x] Create and update the Group Operating Guidelines.
-- [x] Create the Weekly Project Plan.
-- [x] Complete the investigation of the assigned careers websites.
-- [x] Record the website findings in the relevant GitHub Issues.
-- [x] Upload the completed Week 3 work summary to the CITS5206 Channel.
+- Routine Weekly Responsibilities
+    - [x] Complete the assigned section of the Week 3 work summary.
+- Project-Related Tasks
+    - [x] Complete the investigation of the assigned careers websites.
+    - [x] Record the website findings in the relevant GitHub Issues.
+- Role-Specific Responsibilities: Facilitator Liaison
+    - [x] Coordinate communication with the facilitator and organise the meeting invitation.
+- Role-Specific Responsibilities: Team Lead
+    - [x] Set up and organise the team GitHub repository.
+    - [x] Prepare the team roles and leadership rotation record.
+    - [x] Create the Meeting Minutes Rotation.
+    - [x] Create and update the Group Operating Guidelines.
+    - [x] Create the Weekly Project Plan.
+    - [x] Upload the completed Week 3 work summary to the CITS5206 Channel.
+ - Role-Specific Responsibilities: Minutes Taker
+    - [x] Complete the client meeting minutes and upload them to GitHub.
 
 #### Nyx Chen
 Attend to meeting : 1/2
-- [ ] Complete the investigation of the assigned careers websites.
-- [ ] Record the website findings in the relevant GitHub Issues.
-- [x] Complete the assigned section of the Week 3 work summary.
+- Routine Weekly Responsibilities
+    - [x] Complete the assigned section of the Week 3 work summary.
+- Project-Related Tasks
+    - [ ] Complete the investigation of the assigned careers websites.
+    - [ ] Record the website findings in the relevant GitHub Issues.
 
 #### Seonjeong Jeong
 Attend to meeting : 2/2
-- [x] Prepare the facilitator meeting minutes and upload them to GitHub.
-- [x] Complete the investigation of the assigned careers websites.
-- [x] Record the website findings in the relevant GitHub Issues.
-- [x] Complete the assigned section of the Week 3 work summary.
+- Routine Weekly Responsibilities
+    - [x] Complete the assigned section of the Week 3 work summary.
+- Project-Related Tasks
+    - [x] Complete the investigation of the assigned careers websites.
+    - [x] Record the website findings in the relevant GitHub Issues.
+- Role-Specific Responsibilities: Minutes Taker
+    - [x] Complete the facilitator meeting minutes and upload them to GitHub.
 
 #### Sunjol Singh Paul
 Attend to meeting : 1/2
-- [x] Take on the role of primary Client Liaison.
-- [x] Complete the investigation of the assigned careers websites.
-- [x] Record the website findings in the relevant GitHub Issues.
-- [x] Complete the assigned section of the Week 3 work summary.
+- Routine Weekly Responsibilities
+    - [x] Complete the assigned section of the Week 3 work summary.
+- Project-Related Tasks
+    - [x] Complete the investigation of the assigned careers websites.
+    - [x] Record the website findings in the relevant GitHub Issues.
 
 #### Thushamini Chathusika Hewa Pathegamage
 Attend to meeting : 2/2
-- [x] Prepare the group meeting minutes and upload them to GitHub.
-- [x] Complete the investigation of the assigned careers websites.
-- [x] Record the website findings in the relevant GitHub Issues.
-- [x] Complete the assigned section of the Week 3 work summary.
+- Routine Weekly Responsibilities
+    - [x] Complete the assigned section of the Week 3 work summary.
+- Project-Related Tasks
+    - [x] Complete the investigation of the assigned careers websites.
+    - [x] Record the website findings in the relevant GitHub Issues.
+- Role-Specific Responsibilities: Minutes Taker
+    - [x] Complete the group meeting minutes and upload them to GitHub.
 
 #### Leon Nel Nel
 Attend to meeting : 1/2
-- [ ] Complete the investigation of the assigned careers websites.
-- [ ] Record the website findings in the relevant GitHub Issues.
-- [x] Complete the assigned section of the Week 3 work summary.
+- Routine Weekly Responsibilities
+    - [x] Complete the assigned section of the Week 3 work summary.
+- Project-Related Tasks
+    - [ ] Complete the investigation of the assigned careers websites.
+    - [ ] Record the website findings in the relevant GitHub Issues.
+  
 ### 5. Expected Weekly Outcomes
 
 - Team roles and leadership rotation are documented.
@@ -137,53 +157,61 @@ Most team members are also still becoming familiar with using GitHub to document
 
 ### 1. School Deliverables and Meetings
 
-- [x] Prepare and send the facilitator meeting agenda.  
-  **Owner:** Li Luo  
-  **Due:** Before the facilitator meeting
+- Facilitator Meeting
+   **Date:** 10 August 2026
+    - [x] Prepare and send the facilitator meeting agenda.  
+          **Owner:** Li Luo  
+          **Due:** Before the facilitator meeting
+    - [ ] Complete the facilitator meeting minutes and upload them to GitHub.  
+          **Owner:** Leon Nel Nel
+          **Due:** After the facilitator meeting
+    - [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
+          **Owner:** Li Luo  
+          **Due:** After the minutes are completed
+    - [ ] Review the Group Operating Guidelines and suggest any changes.  
+          **Owner:** All team members  
+          **Due:** Facilitator meeting on 10 August 2026
+    - [ ] Review and discuss the website investigation results.  
+          **Owner:** All team members  
+          **Due:** Facilitator meeting on 10 August 2026
+    - [ ] Define the proposed MVP scope, core features, and exclusions.  
+          **Owner:** Team  
+          **Due:** During the facilitator meeting
+              
+- Client Meeting
+  **Date:** 
+    - [ ] Prepare the proposed MVP for the client meeting.  
+          **Owner:** Team  
+          **Due:** Before the client meeting
+    - [ ] Prepare the questions and confirmation points for the client meeting.  
+          **Owner:** Team  
+          **Due:** Before the client meeting
+    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.  
+          **Owner:** Team
+    - [ ] Schedule the client meeting to discuss and confirm the proposed MVP.  
+          **Owner:** Sunjol Singh Paul  
+          **Date:** To be confirmed
+    - [ ] Complete the client meeting minutes and upload them to GitHub.  
+          **Owner:** Nyx Chen  
+          **Due:** After the client meeting
+    - [ ] Send the client meeting minutes to the client and obtain written confirmation of the agreed MVP.  
+          **Owner:** Sunjol Singh Paul  
+          **Due:** After the client meeting minutes are completed
 
-- [ ] Attend the facilitator meeting with Dr Sumayyah.  
-  **Owner:** All team members  
-  **Date:** 10 August 2026
-
-- [ ] Complete the facilitator meeting minutes and upload them to GitHub.  
-  **Owner:** Leon Nel  
-  **Due:** After the facilitator meeting
-
-- [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
-  **Owner:** Li Luo  
-  **Due:** After the minutes are completed
-
-- [ ] Schedule the client meeting to discuss and confirm the proposed MVP.  
-  **Owner:** Sunjol Singh Paul  
-  **Date:** To be confirmed
-
-- [ ] Attend the client meeting and confirm the final MVP scope.  
-  **Owner:** All team members  
-  **Date:** To be confirmed
-
-- [ ] Complete the client meeting minutes and upload them to GitHub.  
-  **Owner:** Nyx Chen  
-  **Due:** After the client meeting
-
-- [ ] Send the client meeting minutes to the client and obtain written confirmation of the agreed MVP.  
-  **Owner:** Sunjol Singh Paul  
-  **Due:** After the client meeting minutes are completed
-
-- [ ] Attend the weekly group meeting.  
-  **Owner:** All team members  
+- Group Meeting
+  **Attend:**
   **Date:** 15 August 2026
+    - [ ] Complete the group meeting minutes and upload them to GitHub.  
+          **Owner:** Sunjol Singh Paul  
+          **Due:** After the group meeting
 
-- [ ] Complete the group meeting minutes and upload them to GitHub.  
-  **Owner:** Sunjol Singh Paul  
-  **Due:** After the group meeting
-
-- [ ] Complete the Week 4 work summary.  
-  **Owner:** All team members  
-  **Location:** Microsoft Teams — Team Shared
-
-- [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.  
-  **Owner:** Li Luo  
-  **Due:** 7:00 PM, Sunday, 16 August 2026
+- Week 3 work summary.          
+    - [ ] Complete the Week 4 work summary.  
+          **Owner:** All team members  
+          **Location:** Microsoft Teams — Team Shared
+    - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.  
+          **Owner:** Li Luo  
+          **Due:** 7:00 PM, Sunday, 16 August 2026
 
 ### 2. Weekly Project Goals
 
@@ -196,99 +224,134 @@ Most team members are also still becoming familiar with using GitHub to document
 - [ ] Begin drafting the four sections of the group deliverable.
 
 ### 3. Internal Task Allocation
-
-- [ ] Review the Group Operating Guidelines and suggest any changes.  
-  **Owner:** All team members  
-  **Due:** Facilitator meeting on 10 August 2026
-
-- [ ] Review and discuss the website investigation results.  
-  **Owner:** All team members  
-  **Due:** Facilitator meeting on 10 August 2026
-
 - [ ] Evaluate the available APIs, ATS platforms, structured data, and alternative collection methods.  
   **Owner:** Team
 
-- [ ] Define the proposed MVP scope, core features, and exclusions.  
-  **Owner:** Team  
-  **Due:** During the facilitator meeting
-
-- [ ] Prepare the proposed MVP for the client meeting.  
-  **Owner:** Team  
-  **Due:** Before the client meeting
-
-- [ ] Prepare the questions and confirmation points for the client meeting.  
-  **Owner:** Team  
-  **Due:** Before the client meeting
-
-- [ ] Coordinate the client meeting arrangements.  
-  **Owner:** Sunjol Singh Paul
-
-- [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.  
-  **Owner:** Team
-
-- [ ] Allocate the four sections of the group deliverable among team members.  
-  **Owner:** Team  
-  **Due:** During the group meeting on 15 August 2026
-
-- [ ] Draft the Problem Statement section of the group deliverable.  
-  **Owner:** [Add assigned member]
-
-- [ ] Draft the Client Communication and MVP Agreement section.  
-  **Owner:** [Add assigned member]
-
-- [ ] Draft the Project Planning and Management section.  
-  **Owner:** [Add assigned member]
-
-- [ ] Draft the Risk and Technology Assessments section.  
-  **Owner:** [Add assigned member]
+-  Delivarable 1
+    - [ ] Allocate the four sections of the group deliverable among team members.  
+          **Owner:** Team  
+          **Due:** During the group meeting on 15 August 2026
+    - [ ] Draft the Problem Statement section of the group deliverable.  
+          **Owner:** [Add assigned member]
+    - [ ] Draft the Client Communication and MVP Agreement section.  
+          **Owner:** [Add assigned member]
+    - [ ] Draft the Project Planning and Management section.  
+          **Owner:** [Add assigned member]
+    - [ ] Draft the Risk and Technology Assessments section.  
+          **Owner:** [Add assigned member]
 
 ### 4. Quick Check
 
 #### Li Luo
-
-- [x] Prepare and send the facilitator meeting agenda.
-- [ ] Lead the team discussion about the MVP scope.
-- [ ] Record the internally agreed MVP scope.
-- [ ] Send the facilitator meeting minutes to Dr Sumayyah.
-- [ ] Coordinate the allocation of the group deliverable sections.
-- [ ] Draft the assigned section of the group deliverable.
-- [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
+Attend to meeting : 
+- Routine Weekly Responsibilities
+    - [ ] Complete the assigned section of the Week 4 work summary.
+- Project-Related Tasks
+  - Facilitator Meeting
+    - [ ] Review the Group Operating Guidelines and suggest any changes.
+    - [ ] Review and discuss the website investigation results. 
+    - [ ] Define the proposed MVP scope, core features, and exclusions.
+  - Client Meeting
+    - [ ] Prepare the proposed MVP for the client meeting.
+    - [ ] Prepare the questions and confirmation points for the client meeting. 
+    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+  - Deliverable 1
+    - [ ] Allocate the four sections of the group deliverable among team members.  
+    - [ ] Draft the assigned section of the group deliverable.
+- Role-Specific Responsibilities: Facilitator Liaison
+    - [x] Coordinate communication with the facilitator and organise the meeting invitation.
+    - [x] Prepare and send the facilitator meeting agenda
+    - [ ] Send the facilitator meeting minutes to Dr Sumayyah.
+- Role-Specific Responsibilities: Team Lead
+    - [ ] Lead the team discussion about the MVP scope.
+    - [ ] Record the internally agreed MVP scope.
+    - [ ] Coordinate the allocation of the group deliverable sections.
+    - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
 
 #### Nyx Chen
-
-- [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Complete the client meeting minutes, Upload the client meeting minutes to GitHub.
-- [ ] Draft the assigned section of the group deliverable.
-- [ ] Complete the assigned section of the Week 4 work summary.
+Attend to meeting : 
+- Routine Weekly Responsibilities
+    - [ ] Complete the assigned section of the Week 4 work summary.
+- Project-Related Tasks
+  - Facilitator Meeting
+    - [ ] Review the Group Operating Guidelines and suggest any changes.
+    - [ ] Review and discuss the website investigation results. 
+    - [ ] Define the proposed MVP scope, core features, and exclusions.
+  - Client Meeting
+    - [ ] Prepare the proposed MVP for the client meeting.
+    - [ ] Prepare the questions and confirmation points for the client meeting. 
+    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+  - Deliverable 1
+    - [ ] Allocate the four sections of the group deliverable among team members.  
+    - [ ] Draft the assigned section of the group deliverable.
+- Role-Specific Responsibilities: Minutes Taker
+    - [ ] Complete the Client meeting minutes, Upload the Client meeting minutes to GitHub.
 
 #### Seonjeong Jeong
-
-- [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Draft the assigned section of the group deliverable.
-- [ ] Complete the assigned section of the Week 4 work summary.
+Attend to meeting : 
+- Routine Weekly Responsibilities
+    - [ ] Complete the assigned section of the Week 4 work summary.
+- Project-Related Tasks
+  - Facilitator Meeting
+    - [ ] Review the Group Operating Guidelines and suggest any changes.
+    - [ ] Review and discuss the website investigation results. 
+    - [ ] Define the proposed MVP scope, core features, and exclusions.
+  - Client Meeting
+    - [ ] Prepare the proposed MVP for the client meeting.
+    - [ ] Prepare the questions and confirmation points for the client meeting. 
+    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+  - Deliverable 1
+    - [ ] Allocate the four sections of the group deliverable among team members.  
+    - [ ] Draft the assigned section of the group deliverable.
 
 #### Sunjol Singh Paul
-
-- [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Draft the assigned section of the group deliverable.
-- [ ] Complete the assigned section of the Week 4 work summary.
-- [ ] Contact the client and schedule the MVP confirmation meeting.
-- [ ] Send the completed client meeting minutes to the client.
-- [ ] Obtain the client's written confirmation of the agreed MVP, Store the written confirmation as project evidence.
-- [ ] Complete the group meeting minutes and upload them to GitHub.
+Attend to meeting : 
+- Routine Weekly Responsibilities
+    - [ ] Complete the assigned section of the Week 4 work summary.
+- Project-Related Tasks
+    - [ ] Draft the assigned section of the group deliverable.
+- Role-Specific Responsibilities: Minutes Taker
+    - [ ] Complete the Group meeting minutes, Upload the Group meeting minutes to GitHub.
+- Role-Specific Responsibilities: Client Liaison
+    - [ ] Schedule the client meeting to discuss and confirm the proposed MVP. 
+    - [ ] Send the completed client meeting minutes to the client.
+    - [ ] Obtain the client's written confirmation of the agreed MVP, Store the written confirmation as project evidence.
 
 #### Thushamini Chathusika Hewa Pathegamage
-
-- [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Draft the assigned section of the group deliverable.
-- [ ] Complete the assigned section of the Week 4 work summary.
+Attend to meeting : 
+- Routine Weekly Responsibilities
+    - [ ] Complete the assigned section of the Week 4 work summary.
+- Project-Related Tasks
+  - Facilitator Meeting
+    - [ ] Review the Group Operating Guidelines and suggest any changes.
+    - [ ] Review and discuss the website investigation results. 
+    - [ ] Define the proposed MVP scope, core features, and exclusions.
+  - Client Meeting
+    - [ ] Prepare the proposed MVP for the client meeting.
+    - [ ] Prepare the questions and confirmation points for the client meeting. 
+    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+  - Deliverable 1
+    - [ ] Allocate the four sections of the group deliverable among team members.  
+    - [ ] Draft the assigned section of the group deliverable.
 
 #### Leon Nel Nel
-
-- [ ] Contribute to the MVP discussion and scope decision.
-- [ ] Complete the facilitator meeting minutes, Upload the facilitator meeting minutes to GitHub.
-- [ ] Draft the assigned section of the group deliverable.
-- [ ] Complete the assigned section of the Week 4 work summary.
+Attend to meeting : 
+- Routine Weekly Responsibilities
+    - [ ] Complete the assigned section of the Week 4 work summary.
+- Project-Related Tasks
+  - Facilitator Meeting
+    - [ ] Review the Group Operating Guidelines and suggest any changes.
+    - [ ] Review and discuss the website investigation results. 
+    - [ ] Define the proposed MVP scope, core features, and exclusions.
+  - Client Meeting
+    - [ ] Prepare the proposed MVP for the client meeting.
+    - [ ] Prepare the questions and confirmation points for the client meeting. 
+    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+  - Deliverable 1
+    - [ ] Allocate the four sections of the group deliverable among team members.  
+    - [ ] Draft the assigned section of the group deliverable.
+- Role-Specific Responsibilities: Minutes Taker
+    - [ ] Complete the facilitator meeting minutes, Upload the facilitator meeting minutes to GitHub.
 
 ### 5. Expected Weekly Outcomes
 
