@@ -170,10 +170,10 @@ Most team members are also still becoming familiar with using GitHub to document
           **Due:** After the minutes are completed
     - [ ] Review the Group Operating Guidelines and suggest any changes.  
           **Owner:** All team members  
-          **Due:** Facilitator meeting on 10 August 2026
     - [ ] Review and discuss the website investigation results.  
           **Owner:** All team members  
-          **Due:** Facilitator meeting on 10 August 2026
+    - [ ] Evaluate the available APIs, ATS platforms, structured data, and alternative collection methods.  
+          **Owner:** All team members
     - [ ] Define the proposed MVP scope, core features, and exclusions.  
           **Owner:** Team  
           **Due:** During the facilitator meeting
