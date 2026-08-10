@@ -162,7 +162,7 @@ Most team members are also still becoming familiar with using GitHub to document
     - [x] Prepare and send the facilitator meeting agenda.  
           **Owner:** Li Luo  
           **Due:** Before the facilitator meeting
-    - [ ] Complete the facilitator meeting minutes and upload them to GitHub.  
+    - [x] Complete the facilitator meeting minutes and upload them to GitHub.  
           **Owner:** Nyx Chen
           **Due:** After the facilitator meeting
     - [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
