@@ -224,9 +224,6 @@ Most team members are also still becoming familiar with using GitHub to document
 - [ ] Begin drafting the four sections of the group deliverable.
 
 ### 3. Internal Task Allocation
-- [ ] Evaluate the available APIs, ATS platforms, structured data, and alternative collection methods.  
-  **Owner:** Team
-
 -  Delivarable 1
     - [ ] Allocate the four sections of the group deliverable among team members.  
           **Owner:** Team  
