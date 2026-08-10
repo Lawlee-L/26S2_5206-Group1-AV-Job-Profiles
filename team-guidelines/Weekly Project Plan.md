@@ -165,7 +165,7 @@ Most team members are also still becoming familiar with using GitHub to document
     - [x] Complete the facilitator meeting minutes and upload them to GitHub.  
           **Owner:** Nyx Chen
           **Due:** After the facilitator meeting
-    - [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
+    - [x] Send the completed facilitator meeting minutes to Dr Sumayyah.  
           **Owner:** Li Luo  
           **Due:** After the minutes are completed
     - [x] Review the Group Operating Guidelines and suggest any changes.  
@@ -215,9 +215,9 @@ Most team members are also still becoming familiar with using GitHub to document
 
 ### 2. Weekly Project Goals
 
-- [ ] Review and compare the website investigation results.
-- [ ] Evaluate the feasible job-data collection methods.
-- [ ] Agree on the proposed MVP scope during the facilitator meeting.
+- [x] Review and compare the website investigation results.
+- [x] Evaluate the feasible job-data collection methods.
+- [x] Agree on the proposed MVP scope during the facilitator meeting.
 - [ ] Present the proposed MVP to the client.
 - [ ] Confirm the final MVP scope with the client.
 - [ ] Obtain written evidence of the client's MVP approval.
@@ -258,9 +258,9 @@ Attend to meeting :
 - Role-Specific Responsibilities: Facilitator Liaison
     - [x] Coordinate communication with the facilitator and organise the meeting invitation.
     - [x] Prepare and send the facilitator meeting agenda
-    - [ ] Send the facilitator meeting minutes to Dr Sumayyah.
+    - [x] Send the facilitator meeting minutes to Dr Sumayyah.
 - Role-Specific Responsibilities: Team Lead
-    - [ ] Lead the team discussion about the MVP scope.
+    - [x] Lead the team discussion about the MVP scope.
     - [ ] Record the internally agreed MVP scope.
     - [ ] Coordinate the allocation of the group deliverable sections.
     - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
