@@ -168,13 +168,13 @@ Most team members are also still becoming familiar with using GitHub to document
     - [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
           **Owner:** Li Luo  
           **Due:** After the minutes are completed
-    - [ ] Review the Group Operating Guidelines and suggest any changes.  
+    - [x] Review the Group Operating Guidelines and suggest any changes.  
           **Owner:** All team members  
-    - [ ] Review and discuss the website investigation results.  
+    - [x] Review and discuss the website investigation results.  
           **Owner:** All team members  
-    - [ ] Evaluate the available APIs, ATS platforms, structured data, and alternative collection methods.  
+    - [x] Evaluate the available APIs, ATS platforms, structured data, and alternative collection methods.  
           **Owner:** All team members
-    - [ ] Define the proposed MVP scope, core features, and exclusions.  
+    - [x] Define the proposed MVP scope, core features, and exclusions.  
           **Owner:** Team  
           **Due:** During the facilitator meeting
               
@@ -245,9 +245,9 @@ Attend to meeting :
     - [ ] Complete the assigned section of the Week 4 work summary.
 - Project-Related Tasks
   - Facilitator Meeting
-    - [ ] Review the Group Operating Guidelines and suggest any changes.
-    - [ ] Review and discuss the website investigation results. 
-    - [ ] Define the proposed MVP scope, core features, and exclusions.
+    - [x] Review the Group Operating Guidelines and suggest any changes.
+    - [x] Review and discuss the website investigation results. 
+    - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
     - [ ] Prepare the proposed MVP for the client meeting.
     - [ ] Prepare the questions and confirmation points for the client meeting. 
@@ -271,9 +271,9 @@ Attend to meeting :
     - [ ] Complete the assigned section of the Week 4 work summary.
 - Project-Related Tasks
   - Facilitator Meeting
-    - [ ] Review the Group Operating Guidelines and suggest any changes.
-    - [ ] Review and discuss the website investigation results. 
-    - [ ] Define the proposed MVP scope, core features, and exclusions.
+    - [x] Review the Group Operating Guidelines and suggest any changes.
+    - [x] Review and discuss the website investigation results. 
+    - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
     - [ ] Prepare the proposed MVP for the client meeting.
     - [ ] Prepare the questions and confirmation points for the client meeting. 
@@ -290,9 +290,9 @@ Attend to meeting :
     - [ ] Complete the assigned section of the Week 4 work summary.
 - Project-Related Tasks
   - Facilitator Meeting
-    - [ ] Review the Group Operating Guidelines and suggest any changes.
-    - [ ] Review and discuss the website investigation results. 
-    - [ ] Define the proposed MVP scope, core features, and exclusions.
+    - [x] Review the Group Operating Guidelines and suggest any changes.
+    - [x] Review and discuss the website investigation results. 
+    - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
     - [ ] Prepare the proposed MVP for the client meeting.
     - [ ] Prepare the questions and confirmation points for the client meeting. 
@@ -307,9 +307,9 @@ Attend to meeting :
     - [ ] Complete the assigned section of the Week 4 work summary.
 - Project-Related Tasks
   - Facilitator Meeting
-    - [ ] Review the Group Operating Guidelines and suggest any changes.
-    - [ ] Review and discuss the website investigation results. 
-    - [ ] Define the proposed MVP scope, core features, and exclusions.
+    - [x] Review the Group Operating Guidelines and suggest any changes.
+    - [x] Review and discuss the website investigation results. 
+    - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
     - [ ] Prepare the proposed MVP for the client meeting.
     - [ ] Prepare the questions and confirmation points for the client meeting. 
@@ -330,9 +330,9 @@ Attend to meeting :
     - [ ] Complete the assigned section of the Week 4 work summary.
 - Project-Related Tasks
   - Facilitator Meeting
-    - [ ] Review the Group Operating Guidelines and suggest any changes.
-    - [ ] Review and discuss the website investigation results. 
-    - [ ] Define the proposed MVP scope, core features, and exclusions.
+    - [x] Review the Group Operating Guidelines and suggest any changes.
+    - [x] Review and discuss the website investigation results. 
+    - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
     - [ ] Prepare the proposed MVP for the client meeting.
     - [ ] Prepare the questions and confirmation points for the client meeting. 
