@@ -396,7 +396,7 @@ To be completed at the end of Week 4.
 
 - Facilitator Meeting
    **Date:** 10 August 2026
-    - [x] Prepare and send the facilitator meeting agenda.  
+    - [ ] Prepare and send the facilitator meeting agenda.  
           **Owner:** Li Luo  
           **Due:** Before the facilitator meeting
     - [ ] Complete the facilitator meeting minutes and upload them to GitHub.  
