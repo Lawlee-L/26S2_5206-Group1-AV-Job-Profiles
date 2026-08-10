@@ -205,7 +205,7 @@ Most team members are also still becoming familiar with using GitHub to document
           **Owner:** Sunjol Singh Paul  
           **Due:** After the group meeting
 
-- Week 3 work summary.          
+- Week 4 work summary.          
     - [ ] Complete the Week 4 work summary.  
           **Owner:** All team members  
           **Location:** Microsoft Teams — Team Shared
@@ -306,6 +306,16 @@ Attend to meeting :
 - Routine Weekly Responsibilities
     - [ ] Complete the assigned section of the Week 4 work summary.
 - Project-Related Tasks
+  - Facilitator Meeting
+    - [ ] Review the Group Operating Guidelines and suggest any changes.
+    - [ ] Review and discuss the website investigation results. 
+    - [ ] Define the proposed MVP scope, core features, and exclusions.
+  - Client Meeting
+    - [ ] Prepare the proposed MVP for the client meeting.
+    - [ ] Prepare the questions and confirmation points for the client meeting. 
+    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+  - Deliverable 1
+    - [ ] Allocate the four sections of the group deliverable among team members.  
     - [ ] Draft the assigned section of the group deliverable.
 - Role-Specific Responsibilities: Minutes Taker
     - [ ] Complete the Group meeting minutes, Upload the Group meeting minutes to GitHub.
@@ -384,37 +394,31 @@ To be completed at the end of Week 4.
   **Format:** One PDF file  
   **Submitted By:** [Add nominated group member]
 
-- [ ] Prepare and send the facilitator meeting agenda.  
-  **Owner:** Li Luo  
-  **Due:** Before the facilitator meeting
+- Facilitator Meeting
+   **Date:** 10 August 2026
+    - [x] Prepare and send the facilitator meeting agenda.  
+          **Owner:** Li Luo  
+          **Due:** Before the facilitator meeting
+    - [ ] Complete the facilitator meeting minutes and upload them to GitHub.  
+          **Owner:** 
+          **Due:** After the facilitator meeting
+    - [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
+          **Owner:** Li Luo  
+          **Due:** After the minutes are completed
+- Group Meeting
+  **Attend:**
+  **Date:** 15 August 2026
+    - [ ] Complete the group meeting minutes and upload them to GitHub.  
+          **Owner:** Li Luo 
+          **Due:** After the group meeting
 
-- [ ] Attend the facilitator meeting with Dr Sumayyah.  
-  **Owner:** All team members  
-  **Date:** TBC
-
-- [ ] Complete the facilitator meeting minutes and upload them to GitHub.  
-  **Owner:** Thushamini Chathusika Hewa Pathegamage  
-  **Due:** After the facilitator meeting
-
-- [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
-  **Owner:** Li Luo  
-  **Due:** After the meeting minutes are completed
-
-- [ ] Attend the weekly group meeting.  
-  **Owner:** All team members  
-  **Date:** TBC
-
-- [ ] Complete the group meeting minutes and upload them to GitHub.  
-  **Owner:** Li Luo  
-  **Due:** After the group meeting
-
-- [ ] Complete the Week 5 work summary.  
-  **Owner:** All team members  
-  **Location:** Microsoft Teams — Team Shared
-
-- [ ] Upload the completed Week 5 work summary to the CITS5206 Channel.  
-  **Owner:** Li Luo  
-  **Due:** 7:00 PM, Sunday, 23 August 2026
+- Week 5 work summary.          
+    - [ ] Complete the Week 5 work summary.  
+          **Owner:** All team members  
+          **Location:** Microsoft Teams — Team Shared
+    - [ ] Upload the completed Week 5 work summary to the CITS5206 Channel.  
+          **Owner:** Li Luo  
+          **Due:** 7:00 PM, Sunday, 23 August 2026
 
 ### 2. Weekly Project Goals
 
@@ -427,54 +431,44 @@ To be completed at the end of Week 4.
 - [ ] Begin planning the MVP implementation tasks after submission.
 
 ### 3. Internal Task Allocation
-
-- [ ] Complete the Problem Statement section.  
-  **Owner:** [Add assigned member]  
-  **Due:** Before the final report review
-
-- [ ] Complete the Client Communication and MVP Agreement section.  
-  **Owner:** [Add assigned member]  
-  **Due:** Before the final report review
-
-- [ ] Complete the Project Planning and Management section.  
-  **Owner:** [Add assigned member]  
-  **Due:** Before the final report review
-
-- [ ] Complete the Risk and Technology Assessments section.  
-  **Owner:** [Add assigned member]  
-  **Due:** Before the final report review
-
-- [ ] Add the client's written confirmation of the agreed MVP to the report.  
-  **Owner:** Sunjol Singh Paul  
-  **Due:** Before the final report review
-
-- [ ] Prepare the AI-use acknowledgement.  
-  **Owner:** [Add assigned member]  
-  **Due:** Before the final report review
-
-- [ ] Combine and edit all report sections into one consistent document.  
-  **Owner:** [Add assigned member]  
-  **Due:** Before submission
-
-- [ ] Review the report against the marking rubric.  
-  **Owner:** All team members  
-  **Due:** Before submission
-
-- [ ] Proofread the final report and check its formatting.  
-  **Owner:** All team members  
-  **Due:** Before submission
-
-- [ ] Convert the final report into one PDF file.  
-  **Owner:** [Add assigned member]  
-  **Due:** Before submission
-
-- [ ] Submit the final PDF through the assignment submission link.  
-  **Owner:** [Add nominated group member]  
-  **Due:** 11:59 PM, Tuesday, 18 August 2026
-
-- [ ] Identify the next implementation tasks based on the approved MVP.  
-  **Owner:** Team  
-  **Due:** During the group meeting
+- Deliverable 1
+    - [ ] Complete the Problem Statement section.  
+          **Owner:** [Add assigned member]  
+          **Due:** Before the final report review
+    - [ ] Complete the Client Communication and MVP Agreement section.  
+          **Owner:** [Add assigned member]  
+          **Due:** Before the final report review
+    - [ ] Complete the Project Planning and Management section.  
+          **Owner:** [Add assigned member]  
+          **Due:** Before the final report review
+    - [ ] Complete the Risk and Technology Assessments section.  
+          **Owner:** [Add assigned member]  
+          **Due:** Before the final report review
+    - [ ] Add the client's written confirmation of the agreed MVP to the report.  
+          **Owner:** Sunjol Singh Paul  
+          **Due:** Before the final report review
+    - [ ] Prepare the AI-use acknowledgement.  
+          **Owner:** [Add assigned member]  
+          **Due:** Before the final report review
+    - [ ] Combine and edit all report sections into one consistent document.  
+          **Owner:** [Add assigned member]  
+          **Due:** Before submission
+    - [ ] Review the report against the marking rubric.  
+          **Owner:** All team members  
+          **Due:** Before submission
+    - [ ] Proofread the final report and check its formatting.  
+          **Owner:** All team members  
+          **Due:** Before submission
+    - [ ] Convert the final report into one PDF file.  
+          **Owner:** [Add assigned member]  
+          **Due:** Before submission
+    - [ ] Submit the final PDF through the assignment submission link.  
+          **Owner:** [Add nominated group member]  
+          **Due:** 11:59 PM, Tuesday, 18 August 2026
+-  Project
+    - [ ] Identify the next implementation tasks based on the approved MVP.  
+          **Owner:** Team  
+          **Due:** During the group meeting
 
 ### 4. Quick Check
 
