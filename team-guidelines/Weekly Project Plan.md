@@ -163,7 +163,7 @@ Most team members are also still becoming familiar with using GitHub to document
           **Owner:** Li Luo  
           **Due:** Before the facilitator meeting
     - [ ] Complete the facilitator meeting minutes and upload them to GitHub.  
-          **Owner:** Leon Nel Nel
+          **Owner:** Nyx Chen
           **Due:** After the facilitator meeting
     - [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
           **Owner:** Li Luo  
@@ -192,7 +192,7 @@ Most team members are also still becoming familiar with using GitHub to document
           **Owner:** Sunjol Singh Paul  
           **Date:** To be confirmed
     - [ ] Complete the client meeting minutes and upload them to GitHub.  
-          **Owner:** Nyx Chen  
+          **Owner:** Leon Nel Nel  
           **Due:** After the client meeting
     - [ ] Send the client meeting minutes to the client and obtain written confirmation of the agreed MVP.  
           **Owner:** Sunjol Singh Paul  
@@ -282,7 +282,7 @@ Attend to meeting :
     - [ ] Allocate the four sections of the group deliverable among team members.  
     - [ ] Draft the assigned section of the group deliverable.
 - Role-Specific Responsibilities: Minutes Taker
-    - [ ] Complete the Client meeting minutes, Upload the Client meeting minutes to GitHub.
+    - [ ] Complete the Facilitator meeting minutes, Upload the Facilitator meeting minutes to GitHub.
 
 #### Seonjeong Jeong
 Attend to meeting : 
@@ -358,7 +358,7 @@ Attend to meeting :
     - [ ] Allocate the four sections of the group deliverable among team members.  
     - [ ] Draft the assigned section of the group deliverable.
 - Role-Specific Responsibilities: Minutes Taker
-    - [ ] Complete the facilitator meeting minutes, Upload the facilitator meeting minutes to GitHub.
+    - [ ] Complete the Client meeting minutes, Upload the Client meeting minutes to GitHub.
 
 ### 5. Expected Weekly Outcomes
 
