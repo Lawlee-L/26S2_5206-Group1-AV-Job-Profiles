@@ -79,7 +79,7 @@ Attend to meeting : 2/2
     - [x] Create the Meeting Minutes Rotation.
     - [x] Create and update the Group Operating Guidelines.
     - [x] Create the Weekly Project Plan.
-    - [x] Complete Weekly Plan and Weekly Track.
+    - [x] Complete Weekly Plan and Weekly Task track.
     - [x] Upload the completed Week 3 work summary to the CITS5206 Channel.
  - Role-Specific Responsibilities: Minutes Taker
     - [x] Complete the client meeting minutes and upload them to GitHub.
