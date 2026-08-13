@@ -79,17 +79,17 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
           **Owner:** Li Luo   
           **Due:** 11:59 PM, Tuesday, 18 August 2026
 -  Data Collection Track
-    - [ ] [Complete 5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
+    - [ ] [Complete 5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)     
           **Owner:**  Nyx Chen   
           **Due:** Before the final report review
-    - [ ] [Complete 6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
+    - [ ] [Complete 6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)    
           **Owner:**  Sunjol Singh Paul   
-          **Due:** Before the final report review
-    - [ ] Share findings base on data collection check 
-          **Owner:**  Sunjol Singh Paul &  Nyx Chen  
+          **Due:** Before the final report review 
+    - [ ] Share findings base on data collection check.    
+          **Owner:**  Sunjol Singh Paul &  Nyx Chen    
           **Due:** During the group meeting
-    - [ ] Identify the next implementation tasks based on the approved MVP & Data collection Findings
-          **Owner:** Team  
+    - [ ] Identify the next implementation tasks based on the approved MVP & Data collection Findings.   
+          **Owner:** Team   
           **Due:** During the group meeting
 
 ---
@@ -98,7 +98,7 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 #### Li Luo
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   - Deliverable 1
     - [ ] [1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
@@ -116,7 +116,7 @@ Attend to meeting :
 #### Nyx Chen
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   -  Data Collection Track
     - [ ] [Complete 5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
@@ -130,7 +130,7 @@ Attend to meeting :
 #### Seonjeong Jeong
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   - Deliverable 1
     - [ ] [Complete 2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
@@ -144,7 +144,7 @@ Attend to meeting :
 #### Sunjol Singh Paul
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   -  Data Collection Track
     - [ ] [Complete 6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
@@ -158,7 +158,7 @@ Attend to meeting :
 #### Thushamini Chathusika Hewa Pathegamage
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   - Deliverable 1
     - [ ] [Complete 4. Project Planning, Risk & Evaluation](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
@@ -170,7 +170,7 @@ Attend to meeting :
 #### Leon Nel Nel
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   - Deliverable 1
     - [ ] [Complete 3. Proposed Solution, AI Analysis & Dashboard](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
