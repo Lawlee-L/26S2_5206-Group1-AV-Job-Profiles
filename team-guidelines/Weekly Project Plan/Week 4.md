@@ -66,7 +66,7 @@
 - [x] Present the proposed MVP to the client.
 - [x] Confirm the final MVP scope with the client.
 - [ ] Obtain written evidence of the client's MVP approval.
-- [ ] Begin drafting the four sections of the group deliverable.
+- [x] Begin drafting the four sections of the group deliverable.
 
 ### 3. Internal Task Allocation
 - Delivarable 1
@@ -99,12 +99,11 @@ Attend to meeting :
     - [x] Review and discuss the website investigation results. 
     - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
-    - [ ] Prepare the proposed MVP for the client meeting.
-    - [ ] Prepare the questions and confirmation points for the client meeting. 
-    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+    - [x] Prepare the proposed MVP for the client meeting.
+    - [x] Prepare the questions and confirmation points for the client meeting. 
+    - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] 1. Project Context, Motivation & Objectives — #10
-- Role-Specific Responsibilities: Facilitator Liaison
+    - [ ] [1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)- Role-Specific Responsibilities: Facilitator Liaison
     - [x] Coordinate communication with the facilitator and organise the meeting invitation.
     - [x] Prepare and send the facilitator meeting agenda
     - [x] Send the facilitator meeting minutes to Dr Sumayyah.
@@ -126,9 +125,8 @@ Attend to meeting :
     - [ ] Prepare the proposed MVP for the client meeting.
     - [ ] Prepare the questions and confirmation points for the client meeting. 
     - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
-  - Deliverable 1
-    - [ ] Allocate the four sections of the group deliverable among team members.  
-    - [ ] Draft the assigned section of the group deliverable.
+  - Data Collection Track
+    - [ ][5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
     - [ ] Complete the Facilitator meeting minutes, Upload the Facilitator meeting minutes to GitHub.
 
@@ -148,8 +146,8 @@ Attend to meeting :
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
     - [x] Allocate the four sections of the group deliverable among team members.  
-    - [ ] Draft the assigned section of the group deliverable.
-
+    - [ ][2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+      
 #### Sunjol Singh Paul
 Attend to meeting : 
 - Routine Weekly Responsibilities
@@ -163,12 +161,12 @@ Attend to meeting :
     - [x] Prepare the proposed MVP for the client meeting.
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
-  - Deliverable 1
-    - [ ] Draft the assigned section of the group deliverable.
+  - Data Collection Track
+    - [ ][6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
     - [ ] Complete the Group meeting minutes, Upload the Group meeting minutes to GitHub.
 - Role-Specific Responsibilities: Client Liaison
-    - [ ] Schedule the client meeting to discuss and confirm the proposed MVP. 
+    - [x] Schedule the client meeting to discuss and confirm the proposed MVP. 
     - [ ] Send the completed client meeting minutes to the client.
     - [ ] Obtain the client's written confirmation of the agreed MVP, Store the written confirmation as project evidence.
 
@@ -186,14 +184,15 @@ Attend to meeting :
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] Draft the assigned section of the group deliverable.
+    - [ ][4. Project Planning, Risk & Evaluation](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+
 
 #### Leon Nel Nel
 Attend to meeting : 
 - Routine Weekly Responsibilities
     - [ ] Complete the assigned section of the Week 4 work summary.
 - Project-Related Tasks
-  - Facilitator Meeting
+  - Facilitator Meeting : Not attended
     - [ ] Review the Group Operating Guidelines and suggest any changes.
     - [ ] Review and discuss the website investigation results. 
     - [ ] Define the proposed MVP scope, core features, and exclusions.
@@ -202,7 +201,7 @@ Attend to meeting :
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] Draft the assigned section of the group deliverable.
+    - [ ][3. Proposed Solution, AI Analysis & Dashboard](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
     - [ ] Complete the Client meeting minutes, Upload the Client meeting minutes to GitHub.
 
