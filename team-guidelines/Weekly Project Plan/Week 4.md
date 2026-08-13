@@ -125,8 +125,8 @@ Attend to meeting :
     - [x] Prepare the proposed MVP for the client meeting.
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
-  - Data Collection Track
-    - [ ][5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+  - Data Collection Track   
+    - [ ] [5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
     - [x] Complete the Facilitator meeting minutes, Upload the Facilitator meeting minutes to GitHub.
 ---
@@ -146,7 +146,7 @@ Attend to meeting :
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
     - [x] Allocate the four sections of the group deliverable among team members.  
-    - [ ][2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+    - [ ] [2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 ---
 #### Sunjol Singh Paul
 Attend to meeting : 
@@ -162,13 +162,14 @@ Attend to meeting :
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Data Collection Track
-    - [ ][6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
-- Role-Specific Responsibilities: Minutes Taker
-    - [ ] Complete the Group meeting minutes, Upload the Group meeting minutes to GitHub.
+    - [ ] [6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Client Liaison
     - [x] Schedule the client meeting to discuss and confirm the proposed MVP. 
     - [ ] Send the completed client meeting minutes to the client.
     - [ ] Obtain the client's written confirmation of the agreed MVP, Store the written confirmation as project evidence.
+- Role-Specific Responsibilities: Minutes Taker
+    - [ ] Complete the Group meeting minutes, Upload the Group meeting minutes to GitHub.
+
 ---
 #### Thushamini Chathusika Hewa Pathegamage
 Attend to meeting : 
