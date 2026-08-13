@@ -24,16 +24,16 @@
           **Due:** During the facilitator meeting
               
 - Client Meeting
-  **Date:** 
-    - [ ] Prepare the proposed MVP for the client meeting.  
+  **Date:** 08/31/2026
+    - [x] Prepare the proposed MVP for the client meeting.  
           **Owner:** Team  
           **Due:** Before the client meeting
-    - [ ] Prepare the questions and confirmation points for the client meeting.  
+    - [x] Prepare the questions and confirmation points for the client meeting.  
           **Owner:** Team  
           **Due:** Before the client meeting
-    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.  
+    - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.  
           **Owner:** Team
-    - [ ] Schedule the client meeting to discuss and confirm the proposed MVP.  
+    - [x] Schedule the client meeting to discuss and confirm the proposed MVP.  
           **Owner:** Sunjol Singh Paul  
           **Date:** To be confirmed
     - [ ] Complete the client meeting minutes and upload them to GitHub.  
@@ -63,24 +63,29 @@
 - [x] Review and compare the website investigation results.
 - [x] Evaluate the feasible job-data collection methods.
 - [x] Agree on the proposed MVP scope during the facilitator meeting.
-- [ ] Present the proposed MVP to the client.
-- [ ] Confirm the final MVP scope with the client.
+- [x] Present the proposed MVP to the client.
+- [x] Confirm the final MVP scope with the client.
 - [ ] Obtain written evidence of the client's MVP approval.
 - [ ] Begin drafting the four sections of the group deliverable.
 
 ### 3. Internal Task Allocation
--  Delivarable 1
-    - [ ] Allocate the four sections of the group deliverable among team members.  
-          **Owner:** Team  
+- Delivarable 1
+    - [x] Allocate the four sections of the group deliverable among team members.  
+          **Owner:** Seonjeong Jeong  
           **Due:** During the group meeting on 15 August 2026
-    - [ ] Draft the Problem Statement section of the group deliverable.  
-          **Owner:** [Add assigned member]
-    - [ ] Draft the Client Communication and MVP Agreement section.  
-          **Owner:** [Add assigned member]
-    - [ ] Draft the Project Planning and Management section.  
-          **Owner:** [Add assigned member]
-    - [ ] Draft the Risk and Technology Assessments section.  
-          **Owner:** [Add assigned member]
+    - [ ] 1. Project Context, Motivation & Objectives 
+          **Owner:** Li Luo
+    - [ ] 2. Scope, Requirements & Data Needs  
+          **Owner:** Seonjeong Jeong 
+    - [ ] 3. Proposed Solution, AI Analysis & Dashboard  
+          **Owner:** Leon Nel Nel
+    - [ ] 4. Project Planning, Risk & Evaluation 
+          **Owner:** Thushamini Chathusika Hewa Pathegamage
+- Data Collection Track
+    - [ ] 5. Data Sources & Collection Strategy
+          **Owner:** Nyx Chen
+    - [ ] 6. Data Processing, Common Schema & AI Feasibility
+          **Owner:** Sunjol Singh Paul
 
 ### 4. Quick Check
 
@@ -98,14 +103,12 @@ Attend to meeting :
     - [ ] Prepare the questions and confirmation points for the client meeting. 
     - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] Allocate the four sections of the group deliverable among team members.  
-    - [ ] Draft the assigned section of the group deliverable.
+    - [ ] 1. Project Context, Motivation & Objectives — #10
 - Role-Specific Responsibilities: Facilitator Liaison
     - [x] Coordinate communication with the facilitator and organise the meeting invitation.
     - [x] Prepare and send the facilitator meeting agenda
     - [x] Send the facilitator meeting minutes to Dr Sumayyah.
 - Role-Specific Responsibilities: Team Lead
-    - [x] Lead the team discussion about the MVP scope.
     - [ ] Record the internally agreed MVP scope.
     - [ ] Coordinate the allocation of the group deliverable sections.
     - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
@@ -139,11 +142,12 @@ Attend to meeting :
     - [x] Review and discuss the website investigation results. 
     - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
-    - [ ] Prepare the proposed MVP for the client meeting.
-    - [ ] Prepare the questions and confirmation points for the client meeting. 
-    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+    - [x] Lead the team discussion about the MVP scope.
+    - [x] Prepare the proposed MVP for the client meeting.
+    - [x] Prepare the questions and confirmation points for the client meeting. 
+    - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] Allocate the four sections of the group deliverable among team members.  
+    - [x] Allocate the four sections of the group deliverable among team members.  
     - [ ] Draft the assigned section of the group deliverable.
 
 #### Sunjol Singh Paul
@@ -156,11 +160,10 @@ Attend to meeting :
     - [x] Review and discuss the website investigation results. 
     - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
-    - [ ] Prepare the proposed MVP for the client meeting.
-    - [ ] Prepare the questions and confirmation points for the client meeting. 
-    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+    - [x] Prepare the proposed MVP for the client meeting.
+    - [x] Prepare the questions and confirmation points for the client meeting. 
+    - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] Allocate the four sections of the group deliverable among team members.  
     - [ ] Draft the assigned section of the group deliverable.
 - Role-Specific Responsibilities: Minutes Taker
     - [ ] Complete the Group meeting minutes, Upload the Group meeting minutes to GitHub.
@@ -179,11 +182,10 @@ Attend to meeting :
     - [x] Review and discuss the website investigation results. 
     - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
-    - [ ] Prepare the proposed MVP for the client meeting.
-    - [ ] Prepare the questions and confirmation points for the client meeting. 
-    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+    - [x] Prepare the proposed MVP for the client meeting.
+    - [x] Prepare the questions and confirmation points for the client meeting. 
+    - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] Allocate the four sections of the group deliverable among team members.  
     - [ ] Draft the assigned section of the group deliverable.
 
 #### Leon Nel Nel
@@ -196,11 +198,10 @@ Attend to meeting :
     - [ ] Review and discuss the website investigation results. 
     - [ ] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
-    - [ ] Prepare the proposed MVP for the client meeting.
-    - [ ] Prepare the questions and confirmation points for the client meeting. 
-    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+    - [x] Prepare the proposed MVP for the client meeting.
+    - [x] Prepare the questions and confirmation points for the client meeting. 
+    - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] Allocate the four sections of the group deliverable among team members.  
     - [ ] Draft the assigned section of the group deliverable.
 - Role-Specific Responsibilities: Minutes Taker
     - [ ] Complete the Client meeting minutes, Upload the Client meeting minutes to GitHub.
