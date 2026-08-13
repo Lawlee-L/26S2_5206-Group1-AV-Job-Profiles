@@ -1,3 +1,19 @@
+# Weekly Project Plan
+
+## Purpose
+
+This document provides a weekly overview of the team's academic requirements, project goals, individual task allocations, risks, and progress.
+
+It will be reviewed and updated during regular team meetings. Team members should check their assigned tasks and update the checkboxes when tasks are completed.
+
+Meeting-minutes responsibilities will rotate among team members. When it is your turn, please ensure that the minutes follow the required format and are uploaded to the Meeting Minutes folder. 
+
+## Status Key
+
+- [ ] Not completed
+- [x] Completed
+
+---
 ## Week 4 — 10 August to 16 August 2026
 ### 1. School Deliverables and Meetings
 
