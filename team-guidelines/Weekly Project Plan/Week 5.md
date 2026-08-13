@@ -6,24 +6,18 @@
 - [ ] ⚠️ Submit **Project Deliverable 1: Project Specification and Plans (Group)**.  
   **Due:** 11:59 PM, Tuesday, 18 August 2026  
   **Format:** One PDF file  
-  **Submitted By:** [Add nominated group member]
+  **Submitted By:** Li Luo
 
-- Facilitator Meeting
-   **Date:** 10 August 2026
-    - [ ] Prepare and send the facilitator meeting agenda.  
-          **Owner:** Li Luo  
-          **Due:** Before the facilitator meeting
-    - [ ] Complete the facilitator meeting minutes and upload them to GitHub.  
-          **Owner:** 
-          **Due:** After the facilitator meeting
-    - [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.  
-          **Owner:** Li Luo  
-          **Due:** After the minutes are completed
-- Group Meeting
-  **Attend:**
-  **Date:** 15 August 2026
+- Group Meeting (Monday)
+  **Date:** 17 August 2026
     - [ ] Complete the group meeting minutes and upload them to GitHub.  
-          **Owner:** Li Luo 
+          **Owner:** Li Luo   
+          **Due:** After the group meeting
+          
+- Group Meeting (Saturday)
+  **Date:** 23 August 2026
+    - [ ] Complete the group meeting minutes and upload them to GitHub.  
+          **Owner:** Seonjeong Jeong   
           **Due:** After the group meeting
 
 - Week 5 work summary.          
@@ -31,7 +25,7 @@
           **Owner:** All team members  
           **Location:** Microsoft Teams — Team Shared
     - [ ] Upload the completed Week 5 work summary to the CITS5206 Channel.  
-          **Owner:** Li Luo  
+          **Owner:** Li Luo    
           **Due:** 7:00 PM, Sunday, 23 August 2026
 
 ### 2. Weekly Project Goals
@@ -46,55 +40,58 @@
 
 ### 3. Internal Task Allocation
 - Deliverable 1
-    - [ ] Complete the Problem Statement section.  
-          **Owner:** [Add assigned member]  
+    - [ ] [Complete 1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
+          **Owner:** Li Luo   
           **Due:** Before the final report review
-    - [ ] Complete the Client Communication and MVP Agreement section.  
-          **Owner:** [Add assigned member]  
+    - [ ] [Complete 2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
+          **Owner:** 	Seonjeong Jeong   
           **Due:** Before the final report review
-    - [ ] Complete the Project Planning and Management section.  
-          **Owner:** [Add assigned member]  
+    - [ ] [Complete 3. Proposed Solution, AI Analysis & Dashboard](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
+          **Owner:** 	Leon Nel Nel   
           **Due:** Before the final report review
-    - [ ] Complete the Risk and Technology Assessments section.  
-          **Owner:** [Add assigned member]  
+    - [ ] [Complete 4. Project Planning, Risk & Evaluation](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
+          **Owner:**  Thushamini Chathusika Hewa Pathegamage.  
           **Due:** Before the final report review
-    - [ ] Add the client's written confirmation of the agreed MVP to the report.  
-          **Owner:** Sunjol Singh Paul  
-          **Due:** Before the final report review
-    - [ ] Prepare the AI-use acknowledgement.  
-          **Owner:** [Add assigned member]  
-          **Due:** Before the final report review
-    - [ ] Combine and edit all report sections into one consistent document.  
-          **Owner:** [Add assigned member]  
-          **Due:** Before submission
     - [ ] Review the report against the marking rubric.  
           **Owner:** All team members  
           **Due:** Before submission
     - [ ] Proofread the final report and check its formatting.  
           **Owner:** All team members  
           **Due:** Before submission
-    - [ ] Convert the final report into one PDF file.  
-          **Owner:** [Add assigned member]  
-          **Due:** Before submission
     - [ ] Submit the final PDF through the assignment submission link.  
-          **Owner:** [Add nominated group member]  
+          **Owner:** Li Luo   
           **Due:** 11:59 PM, Tuesday, 18 August 2026
--  Project
-    - [ ] Identify the next implementation tasks based on the approved MVP.  
+-  Data Collection Track
+    - [ ] [Complete 5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
+          **Owner:**  Nyx Chen   
+          **Due:** Before the final report review
+    - [ ] [Complete 6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
+          **Owner:**  Sunjol Singh Paul   
+          **Due:** Before the final report review
+    - [ ] Share foundings base on data collection check 
+          **Owner:**  Sunjol Singh Paul &  Nyx Chen  
+          **Due:** During the group meeting
+    - [ ] Identify the next implementation tasks based on the approved MVP & Foudings
           **Owner:** Team  
           **Due:** During the group meeting
 
 ### 4. Quick Check
 
 #### Li Luo
-
-- [ ] Prepare and send the facilitator meeting agenda.
-- [ ] Send the completed facilitator meeting minutes to Dr Sumayyah.
-- [ ] Complete the group meeting minutes and upload them to GitHub.
-- [ ] Complete the assigned section of the group report.
-- [ ] Support the integration and final review of the report.
-- [ ] Complete the assigned section of the Week 5 work summary.
-- [ ] Upload the completed Week 5 work summary to the CITS5206 Channel.
+Attend to meeting : 
+- Routine Weekly Responsibilities
+    - [ ] Complete the assigned section of the Week 4 work summary.
+- Project-Related Tasks
+  - Deliverable 1
+    - [ ] [1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+  - Role-Specific Responsibilities: Facilitator Liaison
+    - [x] Coordinate communication with the facilitator and organise the meeting invitation.
+    - [x] Prepare and send the facilitator meeting agenda
+    - [x] Send the facilitator meeting minutes to Dr Sumayyah.
+- Role-Specific Responsibilities: Team Lead
+    - [x] Record the internally agreed MVP scope.
+    - [x] Coordinate the allocation of the group deliverable sections.
+    - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
 
 #### Nyx Chen
 
@@ -119,7 +116,6 @@
 
 #### Thushamini Chathusika Hewa Pathegamage
 
-- [ ] Complete the facilitator meeting minutes, Upload the facilitator meeting minutes to GitHub.
 - [ ] Complete the assigned section of the group report.
 - [ ] Review the report against the marking rubric.
 - [ ] Proofread the final report.
