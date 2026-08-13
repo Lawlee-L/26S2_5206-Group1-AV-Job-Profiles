@@ -102,8 +102,8 @@ Attend to meeting :
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] [1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)- Role-Specific Responsibilities: Facilitator Liaison
-- Role-Specific Responsibilities: Facilitator Liaison
+    - [ ] [1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+  - Role-Specific Responsibilities: Facilitator Liaison
     - [x] Coordinate communication with the facilitator and organise the meeting invitation.
     - [x] Prepare and send the facilitator meeting agenda
     - [x] Send the facilitator meeting minutes to Dr Sumayyah.
@@ -122,13 +122,13 @@ Attend to meeting :
     - [x] Review and discuss the website investigation results. 
     - [x] Define the proposed MVP scope, core features, and exclusions.
   - Client Meeting
-    - [ ] Prepare the proposed MVP for the client meeting.
-    - [ ] Prepare the questions and confirmation points for the client meeting. 
-    - [ ] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
+    - [x] Prepare the proposed MVP for the client meeting.
+    - [x] Prepare the questions and confirmation points for the client meeting. 
+    - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Data Collection Track
     - [ ][5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
-    - [ ] Complete the Facilitator meeting minutes, Upload the Facilitator meeting minutes to GitHub.
+    - [x] Complete the Facilitator meeting minutes, Upload the Facilitator meeting minutes to GitHub.
 ---
 #### Seonjeong Jeong
 Attend to meeting : 
