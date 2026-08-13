@@ -1,5 +1,4 @@
 ## Week 4 — 10 August to 16 August 2026
-
 ### 1. School Deliverables and Meetings
 
 - Facilitator Meeting
@@ -44,7 +43,6 @@
           **Due:** After the client meeting minutes are completed
 
 - Group Meeting
-  **Attend:**
   **Date:** 15 August 2026
     - [ ] Complete the group meeting minutes and upload them to GitHub.  
           **Owner:** Sunjol Singh Paul  
@@ -57,7 +55,7 @@
     - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.  
           **Owner:** Li Luo  
           **Due:** 7:00 PM, Sunday, 16 August 2026
-
+---
 ### 2. Weekly Project Goals
 
 - [x] Review and compare the website investigation results.
@@ -67,26 +65,27 @@
 - [x] Confirm the final MVP scope with the client.
 - [ ] Obtain written evidence of the client's MVP approval.
 - [x] Begin drafting the four sections of the group deliverable.
-
+---
 ### 3. Internal Task Allocation
+
 - Delivarable 1
-    - [x] Allocate the four sections of the group deliverable among team members.  
+    - [x] Allocate the four sections of the group deliverable among team members.   
           **Owner:** Seonjeong Jeong  
           **Due:** During the group meeting on 15 August 2026
-    - [ ] 1. Project Context, Motivation & Objectives 
+    - [ ] 1. Project Context, Motivation & Objectives.   
           **Owner:** Li Luo
-    - [ ] 2. Scope, Requirements & Data Needs  
+    - [ ] 2. Scope, Requirements & Data Needs.   
           **Owner:** Seonjeong Jeong 
     - [ ] 3. Proposed Solution, AI Analysis & Dashboard  
           **Owner:** Leon Nel Nel
-    - [ ] 4. Project Planning, Risk & Evaluation 
+    - [ ] 4. Project Planning, Risk & Evaluation.    
           **Owner:** Thushamini Chathusika Hewa Pathegamage
 - Data Collection Track
-    - [ ] 5. Data Sources & Collection Strategy
+    - [ ] 5. Data Sources & Collection Strategy.    
           **Owner:** Nyx Chen
-    - [ ] 6. Data Processing, Common Schema & AI Feasibility
+    - [ ] 6. Data Processing, Common Schema & AI Feasibility.   
           **Owner:** Sunjol Singh Paul
-
+---
 ### 4. Quick Check
 
 #### Li Luo
@@ -104,14 +103,15 @@ Attend to meeting :
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
     - [ ] [1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)- Role-Specific Responsibilities: Facilitator Liaison
+- Role-Specific Responsibilities: Facilitator Liaison
     - [x] Coordinate communication with the facilitator and organise the meeting invitation.
     - [x] Prepare and send the facilitator meeting agenda
     - [x] Send the facilitator meeting minutes to Dr Sumayyah.
 - Role-Specific Responsibilities: Team Lead
-    - [ ] Record the internally agreed MVP scope.
-    - [ ] Coordinate the allocation of the group deliverable sections.
+    - [x] Record the internally agreed MVP scope.
+    - [x] Coordinate the allocation of the group deliverable sections.
     - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
-
+---
 #### Nyx Chen
 Attend to meeting : 
 - Routine Weekly Responsibilities
@@ -129,7 +129,7 @@ Attend to meeting :
     - [ ][5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
     - [ ] Complete the Facilitator meeting minutes, Upload the Facilitator meeting minutes to GitHub.
-
+---
 #### Seonjeong Jeong
 Attend to meeting : 
 - Routine Weekly Responsibilities
@@ -147,7 +147,7 @@ Attend to meeting :
   - Deliverable 1
     - [x] Allocate the four sections of the group deliverable among team members.  
     - [ ][2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
-      
+---
 #### Sunjol Singh Paul
 Attend to meeting : 
 - Routine Weekly Responsibilities
@@ -169,7 +169,7 @@ Attend to meeting :
     - [x] Schedule the client meeting to discuss and confirm the proposed MVP. 
     - [ ] Send the completed client meeting minutes to the client.
     - [ ] Obtain the client's written confirmation of the agreed MVP, Store the written confirmation as project evidence.
-
+---
 #### Thushamini Chathusika Hewa Pathegamage
 Attend to meeting : 
 - Routine Weekly Responsibilities
@@ -184,9 +184,8 @@ Attend to meeting :
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ][4. Project Planning, Risk & Evaluation](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
-
-
+    - [ ] [4. Project Planning, Risk & Evaluation](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+---
 #### Leon Nel Nel
 Attend to meeting : 
 - Routine Weekly Responsibilities
@@ -201,10 +200,10 @@ Attend to meeting :
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ][3. Proposed Solution, AI Analysis & Dashboard](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+    - [ ] [3. Proposed Solution, AI Analysis & Dashboard](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
     - [ ] Complete the Client meeting minutes, Upload the Client meeting minutes to GitHub.
-
+---
 ### 5. Expected Weekly Outcomes
 
 - The team agrees on a realistic proposed MVP scope.
@@ -215,7 +214,7 @@ Attend to meeting :
 - The four sections of the group deliverable are allocated.
 - Initial drafts of the four report sections are prepared.
 - Weekly contribution records are completed.
-
+---
 ### 6. Risks or Blockers
 
 - The team may not reach agreement on a realistic MVP scope during the facilitator meeting.
@@ -223,7 +222,7 @@ Attend to meeting :
 - The client may request changes to the proposed MVP.
 - Delayed meeting minutes or written client approval may affect the group deliverable.
 - Delayed allocation of report sections may reduce the time available for drafting and review.
-
+---
 ### 7. Week 4 Summary
 
 To be completed at the end of Week 4.
