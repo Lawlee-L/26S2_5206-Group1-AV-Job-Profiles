@@ -43,7 +43,7 @@
           **Due:** After the client meeting minutes are completed
 
 - Group Meeting
-  **Date:** 15 August 2026
+  **Date:** 15 August 2026.  
     - [ ] Complete the group meeting minutes and upload them to GitHub.  
           **Owner:** Sunjol Singh Paul  
           **Due:** After the group meeting
