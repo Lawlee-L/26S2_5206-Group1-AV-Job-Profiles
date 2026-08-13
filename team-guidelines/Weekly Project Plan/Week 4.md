@@ -110,7 +110,7 @@ Attend to meeting :
 - Role-Specific Responsibilities: Team Lead
     - [x] Record the internally agreed MVP scope.
     - [x] Coordinate the allocation of the group deliverable sections.
-    - [ ] Complete Weekly Plan and Weekly Track.
+    - [ ] Complete Weekly Plan and Weekly Task track.
     - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
 ---
 #### Nyx Chen
