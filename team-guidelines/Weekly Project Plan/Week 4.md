@@ -65,7 +65,7 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
           **Due:** After the group meeting
 
 - Week 4 work summary.          
-    - [ ] Complete the Week 4 work summary.  
+    - [ ] Complete the Week 4 work summary form.    
           **Owner:** All team members  
           **Location:** Microsoft Teams — Team Shared
     - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.  
@@ -107,7 +107,7 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 #### Li Luo
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -132,7 +132,7 @@ Attend to meeting :
 #### Nyx Chen
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -150,7 +150,7 @@ Attend to meeting :
 #### Seonjeong Jeong
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -168,7 +168,7 @@ Attend to meeting :
 #### Sunjol Singh Paul
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -191,7 +191,7 @@ Attend to meeting :
 #### Thushamini Chathusika Hewa Pathegamage
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -207,7 +207,7 @@ Attend to meeting :
 #### Leon Nel Nel
 Attend to meeting : 
 - Routine Weekly Responsibilities
-    - [ ] Complete the assigned section of the Week 4 work summary.
+    - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting : Not attended
     - [ ] Review the Group Operating Guidelines and suggest any changes.
