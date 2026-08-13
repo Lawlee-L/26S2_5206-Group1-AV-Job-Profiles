@@ -1,8 +1,5 @@
 # Weekly Project Plan
 
-**Status:** Active  
-**Last Updated:** 9 August 2026
-
 ## Purpose
 
 This document provides a weekly overview of the team's academic requirements, project goals, individual task allocations, risks, and progress.
@@ -82,6 +79,7 @@ Attend to meeting : 2/2
     - [x] Create the Meeting Minutes Rotation.
     - [x] Create and update the Group Operating Guidelines.
     - [x] Create the Weekly Project Plan.
+    - [x] Complete Weekly Plan and Weekly Track.
     - [x] Upload the completed Week 3 work summary to the CITS5206 Channel.
  - Role-Specific Responsibilities: Minutes Taker
     - [x] Complete the client meeting minutes and upload them to GitHub.
