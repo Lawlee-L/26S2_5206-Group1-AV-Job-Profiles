@@ -14,11 +14,10 @@ This table is used to manage the rotation of meeting minutes responsibilities wi
 | Week 4 | Group Meeting | 15/08/2026 | Sunjol Singh Paul | Upcoming |
 | | | | | |
 | Week 5 | Group Meeting Monday | TBC | Li Luo | Upcoming |
-| Week 5 | Facilitator Meeting | TBC | Thushamini Chathusika Hewa Pathegamage | Upcoming |
-| Week 5 | Group Meeting Saturday | TBC | Leon Nel Nel | Upcoming |
-| Week 6 | Facilitator Meeting | TBC | Sunjol Singh Paul | Upcoming |
-| Week 6 | Client Meeting | TBC | Seonjeong Jeong | Upcoming |
-| Week 6 | Group Meeting | TBC | Nyx Chen | Upcoming |
+| Week 5 | Group Meeting Saturday | TBC | Seonjeong Jeong | Upcoming |
+| Week 6 | Facilitator Meeting | TBC | TBC | Upcoming |
+| Week 6 | Client Meeting | TBC | TBC | Upcoming |
+| Week 6 | Group Meeting | TBC | TBC | Upcoming |
 TBC
 ## Status
 
