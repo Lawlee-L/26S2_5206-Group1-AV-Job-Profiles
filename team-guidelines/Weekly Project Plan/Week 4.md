@@ -88,7 +88,7 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
     - [x] Allocate the four sections of the group deliverable among team members.   
           **Owner:** Seonjeong Jeong  
           **Due:** During the group meeting on 15 August 2026
-    - [ ] 1. Project Context, Motivation & Objectives.   
+    - [x] 1. Project Context, Motivation & Objectives.   
           **Owner:** Li Luo
     - [ ] 2. Scope, Requirements & Data Needs.   
           **Owner:** Seonjeong Jeong 
@@ -118,7 +118,7 @@ Attend to meeting :
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] [1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+    - [x] [1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
   - Role-Specific Responsibilities: Facilitator Liaison
     - [x] Coordinate communication with the facilitator and organise the meeting invitation.
     - [x] Prepare and send the facilitator meeting agenda
