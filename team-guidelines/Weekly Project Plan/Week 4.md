@@ -58,12 +58,6 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
           **Owner:** Sunjol Singh Paul  
           **Due:** After the client meeting minutes are completed
 
-- Group Meeting
-  **Date:** 15 August 2026.  
-    - [ ] Complete the group meeting minutes and upload them to GitHub.  
-          **Owner:** Sunjol Singh Paul  
-          **Due:** After the group meeting
-
 - Week 4 work summary.          
     - [ ] Complete the Week 4 work summary form.    
           **Owner:** All team members  
