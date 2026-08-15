@@ -99,7 +99,7 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 ### 4. Quick Check
 
 #### Li Luo
-Attend to meeting : 
+Attend to meeting : 2/2
 - Routine Weekly Responsibilities
     - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
@@ -124,7 +124,7 @@ Attend to meeting :
     - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
 ---
 #### Nyx Chen
-Attend to meeting : 
+Attend to meeting : 2/2
 - Routine Weekly Responsibilities
     - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
@@ -142,7 +142,7 @@ Attend to meeting :
     - [x] Complete the Facilitator meeting minutes, Upload the Facilitator meeting minutes to GitHub.
 ---
 #### Seonjeong Jeong
-Attend to meeting : 
+Attend to meeting : 2/2
 - Routine Weekly Responsibilities
     - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
@@ -160,7 +160,7 @@ Attend to meeting :
     - [ ] [2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 ---
 #### Sunjol Singh Paul
-Attend to meeting : 
+Attend to meeting : 2/2
 - Routine Weekly Responsibilities
     - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
@@ -183,7 +183,7 @@ Attend to meeting :
 
 ---
 #### Thushamini Chathusika Hewa Pathegamage
-Attend to meeting : 
+Attend to meeting : 2/2
 - Routine Weekly Responsibilities
     - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
@@ -199,7 +199,7 @@ Attend to meeting :
     - [ ] [4. Project Planning, Risk & Evaluation](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 ---
 #### Leon Nel Nel
-Attend to meeting : 
+Attend to meeting : 1/2
 - Routine Weekly Responsibilities
     - [ ] Complete the Week 4 work summary form.    
 - Project-Related Tasks
