@@ -51,7 +51,7 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
     - [x] Schedule the client meeting to discuss and confirm the proposed MVP.  
           **Owner:** Sunjol Singh Paul  
           **Date:** To be confirmed
-    - [ ] Complete the client meeting minutes and upload them to GitHub.  
+    - [x] Complete the client meeting minutes and upload them to GitHub.  
           **Owner:** Leon Nel Nel  
           **Due:** After the client meeting
     - [ ] Send the client meeting minutes to the client and obtain written confirmation of the agreed MVP.  
@@ -214,7 +214,7 @@ Attend to meeting : 1/2
   - Deliverable 1
     - [ ] [3. Proposed Solution, AI Analysis & Dashboard](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
-    - [ ] Complete the Client meeting minutes, Upload the Client meeting minutes to GitHub.
+    - [x] Complete the Client meeting minutes, Upload the Client meeting minutes to GitHub.
 ---
 ### 5. Expected Weekly Outcomes
 
