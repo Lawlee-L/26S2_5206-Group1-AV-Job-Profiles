@@ -54,15 +54,12 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
     - [x] Complete the client meeting minutes and upload them to GitHub.  
           **Owner:** Leon Nel Nel  
           **Due:** After the client meeting
-    - [ ] Send the client meeting minutes to the client and obtain written confirmation of the agreed MVP.  
-          **Owner:** Sunjol Singh Paul  
-          **Due:** After the client meeting minutes are completed
 
 - Week 4 work summary.          
-    - [ ] Complete the Week 4 work summary form.    
+    - [x] Complete the Week 4 work summary form.    
           **Owner:** All team members  
           **Location:** Microsoft Teams — Team Shared
-    - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.  
+    - [x] Upload the completed Week 4 work summary to the CITS5206 Channel.  
           **Owner:** Li Luo  
           **Due:** 7:00 PM, Sunday, 16 August 2026
 ---
@@ -73,7 +70,6 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 - [x] Agree on the proposed MVP scope during the facilitator meeting.
 - [x] Present the proposed MVP to the client.
 - [x] Confirm the final MVP scope with the client.
-- [ ] Obtain written evidence of the client's MVP approval.
 - [x] Begin drafting the four sections of the group deliverable.
 ---
 ### 3. Internal Task Allocation
@@ -84,16 +80,16 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
           **Due:** During the group meeting on 15 August 2026
     - [x] 1. Project Context, Motivation & Objectives.   
           **Owner:** Li Luo
-    - [ ] 2. Scope, Requirements & Data Needs.   
+    - [x] 2. Scope, Requirements & Data Needs.   
           **Owner:** Seonjeong Jeong 
-    - [ ] 3. Proposed Solution, AI Analysis & Dashboard  
+    - [x] 3. Proposed Solution, AI Analysis & Dashboard  
           **Owner:** Leon Nel Nel
-    - [ ] 4. Project Planning, Risk & Evaluation.    
+    - [x] 4. Project Planning, Risk & Evaluation.    
           **Owner:** Thushamini Chathusika Hewa Pathegamage
 - Data Collection Track
-    - [ ] 5. Data Sources & Collection Strategy.    
+    - [x] 5. Data Sources & Collection Strategy.    
           **Owner:** Nyx Chen
-    - [ ] 6. Data Processing, Common Schema & AI Feasibility.   
+    - [x] 6. Data Processing, Common Schema & AI Feasibility.   
           **Owner:** Sunjol Singh Paul
 ---
 ### 4. Quick Check
@@ -101,7 +97,7 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 #### Li Luo
 Attend to meeting : 2/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 4 work summary form.    
+    - [x] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -120,13 +116,13 @@ Attend to meeting : 2/2
 - Role-Specific Responsibilities: Team Lead
     - [x] Record the internally agreed MVP scope.
     - [x] Coordinate the allocation of the group deliverable sections.
-    - [ ] Complete Weekly Plan and Weekly Task track.
-    - [ ] Upload the completed Week 4 work summary to the CITS5206 Channel.
+    - [x] Complete Weekly Plan and Weekly Task track.
+    - [x] Upload the completed Week 4 work summary to the CITS5206 Channel.
 ---
 #### Nyx Chen
 Attend to meeting : 2/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 4 work summary form.    
+    - [x] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -137,14 +133,14 @@ Attend to meeting : 2/2
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Data Collection Track   
-    - [ ] [5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+    - [x] [5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
     - [x] Complete the Facilitator meeting minutes, Upload the Facilitator meeting minutes to GitHub.
 ---
 #### Seonjeong Jeong
 Attend to meeting : 2/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 4 work summary form.    
+    - [x] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -157,12 +153,12 @@ Attend to meeting : 2/2
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
     - [x] Allocate the four sections of the group deliverable among team members.  
-    - [ ] [2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+    - [x] [2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 ---
 #### Sunjol Singh Paul
 Attend to meeting : 2/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 4 work summary form.    
+    - [x] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -173,19 +169,15 @@ Attend to meeting : 2/2
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Data Collection Track
-    - [ ] [6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+    - [x] [6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Client Liaison
     - [x] Schedule the client meeting to discuss and confirm the proposed MVP. 
-    - [ ] Send the completed client meeting minutes to the client.
-    - [ ] Obtain the client's written confirmation of the agreed MVP, Store the written confirmation as project evidence.
-- Role-Specific Responsibilities: Minutes Taker
-    - [ ] Complete the Group meeting minutes, Upload the Group meeting minutes to GitHub.
 
 ---
 #### Thushamini Chathusika Hewa Pathegamage
 Attend to meeting : 2/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 4 work summary form.    
+    - [x] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting
     - [x] Review the Group Operating Guidelines and suggest any changes.
@@ -196,12 +188,12 @@ Attend to meeting : 2/2
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] [4. Project Planning, Risk & Evaluation](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+    - [x] [4. Project Planning, Risk & Evaluation](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 ---
 #### Leon Nel Nel
 Attend to meeting : 1/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 4 work summary form.    
+    - [x] Complete the Week 4 work summary form.    
 - Project-Related Tasks
   - Facilitator Meeting : Not attended
     - [ ] Review the Group Operating Guidelines and suggest any changes.
@@ -212,7 +204,7 @@ Attend to meeting : 1/2
     - [x] Prepare the questions and confirmation points for the client meeting. 
     - [x] Confirm relevant intellectual-property, website-access, and data-use constraints with the client.
   - Deliverable 1
-    - [ ] [3. Proposed Solution, AI Analysis & Dashboard](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
+    - [x] [3. Proposed Solution, AI Analysis & Dashboard](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
 - Role-Specific Responsibilities: Minutes Taker
     - [x] Complete the Client meeting minutes, Upload the Client meeting minutes to GitHub.
 ---
@@ -236,7 +228,8 @@ Attend to meeting : 1/2
 - Delayed allocation of report sections may reduce the time available for drafting and review.
 ---
 ### 7. Week 4 Summary
+Overall, the team made good progress during Week 4. Each team member completed their assigned tasks on time, and the planned work was completed without major problems. Team members are gradually becoming familiar with using GitHub to record project activities and manage project documents.
 
-To be completed at the end of Week 4.
+However, some tasks still required reminders before they were completed. Although the team met the deadlines, some members did not always take the initiative to check their responsibilities or provide progress updates. In the following weeks, the team should improve individual responsibility, communicate progress more actively, and complete tasks with fewer reminders.
 
 ---
