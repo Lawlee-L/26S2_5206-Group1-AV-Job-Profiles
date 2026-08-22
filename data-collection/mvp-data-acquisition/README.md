@@ -102,8 +102,11 @@ output/run_id=<RUN_ID>/av_jobs.duckdb        reproducible analytical database
 output/run_id=<RUN_ID>/*.json                quality, issues and run summaries
 ```
 
-Generated data is deliberately excluded from Git. Raw recruitment data can be
-large and may contain text whose redistribution needs separate approval.
+Raw responses and validated JSONL are deliberately excluded from Git. The branch
+contains one reviewed processed snapshot for team use; later generated runs stay
+ignored unless the team deliberately selects another snapshot for publication.
+Raw recruitment responses can be large and may contain text whose redistribution
+needs separate approval.
 
 ## Safe publication behaviour
 
@@ -128,9 +131,10 @@ company websites:
 .\.venv\Scripts\scrapy check
 ```
 
-At the recorded full verification on 20 August 2026, all 16 sources passed and
-1,420 unique active jobs reached Parquet and DuckDB. This is point-in-time test
-evidence, not a promise that external career endpoints will never change.
+At the committed full verification on 22 August 2026, all 16 sources passed and
+1,429 unique active jobs reached Parquet and DuckDB. See the
+[snapshot record](data/README.md). This is point-in-time test evidence, not a
+promise that external career endpoints will never change.
 
 ## Documentation
 

@@ -20,8 +20,9 @@ law before scheduled or redistributed collection.
 - Source URLs, timestamps, response checksums and immutable run IDs provide an
   audit trail.
 - Pydantic rejects malformed or unexpected fields before analytical storage.
-- Generated raw/processed data and databases are Git-ignored; publishing them
-  requires a separate retention/licensing decision.
+- Raw responses and intermediate validated files are Git-ignored. One selected
+  processed snapshot may be committed for team use after reviewing its size,
+  contents, provenance and public-repository implications.
 - No credentials, API keys or user-provided input are required by current spiders.
 - Source HTML is converted to plain text; it is data, never executable code.
 - DuckDB is opened read-only by consumers where possible, and each run builds a

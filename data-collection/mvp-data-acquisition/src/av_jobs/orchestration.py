@@ -246,7 +246,9 @@ def execute_run(config: RunConfig, reporter: Reporter = print) -> RunOutcome:
             issues=issues,
             validated_jobs=len(jobs),
             quality_report=quality,
-            latest_manifest_unchanged=str(latest_manifest),
+            latest_manifest_unchanged=_portable_path(
+                latest_manifest, config.project_root
+            ),
         )
 
     processed_dir = config.data_root / "processed" / f"run_id={config.run_id}"
@@ -304,11 +306,15 @@ def execute_run(config: RunConfig, reporter: Reporter = print) -> RunOutcome:
         "validated_jobs": len(jobs),
         "active_jobs": quality["active_jobs"],
         "historical_jobs": quality["all_historical_jobs"],
-        "jobs_parquet": str(jobs_parquet),
-        "source_status_parquet": str(status_parquet),
-        "duckdb_file": str(database_path),
-        "analysis_file": str(analysis_path),
-        "latest_manifest": str(latest_manifest) if publish_allowed else None,
+        "jobs_parquet": _portable_path(jobs_parquet, config.project_root),
+        "source_status_parquet": _portable_path(status_parquet, config.project_root),
+        "duckdb_file": _portable_path(database_path, config.project_root),
+        "analysis_file": _portable_path(analysis_path, config.project_root),
+        "latest_manifest": (
+            _portable_path(latest_manifest, config.project_root)
+            if publish_allowed
+            else None
+        ),
         "analysis": analysis,
     }
     write_json(output_run_dir / "run_summary.json", summary)
