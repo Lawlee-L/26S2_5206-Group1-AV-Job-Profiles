@@ -1,0 +1,239 @@
+{
+  "run_id": "20260822T050023Z",
+  "status": "published",
+  "selected_spiders": [
+    "fortytwodot",
+    "aurora",
+    "applied_intuition",
+    "avride",
+    "bot_auto",
+    "gatik",
+    "may_mobility",
+    "kodiak",
+    "latitude",
+    "motional",
+    "vay",
+    "xpeng_us",
+    "mobileye",
+    "weride_us",
+    "woven_by_toyota",
+    "zoox"
+  ],
+  "successful_sources": 16,
+  "validated_jobs": 1429,
+  "active_jobs": 1429,
+  "historical_jobs": 1429,
+  "jobs_parquet": "data/processed/run_id=20260822T050023Z/jobs.parquet",
+  "source_status_parquet": "data/processed/run_id=20260822T050023Z/source_status.parquet",
+  "duckdb_file": "output/run_id=20260822T050023Z/av_jobs.duckdb",
+  "analysis_file": "output/run_id=20260822T050023Z/duckdb_analysis.json",
+  "latest_manifest": "data/published/latest.json",
+  "analysis": {
+    "active_jobs": 1429,
+    "historical_jobs": 1429,
+    "companies": 16,
+    "jobs_by_company": [
+      {
+        "company": "Applied Intuition",
+        "jobs": 295
+      },
+      {
+        "company": "Zoox",
+        "jobs": 239
+      },
+      {
+        "company": "Mobileye",
+        "jobs": 153
+      },
+      {
+        "company": "Woven by Toyota",
+        "jobs": 140
+      },
+      {
+        "company": "42dot",
+        "jobs": 114
+      },
+      {
+        "company": "Motional",
+        "jobs": 82
+      },
+      {
+        "company": "Aurora",
+        "jobs": 69
+      },
+      {
+        "company": "Kodiak",
+        "jobs": 64
+      },
+      {
+        "company": "Gatik",
+        "jobs": 51
+      },
+      {
+        "company": "Latitude (Ford)",
+        "jobs": 49
+      },
+      {
+        "company": "May Mobility",
+        "jobs": 44
+      },
+      {
+        "company": "Avride",
+        "jobs": 37
+      },
+      {
+        "company": "WeRide",
+        "jobs": 30
+      },
+      {
+        "company": "XPeng",
+        "jobs": 28
+      },
+      {
+        "company": "Bot Auto",
+        "jobs": 21
+      },
+      {
+        "company": "Vay",
+        "jobs": 13
+      }
+    ],
+    "jobs_by_platform": [
+      {
+        "source_name": "lever",
+        "jobs": 562
+      },
+      {
+        "source_name": "ashby",
+        "jobs": 478
+      },
+      {
+        "source_name": "greenhouse",
+        "jobs": 389
+      }
+    ],
+    "source_status": [
+      {
+        "spider": "fortytwodot",
+        "company": "42dot",
+        "status": "success",
+        "source_items_seen": 114,
+        "validated_items": 114
+      },
+      {
+        "spider": "applied_intuition",
+        "company": "Applied Intuition",
+        "status": "success",
+        "source_items_seen": 295,
+        "validated_items": 295
+      },
+      {
+        "spider": "aurora",
+        "company": "Aurora",
+        "status": "success",
+        "source_items_seen": 69,
+        "validated_items": 69
+      },
+      {
+        "spider": "avride",
+        "company": "Avride",
+        "status": "success",
+        "source_items_seen": 37,
+        "validated_items": 37
+      },
+      {
+        "spider": "bot_auto",
+        "company": "Bot Auto",
+        "status": "success",
+        "source_items_seen": 21,
+        "validated_items": 21
+      },
+      {
+        "spider": "gatik",
+        "company": "Gatik",
+        "status": "success",
+        "source_items_seen": 51,
+        "validated_items": 51
+      },
+      {
+        "spider": "kodiak",
+        "company": "Kodiak",
+        "status": "success",
+        "source_items_seen": 64,
+        "validated_items": 64
+      },
+      {
+        "spider": "latitude",
+        "company": "Latitude (Ford)",
+        "status": "success",
+        "source_items_seen": 49,
+        "validated_items": 49
+      },
+      {
+        "spider": "may_mobility",
+        "company": "May Mobility",
+        "status": "success",
+        "source_items_seen": 44,
+        "validated_items": 44
+      },
+      {
+        "spider": "mobileye",
+        "company": "Mobileye",
+        "status": "success",
+        "source_items_seen": 153,
+        "validated_items": 153
+      },
+      {
+        "spider": "motional",
+        "company": "Motional",
+        "status": "success",
+        "source_items_seen": 82,
+        "validated_items": 82
+      },
+      {
+        "spider": "vay",
+        "company": "Vay",
+        "status": "success",
+        "source_items_seen": 13,
+        "validated_items": 13
+      },
+      {
+        "spider": "weride_us",
+        "company": "WeRide",
+        "status": "success",
+        "source_items_seen": 30,
+        "validated_items": 30
+      },
+      {
+        "spider": "woven_by_toyota",
+        "company": "Woven by Toyota",
+        "status": "success",
+        "source_items_seen": 140,
+        "validated_items": 140
+      },
+      {
+        "spider": "xpeng_us",
+        "company": "XPeng",
+        "status": "success",
+        "source_items_seen": 28,
+        "validated_items": 28
+      },
+      {
+        "spider": "zoox",
+        "company": "Zoox",
+        "status": "success",
+        "source_items_seen": 239,
+        "validated_items": 239
+      }
+    ],
+    "posting_date_range": {
+      "earliest": "2016-02-08 19:02:13.535000+00:00",
+      "latest": "2026-08-22 00:47:30.444000+00:00"
+    },
+    "quality_flags": {
+      "missing_titles": 0.0,
+      "missing_source_urls": 0.0,
+      "short_descriptions": 0.0
+    }
+  }
+}

@@ -11,3 +11,10 @@ Access is managed through UWA SharePoint. If the workbook does not open, request
 ## Charts
 
 Generated charts are stored in [`charts/`](./charts/).
+
+## Data Acquisition MVP
+
+The implementation of the Scrapy-to-Parquet/DuckDB collection workflow is in
+[`mvp-data-acquisition/`](./mvp-data-acquisition/). It contains one spider per
+implemented company, shared ATS adapters, offline tests, and its own operating
+and development documentation.
