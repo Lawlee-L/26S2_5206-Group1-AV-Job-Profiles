@@ -8,7 +8,7 @@ import duckdb
 import pandas as pd
 import pytest
 
-from av_jobs.cleaning import clean_current_jobs, merge_history
+from av_jobs.cleaning import clean_current_jobs, html_to_text, merge_history
 from av_jobs.exports import TEAM_CSV_COLUMNS, export_team_jobs_csv
 from av_jobs.models import RawJob, SourceStatus
 from av_jobs.quality import build_quality_report
@@ -56,6 +56,16 @@ def status_frame(run_id: str) -> pd.DataFrame:
         status="success",
     )
     return pd.DataFrame([status.model_dump(mode="json")])
+
+
+def test_html_to_text_removes_entity_escaped_tags() -> None:
+    description = "&lt;h2&gt;Role&lt;/h2&gt;&lt;p&gt;Build &amp;amp; test&lt;/p&gt;"
+
+    cleaned = html_to_text(description)
+
+    assert cleaned == "Role Build & test"
+    assert "<" not in cleaned
+    assert ">" not in cleaned
 
 
 def test_clean_history_parquet_and_duckdb(tmp_path: Path) -> None:

@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from datetime import UTC
+from html import unescape
 
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -25,9 +26,20 @@ def normalise_text(value: str | None) -> str | None:
 
 
 def html_to_text(value: str) -> str:
-    """Convert source HTML to compact plain text for later analysis."""
+    """Convert source HTML or entity-escaped HTML to compact plain text.
 
-    soup = BeautifulSoup(value, "html.parser")
+    Some ATS APIs return markup encoded as text (for example, ``&lt;p&gt;``).
+    Decode at most twice before parsing so normal source text is retained while
+    escaped tags do not leak into downstream CSV, Parquet or DuckDB fields.
+    """
+
+    decoded = value
+    for _ in range(2):
+        unescaped = unescape(decoded)
+        if unescaped == decoded:
+            break
+        decoded = unescaped
+    soup = BeautifulSoup(decoded, "html.parser")
     return normalise_text(soup.get_text(" ", strip=True)) or ""
 
 

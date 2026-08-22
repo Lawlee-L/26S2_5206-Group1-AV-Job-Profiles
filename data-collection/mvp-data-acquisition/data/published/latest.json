@@ -1,10 +1,10 @@
 {
-  "run_id": "20260822T042215Z",
+  "run_id": "20260822T050023Z",
   "status": "published",
-  "published_at": "2026-08-22T04:22:27.860930+00:00",
-  "jobs_parquet": "data/processed/run_id=20260822T042215Z/jobs.parquet",
-  "source_status_parquet": "data/processed/run_id=20260822T042215Z/source_status.parquet",
-  "duckdb_file": "output/run_id=20260822T042215Z/av_jobs.duckdb",
+  "published_at": "2026-08-22T05:00:55.752675+00:00",
+  "jobs_parquet": "data/processed/run_id=20260822T050023Z/jobs.parquet",
+  "source_status_parquet": "data/processed/run_id=20260822T050023Z/source_status.parquet",
+  "duckdb_file": "output/run_id=20260822T050023Z/av_jobs.duckdb",
   "selected_spiders": [
     "fortytwodot",
     "aurora",

@@ -4,8 +4,8 @@ This directory contains the processed output of one complete, quality-gated run.
 
 | Property | Value |
 |---|---|
-| Run ID | `20260822T042215Z` |
-| Collected | 22 August 2026 at 04:22 UTC |
+| Run ID | `20260822T050023Z` |
+| Collected | 22 August 2026 at 05:00 UTC |
 | Sources | 16/16 successful |
 | Active jobs | 1,429 |
 | Duplicate active source keys | 0 |
@@ -13,10 +13,10 @@ This directory contains the processed output of one complete, quality-gated run.
 
 Committed artifacts:
 
-- `processed/run_id=20260822T042215Z/jobs.parquet`: the documented job dataset;
-- `processed/run_id=20260822T042215Z/source_status.parquet`: collection evidence;
+- `processed/run_id=20260822T050023Z/jobs.parquet`: the documented job dataset;
+- `processed/run_id=20260822T050023Z/source_status.parquet`: collection evidence;
 - `published/latest.json`: repository-relative pointer to the accepted snapshot;
-- `../output/run_id=20260822T042215Z/av_jobs.duckdb`: query-ready database;
+- `../output/run_id=20260822T050023Z/av_jobs.duckdb`: query-ready database;
 - the same output directory's analysis, quality, issue and run summaries.
 
 Raw responses and intermediate validated JSONL are not committed. They duplicate
