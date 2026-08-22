@@ -60,10 +60,20 @@ No Playwright browser, API key, login or paid AI service is required for this
 structured-source MVP. See the [operations guide](docs/OPERATIONS.md) for
 selective runs, outputs, failure recovery and troubleshooting.
 
+Generate the four-column CSV requested by the team from the accepted DuckDB:
+
+```powershell
+.\.venv\Scripts\python export_jobs_csv.py
+```
+
+The result is written to `exports/av_jobs_<RUN_ID>.csv` with the columns
+`company`, `name`, `description` and `date_posted`. It contains active jobs only.
+
 ## Repository layout
 
 ```text
 run_pipeline.py             thin command-line entry point
+export_jobs_csv.py          DuckDB-to-team-CSV command-line entry point
 src/av_jobs/
   orchestration.py          application workflow and publication boundary
   models.py                 strict shared Pydantic contracts
@@ -72,6 +82,7 @@ src/av_jobs/
   quality.py                publication quality rules
   snapshots.py              unmodified response and metadata storage
   storage.py                Parquet, DuckDB and atomic manifest adapters
+  exports.py                stable downstream CSV contract
   registry.py               explicit MVP source inventory
   extensions/               per-source completion evidence
   spiders/

@@ -6,8 +6,10 @@ from pathlib import Path
 
 import duckdb
 import pandas as pd
+import pytest
 
 from av_jobs.cleaning import clean_current_jobs, merge_history
+from av_jobs.exports import TEAM_CSV_COLUMNS, export_team_jobs_csv
 from av_jobs.models import RawJob, SourceStatus
 from av_jobs.quality import build_quality_report
 from av_jobs.storage import (
@@ -175,3 +177,52 @@ def test_relative_latest_manifest_can_be_reopened(tmp_path: Path) -> None:
     reopened = load_latest_jobs(manifest)
     assert reopened is not None
     assert len(reopened) == 1
+
+
+def test_team_csv_export_has_excel_safe_contract(tmp_path: Path) -> None:
+    database_path = tmp_path / "jobs.duckdb"
+    output_path = tmp_path / "jobs.csv"
+    with duckdb.connect(str(database_path)) as connection:
+        connection.execute(
+            """
+            CREATE TABLE active_jobs AS
+            SELECT
+                'ACME, Inc.'::VARCHAR AS company,
+                'Engineer "AV"'::VARCHAR AS original_title,
+                '=Line one\nLine two, with comma'::VARCHAR AS description_text,
+                TIMESTAMPTZ '2026-08-22 08:30:00+08:00' AS posted_at_utc,
+                'job-1'::VARCHAR AS source_job_id
+            """
+        )
+
+    row_count = export_team_jobs_csv(database_path, output_path)
+
+    assert row_count == 1
+    assert output_path.read_bytes().startswith(b"\xef\xbb\xbf")
+    frame = pd.read_csv(output_path, encoding="utf-8-sig")
+    assert tuple(frame.columns) == TEAM_CSV_COLUMNS
+    assert frame.iloc[0].to_dict() == {
+        "company": "ACME, Inc.",
+        "name": 'Engineer "AV"',
+        "description": "'=Line one\nLine two, with comma",
+        "date_posted": "2026-08-22T00:30:00Z",
+    }
+
+
+def test_team_csv_export_rejects_empty_database(tmp_path: Path) -> None:
+    database_path = tmp_path / "empty.duckdb"
+    with duckdb.connect(str(database_path)) as connection:
+        connection.execute(
+            """
+            CREATE TABLE active_jobs (
+                company VARCHAR,
+                original_title VARCHAR,
+                description_text VARCHAR,
+                posted_at_utc TIMESTAMPTZ,
+                source_job_id VARCHAR
+            )
+            """
+        )
+
+    with pytest.raises(ValueError, match="contains no rows"):
+        export_team_jobs_csv(database_path, tmp_path / "empty.csv")

@@ -76,6 +76,18 @@ source from being confused with a company that has closed all jobs.
 | `active_jobs` | view | Only records whose `is_active` value is true |
 | `jobs_with_quality_flags` | view | Missing title/URL and short-description indicators |
 
+## Team CSV contract
+
+`export_jobs_csv.py` creates a simplified exchange file from the `active_jobs`
+DuckDB view. It contains exactly `company`, `name`, `description` and
+`date_posted`. `name` is the original advertised title, not a normalised title.
+`date_posted` is UTC ISO 8601 text ending in `Z`; a blank value means the source
+did not provide a reliable posting date.
+
+The CSV intentionally omits historical inactive jobs and internal provenance
+columns. Use Parquet or DuckDB when source IDs, URLs, locations, history or
+quality fields are required.
+
 ## Not yet produced
 
 `generic_job_title`, normalised country/city, `required_skills`, AV job category,

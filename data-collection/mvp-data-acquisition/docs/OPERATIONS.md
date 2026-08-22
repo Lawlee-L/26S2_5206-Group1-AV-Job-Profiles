@@ -54,6 +54,36 @@ Useful options:
 The process exits with code 0 for verified outputs and code 1 when collection or
 quality gates fail. The final console output is also valid JSON for automation.
 
+## Export the team CSV
+
+After a full accepted run, generate the teammate-compatible CSV from DuckDB:
+
+```powershell
+.\.venv\Scripts\python export_jobs_csv.py
+```
+
+The default output is `exports/av_jobs_<RUN_ID>.csv`. It contains one row per
+active job and exactly four columns:
+
+| Column | DuckDB source | Meaning |
+|---|---|---|
+| `company` | `company` | Company display name |
+| `name` | `original_title` | Original advertised job title |
+| `description` | `description_text` | Cleaned plain-text description |
+| `date_posted` | `posted_at_utc` | UTC date in ISO 8601 format |
+
+The file is UTF-8 with BOM so Microsoft Excel recognises the encoding. Commas,
+quotation marks and line breaks inside descriptions are handled using standard
+CSV quoting. Source text beginning with an Excel formula marker is prefixed with
+an apostrophe to prevent CSV formula injection. To select a database or output
+explicitly:
+
+```powershell
+.\.venv\Scripts\python export_jobs_csv.py `
+  --database output\run_id=<RUN_ID>\av_jobs.duckdb `
+  --output exports\team_jobs.csv
+```
+
 ## Read the result
 
 Start with `output/run_id=<RUN_ID>/run_summary.json`:
