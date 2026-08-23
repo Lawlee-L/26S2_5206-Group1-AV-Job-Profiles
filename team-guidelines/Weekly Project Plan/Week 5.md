@@ -200,6 +200,6 @@ Attend to meeting : 1/2
 ---
 ### 7. Week 5 Summary
 
-To be completed at the end of Week 5.
+The team successfully completed and submitted Deliverable 1 after reviewing the report against the marking rubric. Members continued investigating their assigned companies, including their ATS platforms and available API endpoints. The team also reviewed the collected job data and agreed to begin experimenting with skills-extraction methods. Most members took the initiative to move the project forward, and all team members actively participated in project discussions and shared their ideas and feedback. Data processing, database selection, location filtering, and the next MVP implementation tasks were identified as the main priorities for Week 6.
 
 ---
