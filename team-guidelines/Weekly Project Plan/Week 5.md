@@ -36,10 +36,10 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
           **Due:** After the group meeting
 
 - Week 5 work summary.          
-    - [ ] Complete the Week 5 work summary.  
+    - [x] Complete the Week 5 work summary.  
           **Owner:** All team members  
           **Location:** Microsoft Teams — Team Shared
-    - [ ] Upload the completed Week 5 work summary to the CITS5206 Channel.  
+    - [x] Upload the completed Week 5 work summary to the CITS5206 Channel.  
           **Owner:** Li Luo    
           **Due:** 7:00 PM, Sunday, 23 August 2026
 
@@ -98,7 +98,7 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 #### Li Luo
 Attend to meeting : 2/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 5 work summary form.    
+    - [x] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   - Deliverable 1
     - [x] [1. Project Context, Motivation & Objectives](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
@@ -108,7 +108,7 @@ Attend to meeting : 2/2
     - [x] Complete the Group meeting minutes, Upload the Facilitator meeting minutes to GitHub.
 - Role-Specific Responsibilities: Team Lead
     - [x] Complete Weekly Plan and Weekly Task track.
-    - [ ] Upload the completed Week 5 work summary to the CITS5206 Channel.
+    - [x] Upload the completed Week 5 work summary to the CITS5206 Channel.
 - Role-Specific Responsibilities: Minutes Taker
     - [x] Complete the Group meeting minutes, Upload the Facilitator meeting minutes to GitHub.
 
@@ -116,7 +116,7 @@ Attend to meeting : 2/2
 #### Nyx Chen 
 Attend to meeting : 2/2 
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 5 work summary form.    
+    - [x] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   -  Data Collection Track
     - [x] [Complete 5. Data Sources & Collection Strategy](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
@@ -131,18 +131,18 @@ Attend to meeting : 2/2
 #### Seonjeong Jeong
 Attend to meeting : 1/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 5 work summary form.    
+    - [x] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   - Deliverable 1
     - [x] [Complete 2. Scope, Requirements & Data Needs](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)
     - [x] Review the report against the marking rubric.
-  - [ ] Identify the next implementation tasks based on the approved MVP & Data collection Findings
+  - [x] Identify the next implementation tasks based on the approved MVP & Data collection Findings
 
 ---
 #### Sunjol Singh Paul
 Attend to meeting : 2/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 5 work summary form.    
+    - [x] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   -  Data Collection Track
     - [x] [Complete 6. Data Processing, Common Schema & AI Feasibility](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
@@ -157,7 +157,7 @@ Attend to meeting : 2/2
 #### Thushamini Chathusika Hewa Pathegamage
 Attend to meeting : 2/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 5 work summary form.    
+    - [x] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   - Deliverable 1
     - [x] [Complete 4. Project Planning, Risk & Evaluation](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
@@ -168,7 +168,7 @@ Attend to meeting : 2/2
 #### Leon Nel Nel
 Attend to meeting : 1/2
 - Routine Weekly Responsibilities
-    - [ ] Complete the Week 5 work summary form.    
+    - [x] Complete the Week 5 work summary form.    
 - Project-Related Tasks
   - Deliverable 1
     - [x] [Complete 3. Proposed Solution, AI Analysis & Dashboard](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/10)  
