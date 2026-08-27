@@ -2,17 +2,15 @@
 
 ## Purpose
 
-This document provides a weekly overview of the team's academic requirements, project goals, individual task allocations, risks, and progress.
+This document provides a weekly overview of the team's academic requirements, project goals, task allocations, risks, and progress. It will be reviewed and updated during regular team meetings.
 
-It will be reviewed and updated during regular team meetings. Team members should check their assigned tasks and update the checkboxes when tasks are completed.
-
-Meeting-minutes responsibilities will rotate among team members. When it is your turn, please ensure that the minutes follow the required format and are uploaded to the Meeting Minutes folder.
+All important project documents, including minutes from client meetings and subgroup meetings, should be uploaded to GitHub so that everyone can stay informed about the latest progress. If AI is used to prepare any important project documents, the content must be carefully double-checked before it is uploaded or submitted.
 
 ## Status Key
 
-- [ ] Not completed
-- [x] Completed
-- ⚠️ Important deadline or issue
+- ☐ Not completed
+- ☑ Completed
+- ⚠ Important deadline or issue
 
 # Week 6 — 24 August to 30 August 2026
 
@@ -20,275 +18,205 @@ Meeting-minutes responsibilities will rotate among team members. When it is your
 
 ### Facilitator Meeting
 
-**Date:** Wednesday, 26 August 2026
+**Date:** 27 August 2026  
+**Status:** Completed
 
-- [ ] Prepare findings and questions for the facilitator meeting.
-- [ ] Discuss the proposed methods for extracting skills from job data.
-- [ ] Discuss how the collected data should be processed.
-- [ ] Discuss and compare suitable database options for the project.
-- [ ] Clarify the requirements for location-based and robotics-industry filtering.
-- [ ] Complete the facilitator meeting minutes and upload them to GitHub.
+- ☑ Discuss the current project progress.
+- ☑ Discuss the logic for determining whether jobs are relevant to the AV field.
+- ☑ Discuss data cleaning, multilingual data, skills extraction, and skills standardisation.
+- ☑ Discuss possible data storage and classification approaches.
+- ☐ Review and correct the facilitator meeting minutes against the full transcript.
+- ☐ Upload the final checked meeting minutes to GitHub.
 
 **Owner:** Assigned minutes taker  
-**Due:** After the facilitator meeting
+**Due:** As soon as possible
 
 ### Group Meeting
 
-**Date:** To be confirmed
+**Date:** Saturday, 29 August 2026
 
-- [ ] Review the facilitator’s feedback and agree on the next implementation steps.
-- [ ] Complete the group meeting minutes and upload them to GitHub.
+- ☐ Continue discussing the data processing and classification approach.
+- ☐ Compare findings from the data/classification group.
+- ☐ Agree on the next classification experiments.
+- ☐ Review progress on the web requirements and client communication.
+- ☐ Confirm the tasks to be continued during the study break.
+- ☐ Complete and upload the group meeting minutes to GitHub.
 
-**Owner:** Assigned minutes taker  
-**Due:** After the group meeting
+**Owner:** All team members / assigned minutes taker
 
 ### Week 6 Work Summary
 
-- [ ] Complete the Week 6 work summary.
+- ☐ Complete the Week 6 work summary.
 
 **Owner:** All team members  
 **Location:** Microsoft Teams — Team Shared  
 **Due:** Sunday, 30 August 2026
 
-- [ ] Upload the completed Week 6 work summary to the CITS5206 Channel.
+- ☐ Upload the completed Week 6 work summary to the CITS5206 Channel.
 
 **Owner:** Li Luo  
 **Due:** Sunday, 30 August 2026
 
 ## 2. Weekly Project Goals
 
-- [ ] Finalise the review of assigned companies and their data-collection methods.
-- [ ] Confirm whether each assigned company has an accessible API endpoint.
-- [ ] Update the endpoint findings in **Shared → AV company list.xlsx → Sheet1**.
-- [ ] Finalise the list of companies that may be difficult or impractical to support.
-- [ ] Respond to the client and request clarification on the additional requirements.
-- [ ] Review the two available datasets and understand their structure.
-- [ ] Experiment with different methods for extracting skills from job data.
-- [ ] Begin discussing how the collected data should be cleaned and processed.
-- [ ] Compare possible database options, including DuckDB and MySQL.
-- [ ] Prepare findings and recommendations for the facilitator meeting.
-- [ ] Identify the next MVP implementation tasks based on the facilitator’s feedback.
+- ☐ Progress the web and data/classification work in parallel.
+- ☐ Develop a clear and practical approach for classifying AV-related jobs.
+- ☐ Determine how irrelevant jobs and unrelated text should be removed.
+- ☐ Investigate how multilingual job data should be translated and processed.
+- ☐ Test methods for extracting and standardising skills using Python and LLMs.
+- ☐ Investigate how related skills such as Python, Flask, and Django should be grouped.
+- ☐ Prepare classification findings and questions for the next client meeting.
+- ☐ Confirm the website requirements with Lee.
+- ☐ Continue collecting dated job data for comparison and proof of concept.
+- ☐ Keep all important project documents and meeting minutes updated on GitHub.
 
-## 3. Internal Task Allocation
+## 3. Team Structure and Task Allocation
 
-### Company Endpoint Review
+### Web Group
 
-- [ ] Recheck the companies assigned to each team member.
-- [ ] Identify the ATS used by each company.
-- [ ] Confirm whether the ATS provides an accessible API endpoint.
-- [ ] Add confirmed endpoints to the shared company list.
-- [ ] Mark companies without an accessible endpoint as:
-  - **No accessible endpoint found**
-  - **HTML parsing required**
-  - **Further investigation required**
-- [ ] Review the final list of difficult or unsupported companies.
+**Members:** Leon Nel Nel and Thushamini Chathusika Hewa Pathegamage
 
-**Owner:** All team members  
-**Location:** Shared → AV company list.xlsx → Sheet1  
-**Due:** Before the client response is finalised
+- ☐ Contact Lee as soon as possible to confirm the website requirements.
+- ☐ Arrange a separate meeting with Lee if necessary.
+- ☐ Identify the data fields and structure required by the website.
+- ☐ Begin planning how the processed data will be displayed and used on the website.
+- ☐ Record and upload important meeting notes and web-related documents to GitHub.
+
+**Primary contact with Lee:** Leon Nel Nel
+
+### Data and Classification Group
+
+**Members:** Li Luo, Nyx Chen, Seonjeong Jeong, and Sunjol Singh Paul
+
+- ☐ Determine whether each job is relevant to the AV field.
+- ☐ Remove irrelevant jobs and unrelated content from job descriptions.
+- ☐ Process and translate multilingual data.
+- ☐ Extract and standardise skills from relevant job descriptions.
+- ☐ Test possible classification methods using Python and LLMs.
+- ☐ Compare fixed skill lists with more flexible classification approaches.
+- ☐ Explore whether a main skill–subskill structure is suitable.
+- ☐ Prepare a clear and workable classification proposal before the next client meeting.
+
+**Priority:** Classification is the highest-priority project task. Once the classification approach is stable, members may move to support web development.
+
+### Weekly Data Collection
+
+- ☐ Run the data collection script once a week.
+- ☐ Save each result with its collection date.
+- ☐ Compare results from different dates to identify newly added jobs.
+- ☐ Keep the collected data available to the team.
+
+**Owner:** Nyx Chen
 
 ### Client Communication
 
-- [ ] Compile the final list of difficult or unsupported companies.
-- [ ] Respond to the client regarding the company list.
-- [ ] Ask the client to clarify the location-based use case.
-- [ ] Ask whether robotics-industry filtering is required.
-- [ ] Clarify whether the two-week period is a strict requirement or an example.
+- ☐ Email the client about the companies and available API information.
+- ☐ Help arrange the next client meeting.
+- ☐ Ask the client whether soft skills should be included.
+- ☐ Ask whether skills should use a main skill–subskill structure.
+- ☐ Clarify how flexible the classification system needs to be.
+- ☐ Confirm any remaining MVP scope questions.
 
-**Owner:** Sunjol Singh Paul  
-**Due:** Monday, 24 August 2026
+**Owner:** Sunjol Singh Paul
 
-### Dataset Review and Skills Extraction
+### Project Documentation
 
-- [ ] Select one of the two available datasets:
-  - **green.csv**
-  - **av_jobs_20260822T050023Z**
-- [ ] Review the structure and available fields in the selected dataset.
-- [ ] Develop a method or logic for extracting skills from job data.
-- [ ] Test the proposed method on sample job records.
-- [ ] Record the method, results, limitations, and possible improvements.
-- [ ] Prepare to share the findings at the facilitator meeting.
+- ☐ Upload all important project documents to GitHub.
+- ☐ Upload client and subgroup meeting minutes to GitHub.
+- ☐ Check documents carefully before uploading or submitting them.
+- ☐ Double-check any content prepared or organised with AI against the original source.
 
-**Owner:** All team members  
-**Due:** Before the facilitator meeting on Wednesday, 26 August 2026
+**Owner:** All team members
 
-### Data Sharing
-
-- [ ] Share or upload the scraper code and collected job data.
-- [ ] Export the collected data to CSV if required for team access.
-- [ ] Confirm that all team members can access the datasets.
-
-**Owner:** Nyx Chen  
-**Due:** Before the facilitator meeting
-
-### Data Processing and Database Selection
-
-- [ ] Review the current data-storage approach.
-- [ ] Identify the fields required for the MVP.
-- [ ] Consider how the collected data should be cleaned and standardised.
-- [ ] Compare DuckDB, MySQL, and other suitable database options.
-- [ ] Consider database suitability for experimentation and deployment.
-- [ ] Prepare questions and recommendations for the facilitator.
-
-**Owner:** All team members  
-**Due:** Facilitator meeting on Wednesday, 26 August 2026
-
-### MVP Implementation Planning
-
-- [ ] Review the facilitator’s feedback.
-- [ ] Confirm whether location filtering should be included in the current MVP.
-- [ ] Confirm whether robotics-industry filtering is part of the project scope.
-- [ ] Agree on the preferred skills-extraction approach.
-- [ ] Agree on the data-processing and storage approach.
-- [ ] Divide the next implementation tasks among team members.
-
-**Owner:** All team members  
-**Due:** During the next group meeting
-
-## 4. Quick Check
+## 4. Individual Quick Check
 
 ### Li Luo
 
-**Attend to meetings:** 0/2
-
-#### Routine Weekly Responsibilities
-
-- [ ] Attend the facilitator meeting.
-- [ ] Attend the group meeting.
-- [ ] Complete the Week 6 work summary form.
-
-#### Project-Related Tasks
-
-- [ ] Recheck assigned companies and update endpoint findings.
-- [ ] Select one dataset and experiment with a skills-extraction method.
-- [ ] Prepare ideas for data processing and database selection.
-- [ ] Help identify the next MVP implementation tasks.
-
-#### Role-Specific Responsibilities: Team Lead
-
-- [ ] Complete the Week 6 project plan and maintain the weekly task tracker.
-- [ ] Remind team members of their tasks and deadlines.
-- [ ] Monitor the progress of the company endpoint review.
-- [ ] Coordinate preparation for the facilitator meeting.
-- [ ] Upload the completed Week 6 work summary to the CITS5206 Channel.
+- ☐ Complete the Week 6 work summary.
+- ☐ Upload the completed Week 6 work summary to the CITS5206 Channel.
+- ☐ Work on AV job relevance, data cleaning, and classification logic.
+- ☐ Prepare findings for Saturday's meeting.
+- ☐ Contact the facilitator and send her the facilitator meeting minutes.
+- ☐ Complete the Week 6 project plan and hand over the team-lead role to Nyx for next week.
 
 ### Nyx Chen
 
-**Attend to meetings:** 0/2
-
-#### Routine Weekly Responsibilities
-
-- [ ] Attend the facilitator meeting.
-- [ ] Attend the group meeting.
-- [ ] Complete the Week 6 work summary form.
-
-#### Project-Related Tasks
-
-- [ ] Recheck assigned companies and update endpoint findings.
-- [ ] Share or upload the scraper code and collected job data.
-- [ ] Export the collected data to CSV if required.
-- [ ] Confirm that team members can access the datasets.
-- [ ] Select one dataset and experiment with a skills-extraction method.
-- [ ] Prepare ideas for data processing and database selection.
-- [ ] Help identify the next MVP implementation tasks.
+- ☐ Complete the Week 6 work summary.
+- ☐ Run the data collection script and save the result with the collection date.
+- ☐ Compare the latest data with the previous dataset.
+- ☐ Continue investigating data cleaning, translation, and classification.
+- ☐ Prepare to take over as team leader from Week 7.
 
 ### Seonjeong Jeong
 
-**Attend to meetings:** 0/2
-
-#### Routine Weekly Responsibilities
-
-- [ ] Attend the facilitator meeting.
-- [ ] Attend the group meeting.
-- [ ] Complete the Week 6 work summary form.
-
-#### Project-Related Tasks
-
-- [ ] Recheck assigned companies and update endpoint findings.
-- [ ] Select one dataset and experiment with a skills-extraction method.
-- [ ] Prepare ideas for data processing and database selection.
-- [ ] Help identify the next MVP implementation tasks.
+- ☐ Complete the Week 6 work summary.
+- ☐ Work on AV job relevance, data cleaning, skills extraction, or skills standardisation.
+- ☐ Document the method tested, results, limitations, and possible improvements.
+- ☐ Prepare findings for Saturday's meeting.
 
 ### Sunjol Singh Paul
 
-**Attend to meetings:** 0/2
-
-#### Routine Weekly Responsibilities
-
-- [ ] Attend the facilitator meeting.
-- [ ] Attend the group meeting.
-- [ ] Complete the Week 6 work summary form.
-
-#### Project-Related Tasks
-
-- [ ] Recheck assigned companies and update endpoint findings.
-- [ ] Compile the final list of difficult or unsupported companies.
-- [ ] Respond to the client and request clarification on the additional requirements.
-- [ ] Select one dataset and experiment with a skills-extraction method.
-- [ ] Prepare ideas for data processing and database selection.
-- [ ] Help identify the next MVP implementation tasks.
+- ☐ Complete the Week 6 work summary.
+- ☐ Email the client about company and API information.
+- ☐ Help arrange the next client meeting.
+- ☐ Continue testing skills extraction and standardisation methods.
+- ☐ Prepare client questions about the classification structure and project scope.
 
 ### Thushamini Chathusika Hewa Pathegamage
 
-**Attend to meetings:** 0/2
-
-#### Routine Weekly Responsibilities
-
-- [ ] Attend the facilitator meeting.
-- [ ] Attend the group meeting.
-- [ ] Complete the Week 6 work summary form.
-
-#### Project-Related Tasks
-
-- [ ] Recheck assigned companies and update endpoint findings.
-- [ ] Select one dataset and experiment with a skills-extraction method.
-- [ ] Prepare ideas for data processing and database selection.
-- [ ] Help identify the next MVP implementation tasks.
+- ☐ Complete the Week 6 work summary.
+- ☐ Work with Leon on the website requirements and planning.
+- ☐ Attend a separate meeting with Lee if required.
+- ☐ Identify how the processed job and skills data could be presented on the website.
 
 ### Leon Nel Nel
 
-**Attend to meetings:** 0/2
+- ☐ Complete the Week 6 work summary.
+- ☐ Contact Lee as soon as possible.
+- ☐ Confirm the website requirements and arrange a meeting if necessary.
+- ☐ Work with Thushamini on the web structure and required data fields.
+- ☐ Upload important web meeting notes and documents to GitHub.
 
-#### Routine Weekly Responsibilities
+## 5. Questions to Confirm With the Client
 
-- [ ] Attend the facilitator meeting.
-- [ ] Attend the group meeting.
-- [ ] Complete the Week 6 work summary form.
+- ☐ Should soft skills be included in the classification results?
+- ☐ Should skills be organised using a main skill–subskill structure?
+- ☐ How flexible should the classification system be when new skills appear?
+- ☐ What information and functions are required on the website?
+- ☐ Which companies, locations, and categories must be included in the MVP?
 
-#### Project-Related Tasks
+## 6. Expected Weekly Outcomes
 
-- [ ] Recheck assigned companies and update endpoint findings.
-- [ ] Select one dataset and experiment with a skills-extraction method.
-- [ ] Prepare ideas for data processing and database selection.
-- [ ] Help identify the next MVP implementation tasks.
+- The team is working in two clear groups: web and data/classification.
+- Leon has contacted Lee and started confirming the website requirements.
+- Nyx has saved a new dated copy of the collected job data.
+- Sunjol has progressed the client communication.
+- The data/classification group has documented its experiments and findings.
+- The team has a clearer process for job relevance checking, cleaning, translation, skills extraction, and standardisation.
+- The main classification questions are ready for the next client meeting.
+- Important project documents and meeting minutes are available on GitHub.
+- Week 6 contribution records are completed.
 
-## 5. Expected Weekly Outcomes
+## 7. Risks or Blockers
 
-- The company endpoint review is completed and recorded in the shared spreadsheet.
-- Companies without accessible endpoints are clearly identified.
-- The client receives a response regarding difficult or unsupported companies.
-- The client’s additional requirements are clarified.
-- All team members review at least one dataset.
-- Initial skills-extraction methods are tested and documented.
-- The team begins forming a clear approach to data processing.
-- Suitable database options are compared and discussed.
-- The facilitator provides feedback on skills extraction, data processing, and database selection.
-- The next MVP implementation tasks are identified and allocated.
-- Week 6 contribution records and meeting minutes are completed.
+- Job descriptions may include unrelated roles, company information, or legal text.
+- Different platforms may use inconsistent formats and field names.
+- Multilingual job descriptions may require translation before classification.
+- LLM outputs may be inconsistent or may incorrectly classify skills.
+- A fixed skills dictionary may miss new or emerging technologies.
+- Similar or related skills may not be standardised consistently.
+- The client has not yet confirmed the treatment of soft skills or the preferred classification structure.
+- Delays in confirming the website requirements may affect web development.
+- AI-generated project documents may contain unsupported or inaccurate information if they are not checked against the original source.
+- Progress may slow during the study break, but project work still needs to continue.
 
-## 6. Risks or Blockers
+## 8. Upcoming Milestones
 
-- Some company career websites may not provide accessible endpoints.
-- Some ATS platforms may require complex HTML parsing or additional investigation.
-- Incomplete endpoint findings may delay the response to the client.
-- The client’s additional requirements may expand the MVP scope.
-- Location information may be missing or inconsistent in the collected job data.
-- Different datasets may use inconsistent field names or data structures.
-- Skill extraction may produce inaccurate, duplicated, or overly general results.
-- Team members may use different extraction methods that are difficult to compare.
-- The database decision may be delayed if deployment requirements remain unclear.
-- Delayed task updates may affect preparation for the facilitator meeting.
+- **Saturday, 29 August 2026:** Group meeting to continue the classification discussion.
+- **Week 7:** Nyx becomes the team leader; project work continues during the study break.
+- **Before the next client meeting:** Prepare a clear and practical classification approach.
+- **6 October 2026:** Have a functional project result ready for the demo video.
 
-## 7. Week 6 Summary
+## 9. Week 6 Summary
 
 To be completed at the end of Week 6.
