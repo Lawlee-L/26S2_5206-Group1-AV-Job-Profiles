@@ -1,0 +1,66 @@
+# Meeting Minutes
+
+**Meeting Type:** Team Meeting  
+**Date:** 29-08-2026  
+**Time:** 12:00 PM – 12:20 PM  
+**Recorded by:** Seonjeong Jeong  
+
+## Attendees
+- Seonjeong Jeong
+- Li Luo
+- Thushamini Chathusika Hewa Pathegamage
+- Leon Nel Nel
+
+**Absent:** Nyx Chen, Sunjol Singh Paul
+
+## Discussion
+
+### Topic 1: Data Collection and Data Columns
+- The team discussed the current progress and organisation of the job data collection.
+- Nyx and/or Sunjol are currently involved in leading the data collection, while the exact leadership arrangement still needs to be confirmed.
+- API endpoints have already been identified and added to the Excel file for the companies where data collection is possible.
+- The team needs to decide which job data columns will be used, such as job title and job description, before proceeding with classification.
+- The team agreed that an in-person meeting would be more effective for finalising the data columns.
+- The project timeline was discussed, with the team aiming to complete the required work before 6 October.
+
+### Topic 2: Client Meeting and Website UI/UX
+- The team discussed arranging a meeting with **Lee** regarding the website UI/UX and display.
+- The team agreed that the data columns should be finalised before discussing the website display with Lee.
+- For example, if location is requested for the website but location data is not available in the collected data, discussing the UI/UX before confirming the available data would be inefficient.
+- The team discussed potentially combining client meetings if schedules allow, so that all team members can participate.
+
+### Topic 3: In-Person Team Meeting
+- Since the following week is a study break, the team agreed to meet in person to finalise the data columns.
+- The team agreed to meet at **9:00 AM on 30 August 2026**.
+- Nyx and Sunjol will be invited to attend. If they cannot attend, they should provide/share the data they have collected so the rest of the team can proceed.
+- Seonjeong will arrange the meeting location and inform the team.
+
+## Key Decisions
+
+**Decision 1:**  
+The team will meet **in person at 9:00 AM on 30 August 2026** to finalise the job data columns.
+
+**Decision 2:**  
+The team will finalise the available data columns before proceeding with discussions with **Lee** about the website UI/UX and display.
+
+## Action Items
+
+| Task | Owner | Due Date |
+|------|-------|----------|
+| Arrange the location for the in-person meeting | Seonjeong | 30-08-2026 |
+| Inform Nyx and Sunjol about the 9:00 AM meeting | Seonjeong | 30-08-2026 |
+| Share collected data if unable to attend the meeting | Nyx / Sunjol | 30-08-2026 |
+| Finalise the required job data columns | Team | 30-08-2026 |
+| Contact Lee regarding the website UI/UX discussion after the data columns are finalised | Leon | After 30-08-2026 |
+
+## Follow-up / Next Meeting Agenda
+- Finalise the job data columns.
+- Review the data collected by Nyx and Sunjol.
+- Confirm which data can be displayed on the job website.
+- Discuss website UI/UX requirements with Lee after the data fields are confirmed.
+- Confirm the client meeting schedule.
+
+## Next Meeting
+**Date:** 30-08-2026  
+**Time:** 9:00 AM  
+**Format:** In person
