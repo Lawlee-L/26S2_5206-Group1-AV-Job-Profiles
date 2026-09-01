@@ -1,1 +1,10 @@
 .DS_Store
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+.venv/
+
+data-collection/data/raw/
+data-collection/data/standardized/
+data-collection/data/run_reports/
