@@ -43,6 +43,21 @@ It contains three sheets:
 The program reads only the `In Scope` sheet. A source can be moved from `TBD`
 to `In Scope` after its endpoint is checked and its collector is available.
 
+## Collection scope and data cleaning
+
+This pipeline is responsible for data collection and standardization. Each
+collector reads all public jobs from its configured source and maps the source
+fields to the standard job format.
+
+The collectors do not decide whether a job is related to autonomous vehicles.
+They also do not delete, correct, or classify job records. These tasks belong
+to the later data cleaning stage.
+
+This difference is important for broad companies such as Bosch. The
+SmartRecruiters collector must collect all configured Germany and US postings
+with pagination and full descriptions. AV-related filtering is completed after
+collection. Raw responses are kept so the cleaning result can be checked later.
+
 ## Setup
 
 Python 3.11 or a newer version is required.
@@ -78,7 +93,8 @@ Collect all sources from one platform:
 av-jobs collect --platform greenhouse
 ```
 
-The platform can currently be `greenhouse`, `lever`, or `ashby`.
+The platform can currently be `greenhouse`, `lever`, `ashby`, `workable`,
+`comeet`, `moka`, `smartrecruiters`, or `jobylon`.
 
 Run all available collectors:
 
@@ -94,12 +110,50 @@ available results into `jobs.json`. No manual merge is needed.
 
 Each collected job has two parts:
 
-- `metadata`: company, platform, source ID, tracking key, and collection time.
-- `data`: title, description, job URL, location, salary, and posted date.
+- `metadata`: information used to track where the record came from. It includes
+  the company, region, platform, source ID, original job ID, tracking key, and
+  collection time. This information helps later workstreams trace a record back
+  to its source, recognise the same job in future runs, check data quality, and
+  prepare records for deduplication or database storage.
+- `data`: the job information required by the current collection task. It
+  contains `advertised_job_title`, `job_description`, `job_url`, `location`,
+  `salary`, and `date_posted`. Later workstreams can clean, filter, translate,
+  analyse, or extend these fields.
+
+Keeping these two parts separate prevents tracking information from being mixed
+with the job advertisement itself. The structure can be flattened or changed
+later when the cleaned data is prepared for the final database schema.
 
 Raw source responses are saved under `data/raw/<run-date>/`. Standardized jobs
 are saved under `data/standardized/<run-date>/`. Run reports are saved under
 `data/run_reports/<run-date>/`.
+
+## Important notes
+
+- This collected dataset is an input for later work, not the final analysis
+  dataset. It may include jobs that are not related to autonomous vehicles.
+  Later workstreams must clean and filter the data before analysis or further
+  processing.
+- A missing source field is saved as `null`. The collector does not invent or
+  guess a value.
+- Salary is saved only when the public source gives a clear amount and unit.
+- Jobylon first reads the job links from the company widget. It then reads the
+  `JobPosting` JSON-LD from every detail page to get the full job information.
+- Some platforms require one detail request for every job. A complete run can
+  therefore take several minutes, especially for the large Bosch sources.
+- Job numbers can change between runs because companies add or remove jobs.
+- Generated raw data, standardized data, and run reports are local outputs.
+  They are excluded from GitHub by `.gitignore`.
+
+## Latest update
+
+The current update completed the collection and standardization work for all
+27 `In Scope` sources. It added the SmartRecruiters and Jobylon collectors,
+registered them in the main pipeline, and added tests for their field mapping.
+
+The latest complete run successfully collected and automatically combined
+3,118 jobs from eight platforms. All 26 automated tests passed. No manual file
+merge is required.
 
 ## Current progress
 
@@ -111,17 +165,16 @@ Completed:
 - Greenhouse collector: 12 sources tested
 - Lever collector: 6 sources tested
 - Ashby collector: 3 sources tested
-- 21 sources tested successfully
-- 1,898 job postings collected in the latest test
+- Workable collector: 1 source tested
+- Comeet collector: 1 source tested
+- Moka collector: 1 source tested
+- SmartRecruiters collector: 2 sources tested
+- Jobylon collector: 1 source tested
+- 27 sources tested successfully
+- 3,118 job postings collected in the latest test
 
-Still to do:
-
-- Workable collector
-- Comeet collector
-- Moka collector
-- SmartRecruiters collector
-- Jobylon collector
-- MySQL database connection and data loading
+The collection and standardization work for the current `In Scope` sources is
+complete. MySQL database loading belongs to the later backend export workstream.
 
 ## GitHub note
 

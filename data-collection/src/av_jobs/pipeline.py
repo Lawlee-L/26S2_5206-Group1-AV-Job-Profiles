@@ -6,8 +6,13 @@ from datetime import date
 from pathlib import Path
 
 from av_jobs.collectors.ashby import collect_ashby
+from av_jobs.collectors.comeet import collect_comeet
 from av_jobs.collectors.greenhouse import collect_greenhouse
+from av_jobs.collectors.jobylon import collect_jobylon
 from av_jobs.collectors.lever import collect_lever
+from av_jobs.collectors.moka import collect_moka
+from av_jobs.collectors.smartrecruiters import collect_smartrecruiters
+from av_jobs.collectors.workable import collect_workable
 from av_jobs.config import SourceConfig, load_sources
 from av_jobs.models import StandardJob
 from av_jobs.storage import DATA_DIR, save_raw_snapshot, save_standardized_jobs
@@ -25,8 +30,13 @@ class SourceRunResult:
 
 COLLECTORS = {
     "ashby": collect_ashby,
+    "comeet": collect_comeet,
     "greenhouse": collect_greenhouse,
+    "jobylon": collect_jobylon,
     "lever": collect_lever,
+    "moka": collect_moka,
+    "smartrecruiters": collect_smartrecruiters,
+    "workable": collect_workable,
 }
 
 
@@ -45,6 +55,8 @@ def run_pipeline(
     if not sources:
         raise ValueError("No In Scope sources matched the requested filters")
 
+    # Collect every public job from each selected source.
+    # AV relevance filtering belongs to the later data cleaning stage.
     all_jobs: list[StandardJob] = []
     results: list[SourceRunResult] = []
     for source in sources:
