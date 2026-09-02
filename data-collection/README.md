@@ -176,9 +176,20 @@ Completed:
 The collection and standardization work for the current `In Scope` sources is
 complete. MySQL database loading belongs to the later backend export workstream.
 
+## Next phase
+
+The collectors for the current 27 `In Scope` sources are complete.
+
+The next phase will investigate the 16 sources in the `TBD` sheet. A source will remain in `TBD` until its endpoint or collection method is confirmed and its collector passes a live test.
+
+Some `TBD` sources may require custom HTML parsing, POST requests, browser investigation, or platform-specific collectors. If a source cannot be collected reliably, the blocker will be documented in the Excel source list.
+
+This work is tracked in the new TBD source investigation issue.
+
 ## GitHub note
 
 The generated files inside `data/raw`, `data/standardized`, and
 `data/run_reports` should not be uploaded to GitHub. They can be large and can
 be created again by running the pipeline. A `.gitignore` file should be used to
 exclude them before the first commit.
+
