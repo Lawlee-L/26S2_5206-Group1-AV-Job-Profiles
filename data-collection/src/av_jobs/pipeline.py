@@ -5,13 +5,18 @@ from dataclasses import asdict, dataclass
 from datetime import date
 from pathlib import Path
 
+from av_jobs.collectors.aimotive import collect_aimotive
 from av_jobs.collectors.ashby import collect_ashby
 from av_jobs.collectors.comeet import collect_comeet
+from av_jobs.collectors.gm import collect_gm
 from av_jobs.collectors.greenhouse import collect_greenhouse
+from av_jobs.collectors.herp import collect_herp
+from av_jobs.collectors.hotjob import collect_hotjob
 from av_jobs.collectors.jobylon import collect_jobylon
 from av_jobs.collectors.lever import collect_lever
 from av_jobs.collectors.moka import collect_moka
 from av_jobs.collectors.smartrecruiters import collect_smartrecruiters
+from av_jobs.collectors.tensor import collect_tensor
 from av_jobs.collectors.workable import collect_workable
 from av_jobs.config import SourceConfig, load_sources
 from av_jobs.models import StandardJob
@@ -29,13 +34,18 @@ class SourceRunResult:
 
 
 COLLECTORS = {
+    "aimotive": collect_aimotive,
     "ashby": collect_ashby,
     "comeet": collect_comeet,
+    "gm": collect_gm,
     "greenhouse": collect_greenhouse,
+    "herp": collect_herp,
+    "hotjob": collect_hotjob,
     "jobylon": collect_jobylon,
     "lever": collect_lever,
     "moka": collect_moka,
     "smartrecruiters": collect_smartrecruiters,
+    "tensor": collect_tensor,
     "workable": collect_workable,
 }
 

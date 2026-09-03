@@ -85,3 +85,4 @@ def test_moka_collects_more_than_one_page(monkeypatch) -> None:
     assert len(jobs) == 3
     assert "offset=0" in requested_urls[0]
     assert "offset=100" in requested_urls[1]
+

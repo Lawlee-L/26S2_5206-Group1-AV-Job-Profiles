@@ -94,7 +94,8 @@ av-jobs collect --platform greenhouse
 ```
 
 The platform can currently be `greenhouse`, `lever`, `ashby`, `workable`,
-`comeet`, `moka`, `smartrecruiters`, or `jobylon`.
+`comeet`, `moka`, `smartrecruiters`, `jobylon`, `hotjob`, `herp`, `aimotive`,
+`gm`, or `tensor`.
 
 Run all available collectors:
 
@@ -139,6 +140,19 @@ are saved under `data/standardized/<run-date>/`. Run reports are saved under
 - Salary is saved only when the public source gives a clear amount and unit.
 - Jobylon first reads the job links from the company widget. It then reads the
   `JobPosting` JSON-LD from every detail page to get the full job information.
+- HERP first reads the job links from the public company page. It then reads the
+  `JobPosting` JSON-LD and public HERP page data from every detail page.
+- AImotive uses server-rendered HTML. Its collector reads job links from the
+  careers page and the title, description, and location from each detail page.
+- Inceptio uses the current public Moka job API. The standard Moka collector
+  reads all results from the configured site and removes repeated job IDs.
+- GM uses its public XML job feed. The collector selects jobs containing GM's
+  official `#GM-AV-1` marker. This marker is used to define the configured GM
+  source; the collector does not make its own AV relevance decision.
+- Tensor uses its public static careers page and individual job pages. The
+  collector keeps all public roles from every listed country. It saves the
+  location-specific salary ranges when available. The pages do not provide a
+  reliable posting date, so `date_posted` is saved as `null`.
 - Some platforms require one detail request for every job. A complete run can
   therefore take several minutes, especially for the large Bosch sources.
 - Job numbers can change between runs because companies add or remove jobs.
@@ -147,13 +161,23 @@ are saved under `data/standardized/<run-date>/`. Run reports are saved under
 
 ## Latest update
 
-The current update completed the collection and standardization work for all
-27 `In Scope` sources. It added the SmartRecruiters and Jobylon collectors,
-registered them in the main pipeline, and added tests for their field mapping.
+The collectors for the original 27 `In Scope` sources are complete. Pony.AI US,
+Horizon China, WeRide China, Stack AV USA, Tier IV Japan, AImotive Hungary, GM
+USA, Inceptio China, and Tensor Global have now been verified and moved from `TBD` to
+`In Scope`. Pony.AI uses
+the existing Workable collector. Horizon uses the HotJob collector. WeRide uses
+the existing Moka collector, and Stack AV uses the existing Greenhouse
+collector. Tier IV uses the new HERP collector for all job groups on its public
+company page. AImotive uses the new AImotive HTML collector. GM uses the new GM
+XML collector and selects the official `#GM-AV-1` source marker. Other AV
+relevance filtering belongs to the later data cleaning stage.
+Inceptio uses the existing Moka field mapping and its current public Moka site.
+Tensor uses a new HTML collector. Its source is marked as `Global` because the
+public careers page includes jobs in the US, Singapore, Spain, and the UAE.
 
-The latest complete run successfully collected and automatically combined
-3,118 jobs from eight platforms. All 26 automated tests passed. No manual file
-merge is required.
+The previous complete run collected and automatically combined 3,118 jobs from
+the original 27 sources. A new complete run will be completed after more `TBD`
+sources are added. No manual file merge is required.
 
 ## Current progress
 
@@ -162,29 +186,40 @@ Completed:
 - Excel configuration reader and validation
 - Standard job data model
 - Raw and standardized JSON storage
-- Greenhouse collector: 12 sources tested
+- Greenhouse collector: 13 sources tested
 - Lever collector: 6 sources tested
 - Ashby collector: 3 sources tested
-- Workable collector: 1 source tested
+- Workable collector: 2 sources tested
 - Comeet collector: 1 source tested
-- Moka collector: 1 source tested
+- Moka collector: 3 sources tested
 - SmartRecruiters collector: 2 sources tested
 - Jobylon collector: 1 source tested
-- 27 sources tested successfully
-- 3,118 job postings collected in the latest test
+- HotJob collector: 1 source tested
+- HERP collector: 1 source tested
+- AImotive collector: 1 source tested
+- GM collector: 1 source tested
+- Tensor collector: 1 source tested
+- 36 sources tested successfully
+- Pony.AI US source test: 11 jobs collected
+- Horizon China source test: 229 jobs collected
+- WeRide China source test: 236 jobs collected
+- Stack AV USA source test: 9 jobs collected
+- Tier IV Japan source test: 60 jobs collected
+- AImotive Hungary source test: 5 jobs collected
+- GM USA source test: 49 jobs collected
+- Inceptio China source test: 100 jobs collected
+- Tensor Global source test: 99 jobs collected
+- 45 automated tests passed
+- Previous complete run: 3,118 jobs from 27 sources
 
 The collection and standardization work for the current `In Scope` sources is
 complete. MySQL database loading belongs to the later backend export workstream.
 
 ## Next phase
 
-The collectors for the current 27 `In Scope` sources are complete.
-
-The next phase will investigate the 16 sources in the `TBD` sheet. A source will remain in `TBD` until its endpoint or collection method is confirmed and its collector passes a live test.
-
-Some `TBD` sources may require custom HTML parsing, POST requests, browser investigation, or platform-specific collectors. If a source cannot be collected reliably, the blocker will be documented in the Excel source list.
-
-This work is tracked in the new TBD source investigation issue.
+The remaining 7 sources in the `TBD` sheet will be investigated one at a time.
+A source will remain in `TBD` until its endpoint or collection method is
+confirmed and it passes a live test. This work is tracked in GitHub Issue #24.
 
 ## GitHub note
 
@@ -192,4 +227,3 @@ The generated files inside `data/raw`, `data/standardized`, and
 `data/run_reports` should not be uploaded to GitHub. They can be large and can
 be created again by running the pipeline. A `.gitignore` file should be used to
 exclude them before the first commit.
-
