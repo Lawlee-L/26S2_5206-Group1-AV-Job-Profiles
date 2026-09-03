@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import urllib.error
+import urllib.parse
 import urllib.request
 from typing import Any
 
@@ -53,3 +54,25 @@ def get_text(url: str, timeout: int = 30) -> str:
         return body.decode(charset)
     except (LookupError, UnicodeDecodeError) as exc:
         raise HttpRequestError(f"GET {url} did not return readable text") from exc
+
+
+def post_form_json(url: str, data: dict[str, Any], timeout: int = 30) -> Any:
+    """Send a public form request and read its JSON response."""
+    body = urllib.parse.urlencode(data).encode("utf-8")
+    headers = {
+        **DEFAULT_HEADERS,
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    }
+    request = urllib.request.Request(url, data=body, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            response_body = response.read()
+    except urllib.error.HTTPError as exc:
+        raise HttpRequestError(f"POST {url} returned HTTP {exc.code}") from exc
+    except urllib.error.URLError as exc:
+        raise HttpRequestError(f"POST {url} failed: {exc.reason}") from exc
+
+    try:
+        return json.loads(response_body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise HttpRequestError(f"POST {url} did not return valid UTF-8 JSON") from exc
