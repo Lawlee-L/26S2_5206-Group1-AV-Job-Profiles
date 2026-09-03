@@ -7,3 +7,4 @@ __pycache__/
 data-collection/data/raw/
 data-collection/data/standardized/
 data-collection/data/run_reports/
+*.egg-info/
