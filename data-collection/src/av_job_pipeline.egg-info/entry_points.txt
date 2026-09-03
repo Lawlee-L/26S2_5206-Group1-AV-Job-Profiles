@@ -1,2 +1,0 @@
-[console_scripts]
-av-jobs = av_jobs.cli:main
