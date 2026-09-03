@@ -62,11 +62,27 @@ collection. Raw responses are kept so the cleaning result can be checked later.
 
 Python 3.11 or a newer version is required.
 
-From the project folder, install the project and its packages:
+Open a terminal in the `data-collection` folder. Create a local Python
+environment:
+
+```bash
+python3 -m venv .venv
+```
+
+Activate the environment on macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Install the project and its packages:
 
 ```bash
 python -m pip install -e .
 ```
+
+These setup commands are only required the first time. For later runs, open a
+terminal in the project folder and activate the environment again.
 
 ## Check the source list
 
@@ -106,6 +122,61 @@ av-jobs collect
 During testing, each platform has a separate standardized file, such as
 `greenhouse.json`, `lever.json`, or `ashby.json`. A full run combines all
 available results into `jobs.json`. No manual merge is needed.
+
+## Run a complete In Scope collection
+
+Before a full run, check the Excel source list:
+
+```bash
+av-jobs check-config
+```
+
+The current configuration should show `Ready sources: 36`. The program reads
+only the `In Scope` sheet. It does not run sources from `TBD` or `Out of Scope`.
+
+Run every current `In Scope` source:
+
+```bash
+av-jobs collect
+```
+
+A full run can take several minutes because some collectors must open every job
+detail page. Keep the terminal open and keep the internet connection active.
+
+The terminal prints one result for each source. A successful result looks like:
+
+```text
+source_id: success, 100 jobs
+```
+
+Check that every source reports `success`. If a source reports `failed`, its
+error is also saved in the run report. Job numbers may change between runs.
+
+The full run creates three types of local output under the current date:
+
+```text
+data/raw/<run-date>/
+data/standardized/<run-date>/jobs.json
+data/run_reports/<run-date>/jobs_report.json
+```
+
+- `raw` contains the original response saved for each source.
+- `jobs.json` contains all successfully collected jobs in one standard file.
+- `jobs_report.json` shows whether each source succeeded or failed.
+
+If one source fails, it can be tested separately:
+
+```bash
+av-jobs collect --source-id SOURCE_ID
+```
+
+This separate command creates a file for that source only. It does not add the
+result to an older `jobs.json`. After fixing or retrying a failed source, run
+`av-jobs collect` again to create a new complete combined file.
+
+These generated files are excluded from GitHub by `.gitignore`. They should be
+shared separately with the next workstream when the final collection run is
+ready.
 
 ## Standard job format
 
