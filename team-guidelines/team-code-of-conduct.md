@@ -19,8 +19,8 @@ Team roles have been assigned to support effective communication, coordination, 
 The Team Lead role will rotate among at least three members during the project:
 
 1. **Li Luo** will serve as the first Team Lead until approximately Week 5 or Week 6.
-2. **Nyx Chen** will serve as the second Team Lead.
-3. **Seonjeong Jeong** will serve as the third Team Lead.
+2. **Seonjeong Jeong** will serve as the second Team Lead.
+3. **Nyx Chen** will serve as the third Team Lead.
 
 The exact leadership handover dates may be adjusted according to project progress and team needs. To ensure a smooth transition, the outgoing Team Lead should brief the incoming Team Lead on current progress, outstanding tasks, risks, deadlines, and important decisions.
 
