@@ -14,6 +14,7 @@ AV Job Data Collection/
 ├── data/
 │   ├── raw/                Original responses from each source
 │   ├── standardized/       Jobs converted to the standard format
+│   ├── history/            Jobs kept across all weekly collections
 │   └── run_reports/        Result of each collection run
 ├── src/av_jobs/
 │   ├── collectors/         One collector for each platform
@@ -123,6 +124,10 @@ During testing, each platform has a separate standardized file, such as
 `greenhouse.json`, `lever.json`, or `ashby.json`. A full run combines all
 available results into `jobs.json`. No manual merge is needed.
 
+A full run also updates `data/history/jobs_history.json`. This cumulative file
+keeps jobs from earlier weeks even when they are no longer shown on the careers
+site. The stable `source_key` prevents the same job from being added twice.
+
 ## Run a complete In Scope collection
 
 Before a full run, check the Excel source list:
@@ -164,6 +169,43 @@ data/run_reports/<run-date>/jobs_report.json
 - `jobs.json` contains all successfully collected jobs in one standard file.
 - `jobs_report.json` shows whether each source succeeded or failed.
 
+The cumulative history is stored separately:
+
+```text
+data/history/jobs_history.json
+```
+
+Each history record includes four extra metadata fields:
+
+- `first_seen_date`: the first collection date for this job.
+- `last_seen_date`: the most recent collection date for this job.
+- `is_new_in_latest_run`: `true` when the job first appeared in the latest run.
+- `is_active`: `true` when the job was still listed in the latest successful
+  check of its source.
+
+Use `is_new_in_latest_run` and `is_active` together:
+
+| `is_new_in_latest_run` | `is_active` | Meaning |
+| --- | --- | --- |
+| `true` | `true` | A new job first found in the latest run |
+| `false` | `true` | An older job that is still online |
+| `false` | `false` | An older job that is no longer listed |
+
+These four history fields are stored only inside `metadata` in
+`jobs_history.json`. They do not change the agreed data fields in each weekly
+`jobs.json` snapshot.
+
+If a source fails during a collection run, its older jobs are not marked as
+inactive. This avoids treating a temporary source error as a job removal. The
+weekly `jobs.json` is still one weekly snapshot. The history file supports
+analysis of both newer and older job opportunities.
+
+To build the history file from all weekly snapshots already saved locally, run:
+
+```bash
+av-jobs build-history
+```
+
 If one source fails, it can be tested separately:
 
 ```bash
@@ -177,6 +219,30 @@ result to an older `jobs.json`. After fixing or retrying a failed source, run
 These generated files are excluded from GitHub by `.gitignore`. They should be
 shared separately with the next workstream when the final collection run is
 ready.
+
+## Translated history dataset
+
+The completed English dataset for the current project snapshot is stored at:
+
+```text
+deliverables/2026-09-06/jobs_history_translated.json
+```
+
+This file contains 4,163 cumulative job records. Non-English values in
+`advertised_job_title`, `job_description`, and `location` were translated into
+English. Values that were already in English were kept unchanged. The
+translation process did not change `metadata`, `job_url`, `salary`, or
+`date_posted`, and missing source values remain `null`.
+
+The translated file is a one-time project deliverable derived from the local
+`data/history/jobs_history.json` snapshot. The repository does not include a
+translation API, a personal API key, or an automated translation program.
+Future collection snapshots must be translated separately if an updated
+English dataset is required.
+
+The translated dataset may still contain jobs that are not related to
+autonomous vehicles. Translation does not replace the later relevance
+filtering, cleaning, AI extraction, deduplication, QA, or database export work.
 
 ## Standard job format
 
@@ -227,7 +293,7 @@ are saved under `data/standardized/<run-date>/`. Run reports are saved under
 - Some platforms require one detail request for every job. A complete run can
   therefore take several minutes, especially for the large Bosch sources.
 - Job numbers can change between runs because companies add or remove jobs.
-- Generated raw data, standardized data, and run reports are local outputs.
+- Generated raw data, standardized data, job history, and run reports are local outputs.
   They are excluded from GitHub by `.gitignore`.
 
 ## Latest update
@@ -280,7 +346,7 @@ Completed:
 - GM USA source test: 49 jobs collected
 - Inceptio China source test: 100 jobs collected
 - Tensor Global source test: 99 jobs collected
-- 45 automated tests passed
+- 48 automated tests passed
 - Previous complete run: 3,118 jobs from 27 sources
 
 The collection and standardization work for the current `In Scope` sources is
@@ -294,7 +360,7 @@ confirmed and it passes a live test. This work is tracked in GitHub Issue #24.
 
 ## GitHub note
 
-The generated files inside `data/raw`, `data/standardized`, and
-`data/run_reports` should not be uploaded to GitHub. They can be large and can
-be created again by running the pipeline. A `.gitignore` file should be used to
-exclude them before the first commit.
+The generated files inside `data/raw`, `data/standardized`, `data/history`, and
+`data/run_reports` should not be uploaded to GitHub. They can be large and
+can be created again by running the pipeline. A `.gitignore` file should be
+used to exclude them before the first commit.

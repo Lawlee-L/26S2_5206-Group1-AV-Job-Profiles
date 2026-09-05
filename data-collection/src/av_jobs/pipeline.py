@@ -20,7 +20,7 @@ from av_jobs.collectors.tensor import collect_tensor
 from av_jobs.collectors.workable import collect_workable
 from av_jobs.config import SourceConfig, load_sources
 from av_jobs.models import StandardJob
-from av_jobs.storage import DATA_DIR, save_raw_snapshot, save_standardized_jobs
+from av_jobs.storage import DATA_DIR, save_raw_snapshot, save_standardized_jobs, update_job_history
 
 
 @dataclass(slots=True)
@@ -85,6 +85,17 @@ def run_pipeline(
     # Keep test batches separate. A full run uses jobs.json for all platforms.
     output_stem = source_id or platform or "jobs"
     standardized_path = save_standardized_jobs(run_date, all_jobs, f"{output_stem}.json")
+    # Update cumulative history only after a complete run. A platform or source
+    # test is not a complete weekly snapshot.
+    if not platform and not source_id:
+        successful_source_ids = {
+            result.source_id for result in results if result.status == "success"
+        }
+        update_job_history(
+            run_date,
+            all_jobs,
+            successful_source_ids=successful_source_ids,
+        )
     report_dir = DATA_DIR / "run_reports" / run_date
     report_dir.mkdir(parents=True, exist_ok=True)
     report_path = report_dir / f"{output_stem}_report.json"
