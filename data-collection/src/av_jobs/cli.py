@@ -5,6 +5,7 @@ from collections import Counter
 
 from av_jobs.config import DEFAULT_CONFIG_PATH, load_sources
 from av_jobs.pipeline import run_pipeline
+from av_jobs.storage import rebuild_job_history
 
 
 def check_config() -> int:
@@ -23,6 +24,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="av-jobs")
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("check-config", help="Validate the In Scope sheet")
+    subparsers.add_parser("build-history", help="Combine all dated jobs.json snapshots")
     collect_parser = subparsers.add_parser("collect", help="Collect and standardize jobs")
     collect_parser.add_argument("--platform")
     collect_parser.add_argument("--source-id")
@@ -34,6 +36,10 @@ def main() -> int:
     args = build_parser().parse_args()
     if args.command == "check-config":
         return check_config()
+    if args.command == "build-history":
+        history_path = rebuild_job_history()
+        print(f"History: {history_path}")
+        return 0
     if args.command == "collect":
         jobs, results, output_path = run_pipeline(
             platform=args.platform,

@@ -1,10 +1,11 @@
 # AV Job Data Collection
 
-This project collects job postings from autonomous vehicle companies. It reads
-the company source list, collects jobs from different recruitment platforms,
-and converts all results into one standard format.
+This project collects job advertisements from autonomous vehicle (AV)
+companies. It reads a list of company career sources, collects jobs from
+different recruitment platforms, and converts the results into one standard
+JSON format.
 
-The final goal is to store the standardized job data in one MySQL database.
+The standardized data will later be cleaned and stored in a MySQL database.
 
 ## Project structure
 
@@ -14,7 +15,8 @@ AV Job Data Collection/
 ├── data/
 │   ├── raw/                Original responses from each source
 │   ├── standardized/       Jobs converted to the standard format
-│   └── run_reports/        Result of each collection run
+│   ├── history/            Jobs kept across all weekly collections
+│   └── run_reports/        Results of each collection run
 ├── src/av_jobs/
 │   ├── collectors/         One collector for each platform
 │   ├── cli.py              Commands used to run the project
@@ -26,7 +28,7 @@ AV Job Data Collection/
 └── pyproject.toml          Python project settings
 ```
 
-## Source list
+## Company source list
 
 The source list is stored in:
 
@@ -34,35 +36,37 @@ The source list is stored in:
 config/AV_company_sources_cleaned.xlsx
 ```
 
-It contains three sheets:
+The workbook contains three sheets:
 
-- `In Scope`: sources that are ready to be used by the pipeline.
-- `TBD`: sources that still need endpoint or collector research.
-- `Out of Scope`: sources that are not included in this project.
+- `In Scope`: sources that are ready for collection.
+- `TBD`: sources that still need more research or a working collector.
+- `Out of Scope`: sources that are not included in the current project.
 
-The program reads only the `In Scope` sheet. A source can be moved from `TBD`
-to `In Scope` after its endpoint is checked and its collector is available.
+The program only reads the `In Scope` sheet. A source can be moved from `TBD`
+to `In Scope` after its endpoint has been checked and its collector passes a
+test.
 
 ## Collection scope and data cleaning
 
-This pipeline is responsible for data collection and standardization. Each
-collector reads all public jobs from its configured source and maps the source
-fields to the standard job format.
+This pipeline is responsible for collecting and standardizing job data. Each
+collector reads public jobs from its configured source and maps the platform's
+field names to the standard format used by this project.
 
-The collectors do not decide whether a job is related to autonomous vehicles.
-They also do not delete, correct, or classify job records. These tasks belong
-to the later data cleaning stage.
+The collectors do not decide whether each job is related to autonomous
+vehicles. They also do not delete, correct, or classify jobs. These tasks are
+part of the later data-cleaning stage.
 
-This difference is important for broad companies such as Bosch. The
-SmartRecruiters collector must collect all configured Germany and US postings
-with pagination and full descriptions. AV-related filtering is completed after
-collection. Raw responses are kept so the cleaning result can be checked later.
+This is important for large companies such as Bosch. The SmartRecruiters
+collector collects all configured jobs from Germany and the US, including all
+pages and full descriptions. AV-related filtering is completed later. Raw
+responses are kept so that the cleaned results can be checked against the
+original source data.
 
 ## Setup
 
 Python 3.11 or a newer version is required.
 
-Open a terminal in the `data-collection` folder. Create a local Python
+Open a terminal in the `data-collection` folder and create a local Python
 environment:
 
 ```bash
@@ -81,7 +85,7 @@ Install the project and its packages:
 python -m pip install -e .
 ```
 
-These setup commands are only required the first time. For later runs, open a
+These setup commands are only needed for the first run. After that, open a
 terminal in the project folder and activate the environment again.
 
 ## Check the source list
@@ -92,8 +96,8 @@ Run this command before collecting jobs:
 av-jobs check-config
 ```
 
-It checks required columns, source IDs, request methods, and endpoints in the
-`In Scope` sheet.
+This checks the required columns, source IDs, request methods, and endpoints in
+the `In Scope` sheet.
 
 ## Collect jobs
 
@@ -119,9 +123,14 @@ Run all available collectors:
 av-jobs collect
 ```
 
-During testing, each platform has a separate standardized file, such as
-`greenhouse.json`, `lever.json`, or `ashby.json`. A full run combines all
-available results into `jobs.json`. No manual merge is needed.
+During testing, each platform can produce a separate standardized file, such as
+`greenhouse.json`, `lever.json`, or `ashby.json`. A full run automatically
+combines all successful results into `jobs.json`, so no manual merge is needed.
+
+A full run also updates `data/history/jobs_history.json`. This is the cumulative
+history file. It keeps jobs from earlier weeks, including jobs that are no
+longer shown on a company careers page. The stable `source_key` prevents the
+same job from being added more than once.
 
 ## Run a complete In Scope collection
 
@@ -131,8 +140,9 @@ Before a full run, check the Excel source list:
 av-jobs check-config
 ```
 
-The current configuration should show `Ready sources: 36`. The program reads
-only the `In Scope` sheet. It does not run sources from `TBD` or `Out of Scope`.
+The current configuration should show `Ready sources: 36`. The program only
+runs sources from `In Scope`; it does not run sources from `TBD` or
+`Out of Scope`.
 
 Run every current `In Scope` source:
 
@@ -140,8 +150,9 @@ Run every current `In Scope` source:
 av-jobs collect
 ```
 
-A full run can take several minutes because some collectors must open every job
-detail page. Keep the terminal open and keep the internet connection active.
+A full run may take several minutes because some collectors need to open every
+job detail page. Keep the terminal open and make sure the internet connection
+stays active.
 
 The terminal prints one result for each source. A successful result looks like:
 
@@ -149,8 +160,8 @@ The terminal prints one result for each source. A successful result looks like:
 source_id: success, 100 jobs
 ```
 
-Check that every source reports `success`. If a source reports `failed`, its
-error is also saved in the run report. Job numbers may change between runs.
+Check that every source reports `success`. If a source reports `failed`, the
+error is saved in the run report. The number of jobs may change between runs.
 
 The full run creates three types of local output under the current date:
 
@@ -160,9 +171,46 @@ data/standardized/<run-date>/jobs.json
 data/run_reports/<run-date>/jobs_report.json
 ```
 
-- `raw` contains the original response saved for each source.
-- `jobs.json` contains all successfully collected jobs in one standard file.
-- `jobs_report.json` shows whether each source succeeded or failed.
+- `raw` contains the original response from each source.
+- `jobs.json` is the weekly snapshot. It contains all jobs collected
+  successfully in that run, using the standard format.
+- `jobs_report.json` shows which sources succeeded or failed.
+
+The cumulative job history is stored separately:
+
+```text
+data/history/jobs_history.json
+```
+
+Each history record includes four extra metadata fields:
+
+- `first_seen_date`: the date when the job was first collected.
+- `last_seen_date`: the most recent date when the job was collected.
+- `is_new_in_latest_run`: `true` when the job first appeared in the latest run.
+- `is_active`: `true` when the job was still listed during the latest
+  successful check of its source.
+
+Use `is_new_in_latest_run` and `is_active` together:
+
+| `is_new_in_latest_run` | `is_active` | Meaning |
+| --- | --- | --- |
+| `true` | `true` | A new job first found in the latest run |
+| `false` | `true` | An older job that is still online |
+| `false` | `false` | An older job that is no longer listed |
+
+These four fields are only added to `metadata` in `jobs_history.json`. They do
+not change the agreed job fields in each weekly `jobs.json` snapshot.
+
+If a source fails during a run, its older jobs are not marked as inactive. This
+prevents a temporary source error from being treated as a job removal. In
+summary, `jobs.json` shows one weekly snapshot, while `jobs_history.json` keeps
+both current and older job opportunities for later analysis.
+
+To build the history file from all weekly snapshots already saved locally, run:
+
+```bash
+av-jobs build-history
+```
 
 If one source fails, it can be tested separately:
 
@@ -170,31 +218,56 @@ If one source fails, it can be tested separately:
 av-jobs collect --source-id SOURCE_ID
 ```
 
-This separate command creates a file for that source only. It does not add the
-result to an older `jobs.json`. After fixing or retrying a failed source, run
-`av-jobs collect` again to create a new complete combined file.
+This command creates a file for that source only. It does not add the result to
+an older `jobs.json`. After fixing or retrying a failed source, run
+`av-jobs collect` again to create a new complete snapshot.
 
-These generated files are excluded from GitHub by `.gitignore`. They should be
-shared separately with the next workstream when the final collection run is
-ready.
+The folders under `data/` are excluded from GitHub by `.gitignore`. The required
+final dataset can instead be placed in `deliverables/`, as explained below.
+
+## English history deliverable
+
+The final English dataset for the current project snapshot is stored at:
+
+```text
+deliverables/2026-09-06/jobs_history_translated.json
+```
+
+This file contains 4,163 cumulative job records from `jobs_history.json`.
+Non-English text in `advertised_job_title`, `job_description`, and `location`
+was translated into English. Text that was already in English was kept. The
+translation did not change `metadata`, `job_url`, `salary`, or `date_posted`.
+Missing source values are still stored as `null`.
+
+This translated JSON is a one-time project deliverable made from the local
+`data/history/jobs_history.json` snapshot collected on 6 September 2026. The
+original history file remains local and is not included in GitHub. The
+repository also does not contain a translation API, personal API key, or
+automated translation script. If the team needs a newer English dataset, a new
+history snapshot will need to be translated separately.
+
+The translated dataset may still include jobs that are not related to
+autonomous vehicles. Translation is separate from the later filtering,
+cleaning, information extraction, deduplication, quality checking, and database
+export tasks.
 
 ## Standard job format
 
-Each collected job has two parts:
+Each job record has two parts:
 
-- `metadata`: information used to track where the record came from. It includes
-  the company, region, platform, source ID, original job ID, tracking key, and
-  collection time. This information helps later workstreams trace a record back
-  to its source, recognise the same job in future runs, check data quality, and
-  prepare records for deduplication or database storage.
-- `data`: the job information required by the current collection task. It
+- `metadata`: tracking information about the source. It includes the company,
+  region, platform, source ID, original job ID, `source_key`, and collection
+  time. It helps the team trace each record, recognise the same job in later
+  runs, check data quality, and prepare the data for deduplication or database
+  storage.
+- `data`: the job advertisement fields required by the current task. It
   contains `advertised_job_title`, `job_description`, `job_url`, `location`,
   `salary`, and `date_posted`. Later workstreams can clean, filter, translate,
   analyse, or extend these fields.
 
-Keeping these two parts separate prevents tracking information from being mixed
-with the job advertisement itself. The structure can be flattened or changed
-later when the cleaned data is prepared for the final database schema.
+Keeping these parts separate prevents source-tracking information from being
+mixed with the job advertisement. The structure can be flattened or changed
+later when the cleaned data is prepared for the final database.
 
 Raw source responses are saved under `data/raw/<run-date>/`. Standardized jobs
 are saved under `data/standardized/<run-date>/`. Run reports are saved under
@@ -202,10 +275,9 @@ are saved under `data/standardized/<run-date>/`. Run reports are saved under
 
 ## Important notes
 
-- This collected dataset is an input for later work, not the final analysis
-  dataset. It may include jobs that are not related to autonomous vehicles.
-  Later workstreams must clean and filter the data before analysis or further
-  processing.
+- The collected dataset is an input for later work, not the final analysis
+  dataset. It may include jobs that are not related to autonomous vehicles, so
+  the data must be cleaned and filtered before analysis.
 - A missing source field is saved as `null`. The collector does not invent or
   guess a value.
 - Salary is saved only when the public source gives a clear amount and unit.
@@ -227,28 +299,33 @@ are saved under `data/standardized/<run-date>/`. Run reports are saved under
 - Some platforms require one detail request for every job. A complete run can
   therefore take several minutes, especially for the large Bosch sources.
 - Job numbers can change between runs because companies add or remove jobs.
-- Generated raw data, standardized data, and run reports are local outputs.
-  They are excluded from GitHub by `.gitignore`.
+- Generated raw data, standardized data, job history, and run reports are local
+  outputs. They are excluded from GitHub by `.gitignore`.
 
-## Latest update
+## Project status
 
-The collectors for the original 27 `In Scope` sources are complete. Pony.AI US,
+The collectors for the original 27 `In Scope` sources are complete. Nine more
+sources have been checked and moved from `TBD` to `In Scope`: Pony.AI US,
 Horizon China, WeRide China, Stack AV USA, Tier IV Japan, AImotive Hungary, GM
-USA, Inceptio China, and Tensor Global have now been verified and moved from `TBD` to
-`In Scope`. Pony.AI uses
-the existing Workable collector. Horizon uses the HotJob collector. WeRide uses
-the existing Moka collector, and Stack AV uses the existing Greenhouse
-collector. Tier IV uses the new HERP collector for all job groups on its public
-company page. AImotive uses the new AImotive HTML collector. GM uses the new GM
-XML collector and selects the official `#GM-AV-1` source marker. Other AV
-relevance filtering belongs to the later data cleaning stage.
-Inceptio uses the existing Moka field mapping and its current public Moka site.
-Tensor uses a new HTML collector. Its source is marked as `Global` because the
-public careers page includes jobs in the US, Singapore, Spain, and the UAE.
+USA, Inceptio China, and Tensor Global.
+
+- Pony.AI uses the existing Workable collector.
+- Horizon uses the HotJob collector.
+- WeRide and Inceptio use the Moka collector.
+- Stack AV uses the Greenhouse collector.
+- Tier IV uses the HERP collector and reads all job groups from its public page.
+- AImotive uses its server-rendered HTML collector.
+- GM uses its public XML feed and the official `#GM-AV-1` source marker.
+- Tensor uses an HTML collector. Its region is `Global` because its public
+  careers page contains jobs in the US, Singapore, Spain, and the UAE.
+
+Other AV relevance filtering will be completed during the later data-cleaning
+stage.
 
 The previous complete run collected and automatically combined 3,118 jobs from
-the original 27 sources. A new complete run will be completed after more `TBD`
-sources are added. No manual file merge is required.
+the original 27 sources. Job numbers change over time as companies add and
+remove advertisements. A full run automatically combines the results, so no
+manual file merge is required.
 
 ## Current progress
 
@@ -280,21 +357,24 @@ Completed:
 - GM USA source test: 49 jobs collected
 - Inceptio China source test: 100 jobs collected
 - Tensor Global source test: 99 jobs collected
-- 45 automated tests passed
+- 48 automated tests passed
 - Previous complete run: 3,118 jobs from 27 sources
 
 The collection and standardization work for the current `In Scope` sources is
 complete. MySQL database loading belongs to the later backend export workstream.
 
-## Next phase
+## Next steps
 
-The remaining 7 sources in the `TBD` sheet will be investigated one at a time.
-A source will remain in `TBD` until its endpoint or collection method is
+The remaining seven sources in the `TBD` sheet can be investigated one at a
+time. A source should stay in `TBD` until its endpoint or collection method is
 confirmed and it passes a live test. This work is tracked in GitHub Issue #24.
 
 ## GitHub note
 
-The generated files inside `data/raw`, `data/standardized`, and
-`data/run_reports` should not be uploaded to GitHub. They can be large and can
-be created again by running the pipeline. A `.gitignore` file should be used to
-exclude them before the first commit.
+Do not upload the generated files inside `data/raw`, `data/standardized`,
+`data/history`, or `data/run_reports`. These files can be large and can be
+created again by running the pipeline. They are already excluded by
+`.gitignore`.
+
+The file in `deliverables/2026-09-06/` is different: it is the selected final
+English dataset for this project, so it is intended to be included in GitHub.
