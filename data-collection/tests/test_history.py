@@ -70,6 +70,26 @@ def test_history_updates_existing_job_without_a_duplicate() -> None:
     assert history[0]["metadata"]["is_new_in_latest_run"] is False
 
 
+def test_same_day_rerun_preserves_new_job_flag() -> None:
+    first_run = make_job("job-1", "First title", "2026-09-13T01:00:00Z").to_dict()
+    first_history = merge_history_records([], [first_run], "2026-09-13")
+
+    retry = make_job("job-1", "Updated title", "2026-09-13T02:00:00Z").to_dict()
+    history = merge_history_records(
+        first_history,
+        [retry],
+        "2026-09-13",
+        {"example_greenhouse"},
+    )
+
+    assert len(history) == 1
+    assert history[0]["data"]["advertised_job_title"] == "Updated title"
+    assert history[0]["metadata"]["first_seen_date"] == "2026-09-13"
+    assert history[0]["metadata"]["last_seen_date"] == "2026-09-13"
+    assert history[0]["metadata"]["is_new_in_latest_run"] is True
+    assert history[0]["metadata"]["is_active"] is True
+
+
 def test_rebuild_history_combines_existing_snapshots(tmp_path: Path) -> None:
     first_path = tmp_path / "standardized" / "2026-09-01" / "jobs.json"
     second_path = tmp_path / "standardized" / "2026-09-08" / "jobs.json"

@@ -58,7 +58,8 @@ def merge_history_records(
         metadata = job.get("metadata") if isinstance(job, dict) else None
         source_key = metadata.get("source_key") if isinstance(metadata, dict) else None
         if source_key:
-            metadata["is_new_in_latest_run"] = False
+            first_seen = str(metadata.get("first_seen_date") or "")
+            metadata["is_new_in_latest_run"] = first_seen == run_date
             if successful_source_ids and metadata.get("source_id") in successful_source_ids:
                 metadata["is_active"] = False
             records[str(source_key)] = job
@@ -82,7 +83,7 @@ def merge_history_records(
         }
         updated_job["metadata"]["first_seen_date"] = first_seen
         updated_job["metadata"]["last_seen_date"] = run_date
-        updated_job["metadata"]["is_new_in_latest_run"] = previous is None
+        updated_job["metadata"]["is_new_in_latest_run"] = first_seen == run_date
         updated_job["metadata"]["is_active"] = True
         records[str(source_key)] = updated_job
 
