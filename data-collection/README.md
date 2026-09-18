@@ -17,13 +17,14 @@ AV Job Data Collection/
 │   ├── standardized/       Jobs converted to the standard format
 │   ├── history/            Jobs kept across all weekly collections
 │   └── run_reports/        Results of each collection run
+├── deliverables/           Dated English datasets selected for GitHub
 ├── src/av_jobs/
 │   ├── collectors/         One collector for each platform
 │   ├── cli.py              Commands used to run the project
 │   ├── config.py           Reads and checks the Excel source list
 │   ├── models.py           Standard job data structure
 │   ├── pipeline.py         Runs collectors and combines results
-│   └── storage.py          Saves raw and standardized files
+│   └── storage.py          Saves snapshots and maintains job history
 ├── tests/                  Tests for the collectors and data model
 └── pyproject.toml          Python project settings
 ```
@@ -201,6 +202,10 @@ Use `is_new_in_latest_run` and `is_active` together:
 These four fields are only added to `metadata` in `jobs_history.json`. They do
 not change the agreed job fields in each weekly `jobs.json` snapshot.
 
+If a source is retried or the history is merged again on the same date, a job
+is still marked as new when its `first_seen_date` matches that run date. This
+keeps `is_new_in_latest_run` correct during same-day retries.
+
 If a source fails during a run, its older jobs are not marked as inactive. This
 prevents a temporary source error from being treated as a job removal. In
 summary, `jobs.json` shows one weekly snapshot, while `jobs_history.json` keeps
@@ -225,26 +230,38 @@ an older `jobs.json`. After fixing or retrying a failed source, run
 The folders under `data/` are excluded from GitHub by `.gitignore`. The required
 final dataset can instead be placed in `deliverables/`, as explained below.
 
-## English history deliverable
+## English history deliverables
 
-The final English dataset for the current project snapshot is stored at:
+English history datasets are stored in dated folders under `deliverables/`.
+The latest dataset is:
 
 ```text
-deliverables/2026-09-06/jobs_history_translated.json
+deliverables/2026-09-13/jobs_history_translated.json
 ```
 
-This file contains 4,163 cumulative job records from `jobs_history.json`.
-Non-English text in `advertised_job_title`, `job_description`, and `location`
-was translated into English. Text that was already in English was kept. The
-translation did not change `metadata`, `job_url`, `salary`, or `date_posted`.
-Missing source values are still stored as `null`.
+It contains 4,475 cumulative job records from the local
+`jobs_history.json`: 3,986 active jobs, 489 inactive jobs, and 312 jobs first
+found in the 13 September collection. The earlier 6 September dataset is kept
+in its own dated folder for reference.
 
-This translated JSON is a one-time project deliverable made from the local
-`data/history/jobs_history.json` snapshot collected on 6 September 2026. The
-original history file remains local and is not included in GitHub. The
-repository also does not contain a translation API, personal API key, or
-automated translation script. If the team needs a newer English dataset, a new
-history snapshot will need to be translated separately.
+Non-English text in `advertised_job_title`, `job_description`, and `location`
+is translated into English. During a weekly update, a previous translation can
+be reused when the source text has not changed. Only new or changed
+non-English text needs a new translation. Text already written in English is
+kept. In the 13 September update, 312 jobs were newly collected. Most were
+already in English; 41 records contained 54 new or changed fields that required
+translation.
+
+The translation does not change `metadata`, `job_url`, `salary`, or
+`date_posted`. Missing source values remain `null`. Validation checks confirm
+that the JSON structure and unique `source_key` values are preserved and that
+required translated fields are not empty. Clear translation issues, such as
+incorrect company names or untranslated text, are corrected before the file
+is submitted.
+
+The original `data/history/jobs_history.json` remains local and is not included
+in GitHub. Personal translation API keys are also not stored in this
+repository.
 
 The translated dataset may still include jobs that are not related to
 autonomous vehicles. Translation is separate from the later filtering,
@@ -322,10 +339,11 @@ USA, Inceptio China, and Tensor Global.
 Other AV relevance filtering will be completed during the later data-cleaning
 stage.
 
-The previous complete run collected and automatically combined 3,118 jobs from
-the original 27 sources. Job numbers change over time as companies add and
-remove advertisements. A full run automatically combines the results, so no
-manual file merge is required.
+The complete run on 13 September 2026 collected and combined 3,986 active jobs
+from all 36 configured sources. The cumulative history contains 4,475 records.
+Job numbers change over time as companies add and remove advertisements. A full
+run automatically combines the results, so no manual file merge is normally
+required.
 
 ## Current progress
 
@@ -357,8 +375,9 @@ Completed:
 - GM USA source test: 49 jobs collected
 - Inceptio China source test: 100 jobs collected
 - Tensor Global source test: 99 jobs collected
-- 48 automated tests passed
-- Previous complete run: 3,118 jobs from 27 sources
+- 49 automated tests passed
+- Latest complete run: 3,986 active jobs from 36 sources
+- Latest cumulative history: 4,475 jobs, including 312 newly found jobs
 
 The collection and standardization work for the current `In Scope` sources is
 complete. MySQL database loading belongs to the later backend export workstream.
@@ -376,5 +395,6 @@ Do not upload the generated files inside `data/raw`, `data/standardized`,
 created again by running the pipeline. They are already excluded by
 `.gitignore`.
 
-The file in `deliverables/2026-09-06/` is different: it is the selected final
-English dataset for this project, so it is intended to be included in GitHub.
+The dated files under `deliverables/` are different: they are selected English
+datasets for the project, so they are intended to be included in GitHub. The
+latest file is `deliverables/2026-09-13/jobs_history_translated.json`.
