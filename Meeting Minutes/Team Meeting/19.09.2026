@@ -1,0 +1,98 @@
+# Meeting Minutes
+
+**Meeting Type:** Team  
+**Date:** To be confirmed (20 September was mentioned; the year was not specified)  
+**Time:** To be confirmed (approximately 30 minutes recorded)  
+**Recorded by:** Li Luo  
+
+## Attendees
+
+- Li Luo
+- Sunjol Singh Paul
+- Leon Nel Nel
+- Thushamini Chathusika Hewa Pathegamage
+
+## Discussion
+
+### Topic 1: External Communication and Code Uploads
+
+- Leon had sent an email but had not received a response. He planned to send a follow-up on Sunday evening or Monday morning.
+- Sunjol planned to contact Adrian on Monday.
+- Thushamini had uploaded her code to a separate GitHub branch.
+
+### Topic 2: Data Collection for Two Target Companies
+
+- The client expressed strong interest in obtaining job listings from two particular companies.
+- All team members will explore possible approaches and share their findings. This is a shared team task, not solely Li's responsibility.
+- Potential approaches include company-specific spiders, browser automation, and other suitable data sources or APIs.
+- The team discussed difficulties with dynamic websites and the potential cost of LinkedIn APIs.
+- These two data sources do not need to be included in the MVP at this stage. Integration will be considered if a sufficiently reliable approach is found.
+- If further attempts are unsuccessful, the team will explain the limitations to the client and continue with the remaining work.
+
+### Topic 3: Automated Translation and Incremental Processing
+
+- The client would ideally like the data workflow to be automated from beginning to end. The current manual translation process therefore needs to be adapted.
+- Sunjol will share a translation website for Li to evaluate the quality of DeepSeek's Chinese-to-English translations before proceeding with API integration.
+- Translation automation is expected to be implemented within Li's data collection module.
+- Unique job identifiers can be used to detect new listings and avoid translating existing records again.
+- Li reported having checked approximately 4,000 jobs and estimated that around 100–200 new listings might appear each week.
+- Sunjol reported that the client was willing to cover approximately USD 20 in API usage for translation and NLP. The provider, free allowances, and exact pricing arrangements remain to be clarified.
+- API keys must not be uploaded to GitHub. Required registration and configuration steps should be documented.
+
+### Topic 4: Database, Deployment, and Module Integration
+
+- The collection, analysis, and website components currently operate largely independently and need to be integrated through a shared database.
+- The proposed workflow is to collect and translate data weekly, store it in the database, and make it available to the website, dashboard, and analysis scripts.
+- Sunjol's clustering and skills analysis script is intended to run locally when Adrian needs it, with results written back to the database. No fixed execution frequency was agreed.
+- Relevant team members need to review the existing database schema and agree on the database technology and fields required by the website and dashboard.
+- The database insertion task may be separated from other work. Nick was suggested as a possible contributor or owner, but this assignment was not confirmed. The spelling of Nick's name should be checked, as it varies in the transcript.
+
+### Topic 5: Job Relevance Filtering and Website Scope
+
+- Li understood that an AV-related job website should exclude irrelevant jobs. Sunjol understood that the website might display all jobs, with relevance analysis treated as a separate function.
+- The team clarified that “cleaning” in this discussion referred primarily to filtering jobs by industry relevance, rather than simply removing HTML tags.
+- If relevance filtering depends on an analysis script that runs only on demand, this could affect weekly updates and the automated website workflow.
+- Options discussed included storing all jobs first and adding relevance flags, or incorporating relevance filtering into the scheduled pipeline. No final approach was selected.
+- Sunjol will confirm the intended website scope with Adrian before the team finalises the filtering workflow and database insertion responsibilities.
+
+### Topic 6: Dashboard Metrics and Delivery Schedule
+
+- Three dashboard areas were discussed: weekly new jobs and changes in job counts, recruitment trends for each company, and the most frequently identified skills.
+- The first two can primarily use collected job data and date fields. Skills statistics require output from the analysis module.
+- Li reminded the team of the demonstration video assignment on 6 October and the need to integrate the components into a demonstrable system.
+- Sunjol suggested aiming to complete the main work within two weeks. Specific delivery dates for individual modules were not agreed.
+
+## Key Decisions
+
+**Decision 1:** Proceed with automated translation and use unique job identifiers to process only new listings. Li will first assess translation quality and then progress implementation.  
+**Decision 2:** All team members will explore ways to collect data from the two target companies and share their findings. These sources are not mandatory for the MVP at this stage; integration depends on feasibility and reliability.  
+**Decision 3:** API keys must not be uploaded to GitHub.  
+**Decision 4:** Final decisions on website job scope, relevance filtering, and database insertion responsibilities will follow clarification from Adrian.  
+**Decision 5:** Li Luo will prepare the minutes for this meeting.  
+
+## Action Items
+
+| Task | Owner | Due Date |
+|------|-------|----------|
+| Send a follow-up email regarding the outstanding response | Leon Nel Nel | Sunday evening or Monday morning; exact date to be confirmed |
+| Share the translation website link for quality assessment | Sunjol Singh Paul | Approximately one hour after the meeting, as estimated during the discussion |
+| Assess DeepSeek translation quality and progress automated translation for new job listings | Li Luo | Begin after receiving the link; completion date to be agreed |
+| Explore data collection methods for the two target companies, including spiders, browser automation, and other feasible approaches; share findings with the team | All team members | As time permits; no fixed deadline agreed |
+| Confirm whether the website should display all jobs or only AV-related jobs | Sunjol Singh Paul | Monday; exact date to be confirmed |
+| Review the existing schema and identify fields or changes required for the website | Leon Nel Nel and Thushamini Chathusika Hewa Pathegamage | Before implementation; Leon planned to review it on the meeting day |
+| Coordinate database selection, schema requirements, and database insertion responsibilities | Relevant module contributors; final owner to be confirmed | Before database implementation |
+| Prepare the meeting minutes | Li Luo | After the meeting; no specific deadline agreed |
+
+## Follow-up / Next Meeting Agenda
+
+- Check whether a response has been received to the outstanding email.
+- Confirm Adrian's requirements for website job scope and whether relevance filtering must run automatically on a schedule.
+- Agree on responsibilities and execution order for database insertion, relevance filtering, and skills analysis.
+- Finalise database selection, schema fields, and website/dashboard data requirements.
+- Review translation test results and clarify the API provider, allowances, and costs.
+- Share the team's findings on the two target companies and determine whether their data sources can be included in the MVP.
+- Set an integration, testing, and demonstration preparation schedule for the 6 October video assignment.
+
+## Next Meeting
+
+**Date:** To be confirmed
