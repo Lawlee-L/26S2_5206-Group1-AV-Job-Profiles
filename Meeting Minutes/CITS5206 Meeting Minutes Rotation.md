@@ -13,9 +13,14 @@ This table is used to manage the rotation of meeting minutes responsibilities wi
 | Week 4 | Client Meeting |  13/08/2026 | Leon Nel Nel | Completed |
 | Week 5 | Group Meeting Monday | 17/08/2026 | Sunjol Singh Paul | completed |
 | Week 5 | Group Meeting Saturday | 22/08/2026 | Li Luo | Completed |
-| |   |   |   |   |
-| Week 6 | Facilitator Meeting | 26/08/2026 | Thushamini Chathusika Hewa Pathegamage | Upcoming |
-| Week 6 | Group Meeting | 29/08/2026 | Seonjeong Jeong | Upcoming |
+| Week 6 | Facilitator Meeting | 26/08/2026 | Thushamini Chathusika Hewa Pathegamage | Completed |
+| Week 6 | Group Meeting | 29/08/2026 | Seonjeong Jeong | Completed |
+| Study Break | Group Meeting | 30/08/2026 | Seonjeong Jeong | Completed |
+| Study Break | Group Meeting | 05/09/2026 | Seonjeong Jeong | Completed |
+| Week 7 | Facilitator Meeting | 09/09/2026 | Nyx Chen | Completed |
+| Week 7 | Group Meeting | 12/09/2026 | Sunjol Singh Paul | Completed |
+| Week 8 | Client Meeting | 18/09/2026 | Nyx Chen | Completed |
+| Week 8 | Group Meeting | 19/09/2026 | Li Luo | Completed |
 TBC
 ## Status
 
