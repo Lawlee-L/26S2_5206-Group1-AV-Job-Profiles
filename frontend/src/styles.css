@@ -1,0 +1,1503 @@
+:root {
+    --navy: #06123b;
+    --navy-2: #08174c;
+    --primary: #3138c6;
+    --primary-2: #5b5eea;
+    --text: #09132f;
+    --muted: #65708a;
+    --line: #e4e8f0;
+    --soft: #f5f7fb;
+    --chip: #f0f1ff;
+    --white: #ffffff;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--text);
+    background: #edf1f7;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: #edf1f7;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+.app-shell {
+    width: min(1180px, calc(100% - 28px));
+    margin: 18px auto;
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 26px rgba(15, 23, 42, .10);
+}
+
+.site-header {
+    height: 72px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0 28px;
+    border-bottom: 1px solid #eef1f5;
+    background: rgba(255, 255, 255, .96);
+}
+
+.brand,
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 18px;
+}
+
+.brand-icon {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    color: white;
+    background: var(--navy);
+    border-radius: 50%;
+}
+
+.brand-icon.light {
+    background: white;
+    color: var(--navy);
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+    font-size: 13px;
+    color: #1e293b;
+}
+
+.nav-links a {
+    padding: 27px 0 23px;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-links a.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.nav-cta {
+    justify-self: end;
+    color: white;
+    background: linear-gradient(135deg, #151a67, #3841c8);
+    padding: 12px 20px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.hero {
+    min-height: 485px;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    overflow: hidden;
+    background: radial-gradient(circle at 70% 15%, rgba(255, 255, 255, .9), transparent 28%), linear-gradient(120deg, #ffffff 0%, #f8fbff 46%, #d9edff 100%);
+}
+
+.hero-copy {
+    padding: 68px 36px 50px 52px;
+    z-index: 2;
+}
+
+.hero h1 {
+    margin: 0;
+    font-size: 43px;
+    line-height: 1.23;
+    letter-spacing: -1.5px;
+}
+
+.hero p {
+    color: #465169;
+    line-height: 1.8;
+    max-width: 470px;
+    font-size: 15px;
+    margin: 20px 0 25px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 14px;
+}
+
+.primary-btn,
+.secondary-btn,
+.filters-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    border-radius: 7px;
+    padding: 0 18px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #383ed6, #22288a);
+    color: white;
+    border: 1px solid transparent;
+}
+
+.secondary-btn {
+    background: white;
+    color: #3138c6;
+    border: 1px solid #4d55de;
+}
+
+.hero-visual {
+    position: relative;
+    min-height: 430px;
+    overflow: hidden;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0 56%, rgba(167, 211, 244, .58) 57% 100%);
+}
+
+.city {
+    position: absolute;
+    bottom: 160px;
+    background: rgba(96, 150, 196, .28);
+}
+
+.city-1 {
+    right: 24px;
+    width: 70px;
+    height: 170px;
+    box-shadow: -90px 32px 0 rgba(96, 150, 196, .22), -180px 18px 0 rgba(96, 150, 196, .18);
+}
+
+.city-2 {
+    right: 120px;
+    width: 50px;
+    height: 118px;
+    box-shadow: -140px 22px 0 rgba(96, 150, 196, .16);
+}
+
+.city::after,
+.city::before {
+    content: "";
+    position: absolute;
+    inset: 10px 10px auto;
+    height: 4px;
+    background: rgba(255, 255, 255, .7);
+    box-shadow: 0 18px 0 rgba(255, 255, 255, .7), 0 36px 0 rgba(255, 255, 255, .7), 0 54px 0 rgba(255, 255, 255, .7);
+}
+
+.road-line {
+    position: absolute;
+    height: 2px;
+    background: rgba(255, 255, 255, .8);
+    bottom: 95px;
+    width: 400px;
+    transform: rotate(-7deg);
+}
+
+.road-line.one {
+    left: 10px;
+}
+
+.road-line.two {
+    left: 120px;
+    bottom: 55px;
+}
+
+.car {
+    position: absolute;
+    width: 300px;
+    height: 140px;
+    bottom: 92px;
+    left: 70px;
+}
+
+.car-body {
+    position: absolute;
+    bottom: 20px;
+    left: 25px;
+    width: 245px;
+    height: 75px;
+    background: linear-gradient(#fff, #d5e6f0);
+    border-radius: 70px 80px 28px 28px;
+    border: 2px solid #7f9fb6;
+    box-shadow: 0 18px 35px rgba(8, 45, 80, .25);
+}
+
+.car-roof {
+    position: absolute;
+    bottom: 82px;
+    left: 83px;
+    width: 130px;
+    height: 54px;
+    background: linear-gradient(135deg, #f8ffff, #b8d3e1);
+    border-radius: 80px 80px 16px 16px;
+    border: 2px solid #7f9fb6;
+}
+
+.car-window {
+    position: absolute;
+    bottom: 89px;
+    left: 104px;
+    width: 88px;
+    height: 39px;
+    background: #17324b;
+    border-radius: 48px 48px 8px 8px;
+    z-index: 3;
+}
+
+.wheel {
+    position: absolute;
+    bottom: 5px;
+    width: 48px;
+    height: 48px;
+    background: #0a1324;
+    border: 9px solid #273750;
+    border-radius: 50%;
+    z-index: 4;
+}
+
+.wheel.left {
+    left: 58px;
+}
+
+.wheel.right {
+    right: 53px;
+}
+
+.lidar {
+    position: absolute;
+    left: 142px;
+    bottom: 132px;
+    width: 28px;
+    height: 14px;
+    background: #07162d;
+    border-radius: 4px;
+}
+
+.sensor-ring {
+    position: absolute;
+    border: 2px solid rgba(53, 205, 255, .55);
+    border-radius: 50%;
+    bottom: 65px;
+    left: 120px;
+    transform: rotate(-8deg);
+}
+
+.ring1 {
+    width: 210px;
+    height: 48px;
+}
+
+.ring2 {
+    width: 300px;
+    height: 70px;
+    left: 77px;
+    bottom: 53px;
+}
+
+.ring3 {
+    width: 390px;
+    height: 92px;
+    left: 35px;
+    bottom: 42px;
+}
+
+.section {
+    padding: 36px 52px;
+}
+
+.section h2,
+.market-strip h2 {
+    text-align: center;
+    font-size: 22px;
+    margin: 0 0 26px;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.feature-card,
+.company-tile,
+.card,
+.job-row,
+.filter-panel {
+    border: 1px solid var(--line);
+    background: white;
+    border-radius: 10px;
+}
+
+.feature-card {
+    min-height: 174px;
+    padding: 20px;
+}
+
+.feature-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: #eeeeff;
+    color: #555ce0;
+    display: grid;
+    place-items: center;
+}
+
+.feature-card h3 {
+    font-size: 15px;
+    margin: 16px 0 10px;
+}
+
+.feature-card p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0;
+}
+
+.company-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+}
+
+.company-tile {
+    height: 94px;
+    display: grid;
+    place-items: center;
+}
+
+.company-logo {
+    width: 64px;
+    height: 52px;
+    border: 1px solid #e7eaf0;
+    border-radius: 7px;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 14px;
+}
+
+.company-logo.large {
+    width: 86px;
+    height: 86px;
+    font-size: 20px;
+}
+
+.logo-nvidia {
+    background: #070707;
+    color: #8ee500;
+}
+
+.logo-mobileye {
+    color: #1930ad;
+    font-size: 24px;
+}
+
+.logo-motional {
+    color: #4738d1;
+    font-size: 26px;
+}
+
+.logo-pony {
+    color: #79abb8;
+}
+
+.logo-nuro {
+    color: #111;
+    font-size: 18px;
+}
+
+.logo-momenta {
+    color: #1b52d8;
+    font-size: 30px;
+}
+
+.logo-plus {
+    color: #111;
+    font-size: 20px;
+}
+
+.market-strip {
+    background: linear-gradient(100deg, #061336, #07184f);
+    color: white;
+    padding: 36px 52px 40px;
+}
+
+.market-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    text-align: center;
+}
+
+.market-grid strong {
+    display: block;
+    color: #6b6cff;
+    font-size: 31px;
+}
+
+.market-grid span {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.skills {
+    padding-top: 32px;
+    padding-bottom: 35px;
+}
+
+.chip-row,
+.skill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.chip-row {
+    justify-content: center;
+}
+
+.chip,
+.skill-row span {
+    background: #f0f1ff;
+    color: #3140ad;
+    border-radius: 999px;
+    padding: 7px 13px;
+    font-size: 12px;
+}
+
+.footer {
+    background: linear-gradient(100deg, #061336, #07184f);
+    color: white;
+    display: grid;
+    grid-template-columns: 1.7fr 1fr 1fr 1.3fr;
+    gap: 30px;
+    padding: 38px 38px 70px;
+    position: relative;
+}
+
+.footer p,
+.footer a {
+    color: #d8def2;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.footer h4 {
+    margin: 3px 0 13px;
+    font-size: 12px;
+}
+
+.footer a {
+    display: block;
+}
+
+.socials {
+    margin-top: 18px;
+}
+
+.copyright {
+    position: absolute;
+    bottom: 18px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #d5dcf0;
+    font-size: 11px;
+}
+
+.jobs-page,
+.detail-page {
+    padding: 38px 38px 58px;
+    background: #fff;
+}
+
+.page-heading h1 {
+    margin: 0;
+    font-size: 31px;
+}
+
+.page-heading p {
+    margin: 10px 0 22px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.filter-panel {
+    padding: 14px;
+}
+
+.search-box {
+    height: 46px;
+    border: 1px solid #dfe4ec;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    color: #8b94a7;
+}
+
+.search-box input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    color: var(--text);
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.filter-row select {
+    border: 1px solid #e2e6ee;
+    background: #fff;
+    border-radius: 7px;
+    min-height: 41px;
+    padding: 0 10px;
+    color: #475569;
+    font-size: 12px;
+}
+
+.filters-btn {
+    border: 0;
+    background: #f0efff;
+    color: #3534aa;
+}
+
+.jobs-meta {
+    display: flex;
+    justify-content: space-between;
+    margin: 22px 0 13px;
+    color: #4d566a;
+    font-size: 12px;
+}
+
+.job-list {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.job-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 130px;
+    gap: 15px;
+    align-items: start;
+    padding: 18px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    transition: background .18s ease, transform .18s ease;
+}
+
+.job-row:last-child {
+    border-bottom: 0;
+}
+
+.job-row:hover {
+    background: #fafbff;
+}
+
+.job-main h3 {
+    margin: 1px 0 5px;
+    font-size: 16px;
+}
+
+.job-main strong {
+    font-size: 12px;
+}
+
+.job-meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: #6a7388;
+    font-size: 11px;
+    margin: 8px 0 10px;
+}
+
+.job-meta-line span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.skill-row span {
+    padding: 5px 10px;
+    font-size: 10px;
+}
+
+.job-date {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+    color: #65708a;
+    font-size: 11px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 28px;
+}
+
+.pagination button {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    color: white;
+    background: #343cc0;
+}
+
+.empty-state {
+    padding: 55px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    margin-bottom: 22px;
+    color: #384255;
+}
+
+.detail-hero {
+    padding: 22px 22px 0;
+}
+
+.detail-company {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-right: 250px;
+}
+
+.detail-company h1 {
+    margin: 0 0 8px;
+    font-size: 24px;
+}
+
+.detail-company strong {
+    font-size: 13px;
+}
+
+.detail-meta {
+    margin-bottom: 0;
+}
+
+.detail-actions {
+    position: absolute;
+    right: 66px;
+    top: 135px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 145px;
+}
+
+.icon-btn {
+    color: #2634b2;
+}
+
+.detail-stat-grid {
+    border-top: 1px solid var(--line);
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.detail-stat-grid>div {
+    padding: 24px 16px;
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+}
+
+.detail-stat-grid svg {
+    width: 20px;
+    color: #65708a;
+}
+
+.detail-stat-grid span {
+    font-size: 11px;
+    color: #667085;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-stat-grid strong {
+    color: var(--text);
+    font-size: 12px;
+}
+
+.detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.description-card,
+.sidebar-card,
+.original-post {
+    padding: 24px;
+}
+
+.description-card h2,
+.sidebar-card h2,
+.original-post h2 {
+    font-size: 16px;
+    margin: 0 0 16px;
+}
+
+.description-card h3 {
+    margin: 24px 0 12px;
+    font-size: 13px;
+}
+
+.description-card p,
+.description-card li,
+.sidebar-card p,
+.original-post p {
+    font-size: 12px;
+    line-height: 1.8;
+    color: #4d566a;
+}
+
+.description-card ul {
+    padding-left: 19px;
+}
+
+.sidebar-card+.sidebar-card {
+    margin-top: 16px;
+}
+
+.sidebar-card a {
+    color: #313ac5;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.sidebar-card dl {
+    margin: 0;
+}
+
+.sidebar-card dt {
+    color: #7a8499;
+    font-size: 10px;
+    margin-top: 16px;
+}
+
+.sidebar-card dd {
+    margin: 5px 0 0;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.large-gap {
+    gap: 10px;
+}
+
+.original-post {
+    margin-top: 18px;
+}
+
+.original-post .secondary-btn {
+    margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+    .site-header {
+        grid-template-columns: 1fr auto;
+    }
+    .nav-links {
+        display: none;
+    }
+    .hero {
+        grid-template-columns: 1fr;
+    }
+    .hero-visual {
+        min-height: 340px;
+    }
+    .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .company-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .filter-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .detail-actions {
+        position: static;
+        margin-top: 20px;
+        flex-direction: row;
+    }
+    .detail-company {
+        padding-right: 0;
+    }
+    .detail-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .detail-layout {
+        grid-template-columns: 1fr;
+    }
+    .footer {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 620px) {
+    .app-shell {
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+    }
+    .site-header {
+        padding: 0 18px;
+    }
+    .nav-cta {
+        display: none;
+    }
+    .hero-copy {
+        padding: 42px 22px;
+    }
+    .hero h1 {
+        font-size: 34px;
+    }
+    .section,
+    .market-strip {
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+    .feature-grid,
+    .company-grid,
+    .market-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .jobs-page,
+    .detail-page {
+        padding: 28px 16px 40px;
+    }
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+    .job-row {
+        grid-template-columns: 58px 1fr;
+    }
+    .job-date {
+        grid-column: 2;
+        justify-content: space-between;
+    }
+    .detail-company {
+        align-items: flex-start;
+    }
+    .detail-stat-grid {
+        grid-template-columns: 1fr;
+    }
+    .footer {
+        grid-template-columns: 1fr 1fr;
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+}
+
+
+/* =========================================================
+   UPDATED HOME PAGE STYLES
+   Added for the new Home.jsx.
+   Existing Jobs and Job Details styles above are preserved.
+   ========================================================= */
+
+.navbar {
+    height: 68px;
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    border-bottom: 1px solid #edf0f5;
+    background: #fff;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.logo-circle {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    background: #07163d;
+}
+
+.nav-menu {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 34px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.nav-menu a {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-menu a:hover,
+.nav-menu .active {
+    color: #3a3bd2;
+    border-bottom-color: #3a3bd2;
+}
+
+.nav-button {
+    justify-self: end;
+    padding: 11px 20px;
+    color: #fff;
+    background: linear-gradient(135deg, #151a67, #3841c8);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.hero-section {
+    height: 410px;
+    display: grid;
+    grid-template-columns: 51% 49%;
+    overflow: hidden;
+    background: linear-gradient(105deg, #fff 0%, #fff 42%, #f5fbff 60%, #dcefff 100%);
+}
+
+.hero-content {
+    padding: 52px 20px 40px 53px;
+    position: relative;
+    z-index: 10;
+}
+
+.hero-content h1 {
+    margin: 0;
+    font-size: 39px;
+    line-height: 1.14;
+    letter-spacing: -1.5px;
+    font-weight: 800;
+}
+
+.hero-content p {
+    margin: 20px 0 24px;
+    color: #4e5970;
+    font-size: 13px;
+    line-height: 1.75;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-primary,
+.btn-outline {
+    min-width: 104px;
+    height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.btn-primary {
+    color: #fff;
+    background: linear-gradient(135deg, #4145dc, #252a92);
+}
+
+.btn-outline {
+    border: 1.5px solid #4b50de;
+    color: #3539be;
+    background: #fff;
+}
+
+.hero-image {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(to bottom, transparent 0%, transparent 54%, rgba(183, 221, 249, .35) 55%, rgba(149, 205, 245, .55) 100%);
+}
+
+.sky-glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    right: 50px;
+    top: -50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .85);
+    filter: blur(40px);
+}
+
+.city-building {
+    position: absolute;
+    bottom: 118px;
+    background: rgba(128, 180, 220, .27);
+    border-radius: 3px 3px 0 0;
+}
+
+.city-building span {
+    display: block;
+    width: 55%;
+    height: 4px;
+    margin: 15px auto;
+    background: rgba(255, 255, 255, .65);
+}
+
+.building-one {
+    width: 58px;
+    height: 130px;
+    right: 235px;
+}
+
+.building-two {
+    width: 72px;
+    height: 175px;
+    right: 145px;
+}
+
+.building-three {
+    width: 65px;
+    height: 210px;
+    right: 55px;
+}
+
+.road {
+    position: absolute;
+    left: 10px;
+    right: 0;
+    bottom: 55px;
+    height: 2px;
+    background: rgba(255, 255, 255, .8);
+    transform: rotate(-5deg);
+}
+
+.av-car {
+    position: absolute;
+    width: 265px;
+    height: 110px;
+    left: 85px;
+    bottom: 82px;
+}
+
+.car-body {
+    position: absolute;
+    left: 10px;
+    bottom: 16px;
+    width: 245px;
+    height: 72px;
+    border: 2px solid #8ca4b5;
+    border-radius: 70px 85px 28px 30px;
+    background: linear-gradient(to bottom, #fff, #e3edf3);
+    box-shadow: 0 15px 25px rgba(40, 83, 110, .2);
+}
+
+.car-roof {
+    position: absolute;
+    width: 140px;
+    height: 62px;
+    left: 63px;
+    bottom: 75px;
+    border: 2px solid #839cad;
+    border-radius: 80px 80px 12px 12px;
+    background: linear-gradient(135deg, #fff, #c7dae5);
+}
+
+.car-window {
+    position: absolute;
+    width: 96px;
+    height: 42px;
+    left: 20px;
+    top: 10px;
+    border-radius: 50px 50px 7px 7px;
+    background: #193a53;
+}
+
+.car-lidar {
+    position: absolute;
+    width: 29px;
+    height: 13px;
+    left: 119px;
+    top: -37px;
+    z-index: 10;
+    border-radius: 4px;
+    background: #071c32;
+}
+
+.av-car .wheel {
+    position: absolute;
+    width: 47px;
+    height: 47px;
+    bottom: 0;
+    z-index: 5;
+    border-radius: 50%;
+    border: 8px solid #294660;
+    background: #071323;
+}
+
+.wheel-left {
+    left: 39px;
+}
+
+.wheel-right {
+    right: 36px;
+}
+
+.head-light {
+    position: absolute;
+    right: 7px;
+    top: 25px;
+    width: 16px;
+    height: 10px;
+    border-radius: 50%;
+    background: #c5f7ff;
+    box-shadow: 0 0 13px #82eaff;
+}
+
+.sensor {
+    position: absolute;
+    border: 2px solid rgba(53, 203, 255, .55);
+    border-radius: 50%;
+    transform: rotate(-7deg);
+}
+
+.sensor-one {
+    width: 245px;
+    height: 58px;
+    left: 93px;
+    bottom: 65px;
+}
+
+.sensor-two {
+    width: 330px;
+    height: 78px;
+    left: 50px;
+    bottom: 53px;
+}
+
+.sensor-three {
+    width: 420px;
+    height: 100px;
+    left: 8px;
+    bottom: 41px;
+}
+
+.home-section {
+    padding: 30px 32px;
+}
+
+.home-section h2,
+.market-section h2,
+.skills-section h2 {
+    margin: 0 0 24px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.home-section .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.home-section .feature-card {
+    min-height: 145px;
+    padding: 18px;
+    border: 1px solid #e0e4eb;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.home-section .feature-icon {
+    width: 33px;
+    height: 33px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    color: #5154d9;
+    background: #efefff;
+}
+
+.home-section .feature-card h3 {
+    margin: 14px 0 8px;
+    font-size: 13px;
+}
+
+.home-section .feature-card p {
+    margin: 0;
+    color: #59647a;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.company-section {
+    padding-top: 8px;
+    padding-bottom: 32px;
+}
+
+.company-section .company-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+}
+
+.company-box {
+    height: 79px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #e1e5ec;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.company-name {
+    font-weight: 800;
+}
+
+.nvidia-logo {
+    color: #64b928;
+    font-size: 12px;
+}
+
+.mobileye-logo {
+    color: #183bb2;
+    font-size: 17px;
+}
+
+.motional-logo {
+    color: #4d3bc4;
+    font-size: 16px;
+}
+
+.pony-logo {
+    color: #69a6b3;
+    font-size: 14px;
+}
+
+.nuro-logo {
+    color: #111;
+    font-size: 17px;
+}
+
+.momenta-logo {
+    color: #2257c9;
+    font-size: 14px;
+}
+
+.plus-logo {
+    color: #111;
+    font-size: 18px;
+}
+
+.market-section {
+    padding: 28px 40px 35px;
+    color: #fff;
+    background: linear-gradient(100deg, #061237, #07194d);
+}
+
+.market-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    text-align: center;
+}
+
+.market-stats div {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.market-stats strong {
+    color: #6c6cff;
+    font-size: 28px;
+}
+
+.market-stats span {
+    font-size: 11px;
+}
+
+.skills-section {
+    padding: 27px 30px 32px;
+    text-align: center;
+}
+
+.skill-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.skill-list span {
+    padding: 7px 13px;
+    border-radius: 20px;
+    color: #3340ad;
+    background: #f0f1ff;
+    font-size: 10px;
+}
+
+
+/* New Home footer. These rules intentionally override the older .footer
+   presentation while keeping the same footer content usable elsewhere. */
+
+.footer {
+    position: relative;
+    padding: 30px 38px 55px;
+    color: #fff;
+    background: linear-gradient(100deg, #061237, #07194d);
+    display: block;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    gap: 35px;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.footer-logo span {
+    width: 25px;
+    height: 25px;
+    display: grid;
+    place-items: center;
+    color: #07143a;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.footer-about p {
+    color: #d8def0;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footer-column h4 {
+    margin: 2px 0 4px;
+    font-size: 10px;
+}
+
+.footer-column a {
+    color: #d7deef;
+    font-size: 9px;
+    line-height: normal;
+}
+
+.social-icons {
+    display: flex;
+    gap: 14px;
+    margin-top: 8px;
+}
+
+@media (max-width: 850px) {
+    .navbar {
+        grid-template-columns: 1fr auto;
+    }
+    .nav-menu {
+        display: none;
+    }
+    .hero-section {
+        height: auto;
+        grid-template-columns: 1fr;
+    }
+    .hero-image {
+        min-height: 320px;
+    }
+    .home-section .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .company-section .company-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .market-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+}
+
+@media (max-width: 550px) {
+    .navbar {
+        padding: 0 18px;
+    }
+    .nav-button {
+        display: none;
+    }
+    .hero-content {
+        padding: 38px 22px;
+    }
+    .hero-content h1 {
+        font-size: 31px;
+    }
+    .home-section .feature-grid,
+    .company-section .company-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
