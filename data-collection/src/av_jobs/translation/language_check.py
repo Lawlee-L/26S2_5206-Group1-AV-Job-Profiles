@@ -22,7 +22,7 @@ NON_LATIN_SCRIPTS = {
     "ar": ((0x0600, 0x06FF),),
     "el": ((0x0370, 0x03FF),),
     "he": ((0x0590, 0x05FF),),
-    "ja": ((0x3040, 0x30FF),),
+    "ja": ((0x3041, 0x3096), (0x30A1, 0x30FA)),
     "ko": ((0xAC00, 0xD7AF),),
     "ru": ((0x0400, 0x052F),),
     "th": ((0x0E00, 0x0E7F),),
@@ -40,7 +40,11 @@ def _non_latin_language(text: str) -> str | None:
 
 
 @lru_cache(maxsize=100_000)
-def detect_non_english(text: Any) -> dict[str, Any] | None:
+def detect_non_english(
+    text: Any,
+    *,
+    allow_short: bool = False,
+) -> dict[str, Any] | None:
     """Return a language finding when a non-empty value is confidently non-English."""
     if not isinstance(text, str) or not text.strip():
         return None
@@ -51,11 +55,12 @@ def detect_non_english(text: Any) -> dict[str, Any] | None:
         return {"language": script_language, "confidence": 1.0}
 
     letters = "".join(character for character in value if character.isalpha())
-    if len(letters) < 8:
+    if len(letters) < 8 or (len(letters) < 80 and not allow_short):
         return None
 
+    detection_value = value.replace("・", " ")
     try:
-        candidates = detect_langs(value)
+        candidates = detect_langs(detection_value)
     except LangDetectException:
         return None
     if not candidates:
@@ -76,11 +81,11 @@ def find_non_english_fields(data: Mapping[str, Any]) -> dict[str, dict[str, Any]
     description_finding = detect_non_english(data.get("job_description"))
     for field in TRANSLATABLE_FIELDS:
         value = data.get(field)
-        finding = description_finding if field == "job_description" else detect_non_english(value)
-        if not finding:
-            continue
-
-        if isinstance(value, str) and field == "advertised_job_title":
+        if field == "job_description":
+            finding = description_finding
+        elif isinstance(value, str) and _non_latin_language(value):
+            finding = detect_non_english(value, allow_short=True)
+        elif field == "advertised_job_title" and isinstance(value, str):
             # Avoid treating short English technical titles as another language.
             letters = "".join(character for character in value if character.isalpha())
             has_non_ascii_letter = any(
@@ -88,24 +93,16 @@ def find_non_english_fields(data: Mapping[str, Any]) -> dict[str, dict[str, Any]
                 for character in value
             )
             is_long_single_word = " " not in value.strip() and len(letters) >= 15
-            if not (
-                _non_latin_language(value)
-                or description_finding
-                or has_non_ascii_letter
-                or is_long_single_word
-            ):
-                continue
-
-        if (
-            isinstance(value, str)
-            and field == "location"
-            and _non_latin_language(value) is None
-            and description_finding is None
-        ):
+            if has_non_ascii_letter or is_long_single_word:
+                finding = detect_non_english(value, allow_short=True)
+            else:
+                finding = description_finding
+        else:
             # Short place names are unreliable input for statistical detection.
-            continue
+            finding = description_finding
 
-        findings[field] = {"value": value, **finding}
+        if finding and isinstance(value, str) and value.strip():
+            findings[field] = {"value": value, **finding}
     return findings
 
 

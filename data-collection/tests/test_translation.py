@@ -35,7 +35,7 @@ def test_finds_latin_and_non_latin_languages() -> None:
         make_record(
             "german",
             "Entwicklungsingenieur für Fahrerassistenzsysteme",
-            "Stellenbeschreibung: Sie entwickeln moderne Fahrerassistenzsysteme.",
+            "Stellenbeschreibung: Sie entwickeln moderne Fahrerassistenzsysteme und arbeiten mit verschiedenen Teams an sicheren Softwarelösungen.",
         ),
         make_record(
             "japanese",
@@ -66,6 +66,19 @@ def test_does_not_flag_english_place_names_or_technical_titles() -> None:
             "Deep Learning Developer - REM Modeling",
             "We build autonomous driving software for production vehicles.",
             "Pittsburgh, PA",
+        )
+    ]
+
+    assert find_non_english_records(records) == []
+
+
+def test_does_not_treat_japanese_bullet_as_japanese_text() -> None:
+    records = [
+        make_record(
+            "english-bullets",
+            "Data Engineer",
+            "・Build data pipelines\n・Maintain autonomous driving systems",
+            "Tokyo, Japan",
         )
     ]
 
@@ -114,4 +127,3 @@ def test_validation_rejects_missing_or_untranslated_output() -> None:
 
     with pytest.raises(ValueError, match="Non-English content remains"):
         validate_translation_batch(source_batch, source_batch)
-
