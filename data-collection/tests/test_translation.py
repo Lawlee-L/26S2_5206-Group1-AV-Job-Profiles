@@ -1,5 +1,7 @@
 import pytest
+import requests
 
+import av_jobs.translation.azure as azure_module
 from av_jobs.translation.azure import split_text, translate_source_batch
 from av_jobs.translation.language_check import find_non_english_records
 from av_jobs.translation.workflow import (
@@ -174,3 +176,56 @@ def test_azure_batch_rejects_remaining_non_english_text() -> None:
 
     with pytest.raises(ValueError, match="Non-English content remains"):
         translate_source_batch(source_batch, lambda texts: texts)
+
+
+def test_azure_batch_retries_only_the_failed_field() -> None:
+    source_batch = [
+        {
+            "source_key": "job-1",
+            "company": "Example",
+            "fields": {"advertised_job_title": "软件_工程师"},
+        }
+    ]
+    calls: list[list[str]] = []
+
+    def fake_translate(texts: list[str]) -> list[str]:
+        calls.append(texts)
+        return [
+            "Software Engineer" if text == "软件 工程师" else text
+            for text in texts
+        ]
+
+    result = translate_source_batch(source_batch, fake_translate)
+
+    assert result[0]["fields"]["advertised_job_title"] == "Software Engineer"
+    assert calls == [["软件_工程师"], ["软件 工程师"]]
+
+
+def test_azure_request_retries_a_network_timeout(monkeypatch) -> None:
+    attempts = 0
+
+    class SuccessfulResponse:
+        status_code = 200
+
+        def json(self) -> list[dict]:
+            return [{"translations": [{"text": "English text"}]}]
+
+    def fake_post(*args, **kwargs):
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            raise requests.Timeout("temporary timeout")
+        return SuccessfulResponse()
+
+    monkeypatch.setattr(azure_module.requests, "post", fake_post)
+    monkeypatch.setattr(azure_module.time, "sleep", lambda seconds: None)
+
+    result = azure_module._request_translation(
+        ["Deutscher Text"],
+        key="test-key",
+        region="australiaeast",
+        endpoint=azure_module.DEFAULT_ENDPOINT,
+    )
+
+    assert result == ["English text"]
+    assert attempts == 2

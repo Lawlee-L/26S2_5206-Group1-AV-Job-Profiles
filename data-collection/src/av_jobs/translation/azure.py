@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import getpass
 import json
+import re
 import time
 import uuid
 from pathlib import Path
@@ -10,6 +11,7 @@ from typing import Any, Callable
 
 import requests
 
+from av_jobs.translation.language_check import find_non_english_records
 from av_jobs.translation.workflow import validate_translation_batch
 
 
@@ -62,13 +64,28 @@ def _request_translation(
     body = [{"Text": text} for text in texts]
 
     for attempt in range(max_retries + 1):
-        response = requests.post(
-            url,
-            headers=headers,
-            params=params,
-            json=body,
-            timeout=120,
-        )
+        try:
+            response = requests.post(
+                url,
+                headers=headers,
+                params=params,
+                json=body,
+                timeout=120,
+            )
+        except requests.RequestException as error:
+            if attempt == max_retries:
+                raise RuntimeError(
+                    "Azure translation failed after repeated network errors"
+                ) from error
+            # Temporary connection failures use the same safe retry delay.
+            wait_seconds = min(2**attempt, 30)
+            print(
+                "Azure request timed out or lost connection; "
+                f"retrying in {wait_seconds} seconds."
+            )
+            time.sleep(wait_seconds)
+            continue
+
         if response.status_code == 200:
             payload = response.json()
             if not isinstance(payload, list) or len(payload) != len(texts):
@@ -132,6 +149,74 @@ def _translate_unique_texts(
     submit()
 
     return {source: "".join(chunks) for source, chunks in chunks_by_text.items()}
+
+
+def _find_failed_fields(
+    translated_batch: list[dict[str, Any]],
+) -> dict[str, set[str]]:
+    failed: dict[str, set[str]] = {}
+    for item in translated_batch:
+        source_key = str(item.get("source_key", ""))
+        findings = find_non_english_records(
+            [
+                {
+                    "metadata": {
+                        "source_key": source_key,
+                        "company": item.get("company"),
+                    },
+                    "data": item.get("fields", {}),
+                }
+            ]
+        )
+        if findings:
+            failed[source_key] = set(findings[0]["fields"])
+    return failed
+
+
+def _retry_failed_fields(
+    source_batch: list[dict[str, Any]],
+    translated_batch: list[dict[str, Any]],
+    translate_chunks: Callable[[list[str]], list[str]],
+    checkpoint: Callable[[list[dict[str, Any]]], None] | None,
+    *,
+    max_attempts: int = 2,
+) -> None:
+    source_by_key = {str(item["source_key"]): item for item in source_batch}
+    translated_by_key = {
+        str(item["source_key"]): item for item in translated_batch
+    }
+
+    for attempt in range(max_attempts):
+        failed = _find_failed_fields(translated_batch)
+        if not failed:
+            return
+
+        retry_inputs: list[str] = []
+        field_inputs: list[tuple[dict[str, Any], str, str]] = []
+        for source_key, fields in failed.items():
+            source_fields = source_by_key[source_key]["fields"]
+            translated_fields = translated_by_key[source_key]["fields"]
+            for field in fields:
+                value = source_fields[field] if attempt == 0 else translated_fields[field]
+                # Separators can make Azure treat a mixed-language title as an ID.
+                value = re.sub(r"(?<=\w):(?=\w)", " ", value.replace("_", " "))
+                retry_inputs.append(value)
+                field_inputs.append((translated_fields, field, value))
+
+        translated_values = _translate_unique_texts(
+            list(dict.fromkeys(retry_inputs)),
+            translate_chunks,
+        )
+        for fields, field, retry_input in field_inputs:
+            fields[field] = translated_values[retry_input]
+
+        # Keep repaired fields in the same resumable checkpoint.
+        if checkpoint:
+            checkpoint(translated_batch)
+        print(
+            f"Retried {len(field_inputs)} field(s) that still appeared non-English "
+            f"(repair pass {attempt + 1}/{max_attempts})."
+        )
 
 
 def translate_source_batch(
@@ -209,6 +294,7 @@ def translate_source_batch(
         )
 
     result = [completed[str(item["source_key"])] for item in source_batch]
+    _retry_failed_fields(source_batch, result, translate_chunks, checkpoint)
     # Reuse the shared checker before any Azure result can be accepted.
     validate_translation_batch(source_batch, result)
     return result
@@ -256,12 +342,41 @@ def main() -> None:
             endpoint=args.endpoint,
         )
 
-    result = translate_source_batch(
-        source_batch,
-        translate_chunks,
-        existing=existing,
-        checkpoint=lambda records: _write_list(partial_path, records),
-    )
+    try:
+        result = translate_source_batch(
+            source_batch,
+            translate_chunks,
+            existing=existing,
+            checkpoint=lambda records: _write_list(partial_path, records),
+        )
+    except ValueError as error:
+        saved = _load_list(partial_path) if partial_path.exists() else []
+        failed = _find_failed_fields(saved)
+        if not failed:
+            raise
+
+        passed_path = args.output.with_name(args.output.stem + ".passed.json")
+        review_path = args.output.with_name(args.output.stem + ".review.json")
+        passed = [
+            item for item in saved if str(item.get("source_key")) not in failed
+        ]
+        review = [
+            {
+                **item,
+                "failed_fields": sorted(failed[str(item["source_key"])]),
+            }
+            for item in saved
+            if str(item.get("source_key")) in failed
+        ]
+        # Keep successful output separate from fields that still need review.
+        _write_list(passed_path, passed)
+        _write_list(review_path, review)
+        print(f"English validation passed: {len(passed)} records")
+        print(f"Still needs review after retries: {len(review)} records")
+        print(f"Passed results: {passed_path}")
+        print(f"Review results: {review_path}")
+        raise SystemExit(str(error)) from None
+
     _write_list(args.output, result)
     print(f"Azure translation complete: {len(result)} records")
     print(f"Output: {args.output}")
