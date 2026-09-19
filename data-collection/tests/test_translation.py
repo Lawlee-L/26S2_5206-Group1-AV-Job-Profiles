@@ -1,5 +1,6 @@
 import pytest
 
+from av_jobs.translation.azure import split_text, translate_source_batch
 from av_jobs.translation.language_check import find_non_english_records
 from av_jobs.translation.workflow import (
     merge_translation_batch,
@@ -127,3 +128,49 @@ def test_validation_rejects_missing_or_untranslated_output() -> None:
 
     with pytest.raises(ValueError, match="Non-English content remains"):
         validate_translation_batch(source_batch, source_batch)
+
+
+def test_azure_batch_splits_deduplicates_and_preserves_structure() -> None:
+    long_text = "German text " * 500
+    source_batch = [
+        {
+            "source_key": "job-1",
+            "company": "Example",
+            "fields": {"job_description": long_text, "location": "München"},
+        },
+        {
+            "source_key": "job-2",
+            "company": "Example",
+            "fields": {"job_description": long_text},
+        },
+    ]
+    calls: list[str] = []
+
+    def fake_translate(texts: list[str]) -> list[str]:
+        calls.extend(texts)
+        return [
+            text.replace("German", "English").replace("München", "Munich")
+            for text in texts
+        ]
+
+    result = translate_source_batch(source_batch, fake_translate, group_size=20)
+
+    assert "".join(split_text(long_text)) == long_text
+    assert all(len(chunk) <= 4_500 for chunk in split_text(long_text))
+    assert sum(chunk.count("German") for chunk in calls) == long_text.count("German")
+    assert result[0]["fields"]["job_description"].startswith("English text")
+    assert result[1]["fields"]["job_description"] == result[0]["fields"]["job_description"]
+    assert result[0]["source_key"] == "job-1"
+
+
+def test_azure_batch_rejects_remaining_non_english_text() -> None:
+    source_batch = [
+        {
+            "source_key": "job-1",
+            "company": "Example",
+            "fields": {"job_description": "负责自动驾驶软件开发。"},
+        }
+    ]
+
+    with pytest.raises(ValueError, match="Non-English content remains"):
+        translate_source_batch(source_batch, lambda texts: texts)

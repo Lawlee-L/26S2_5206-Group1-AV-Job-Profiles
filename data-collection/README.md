@@ -286,6 +286,21 @@ python -m av_jobs.translation.workflow validate \
   /tmp/translation_result.json
 ```
 
+Azure Translator can produce the result file directly. The key is requested
+through a hidden terminal prompt and is never written to the repository:
+
+```bash
+python -m av_jobs.translation.azure \
+  /tmp/translation_source.json \
+  /tmp/translation_result.json \
+  --region australiaeast
+```
+
+The Azure helper deduplicates repeated text, splits long descriptions into
+safe request sizes, retries temporary errors, and saves a `.partial.json`
+checkpoint after each completed group. Running the same command again resumes
+from that checkpoint.
+
 Only after validation succeeds, merge it into a new output file:
 
 ```bash
