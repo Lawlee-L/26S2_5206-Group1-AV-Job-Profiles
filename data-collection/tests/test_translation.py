@@ -1,7 +1,10 @@
+import json
+
 import pytest
 import requests
 
 import av_jobs.translation.azure as azure_module
+import av_jobs.translation.deepseek as deepseek_module
 from av_jobs.translation.azure import split_text, translate_source_batch
 from av_jobs.translation.language_check import find_non_english_records
 from av_jobs.translation.workflow import (
@@ -229,3 +232,76 @@ def test_azure_request_retries_a_network_timeout(monkeypatch) -> None:
 
     assert result == ["English text"]
     assert attempts == 2
+
+
+def test_deepseek_request_preserves_order_and_disables_reasoning(monkeypatch) -> None:
+    captured: dict = {}
+
+    class SuccessfulResponse:
+        status_code = 200
+
+        def json(self) -> dict:
+            return {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {"translations": ["Software Engineer", "Munich"]}
+                            )
+                        }
+                    }
+                ]
+            }
+
+    def fake_post(*args, **kwargs):
+        captured.update(kwargs)
+        return SuccessfulResponse()
+
+    monkeypatch.setattr(deepseek_module.requests, "post", fake_post)
+
+    result = deepseek_module._request_translation(
+        ["软件工程师", "München"],
+        key="test-key",
+    )
+
+    assert result == ["Software Engineer", "Munich"]
+    assert captured["headers"]["Authorization"] == "Bearer test-key"
+    assert captured["json"]["reasoning"]["enabled"] is False
+    assert captured["json"]["model"] == deepseek_module.DEFAULT_MODEL
+
+
+def test_deepseek_rejects_missing_translation() -> None:
+    content = json.dumps({"translations": ["Only one result"]})
+
+    with pytest.raises(RuntimeError, match="unexpected number"):
+        deepseek_module._parse_translations(content, expected_count=2)
+
+
+def test_deepseek_repair_prompt_removes_repeated_source_text(monkeypatch) -> None:
+    captured: dict = {}
+
+    class SuccessfulResponse:
+        status_code = 200
+
+        def json(self) -> dict:
+            return {
+                "choices": [
+                    {"message": {"content": '{"translations":["employee pension"]}'}}
+                ]
+            }
+
+    def fake_post(*args, **kwargs):
+        captured.update(kwargs)
+        return SuccessfulResponse()
+
+    monkeypatch.setattr(deepseek_module.requests, "post", fake_post)
+
+    result = deepseek_module._request_translation(
+        ["employee pension (厚生年金)"],
+        key="test-key",
+        repair=True,
+    )
+
+    assert result == ["employee pension"]
+    prompt = captured["json"]["messages"][0]["content"]
+    assert "remove the repeated source-language text" in prompt

@@ -179,7 +179,8 @@ def _retry_failed_fields(
     translate_chunks: Callable[[list[str]], list[str]],
     checkpoint: Callable[[list[dict[str, Any]]], None] | None,
     *,
-    max_attempts: int = 2,
+    repair_chunks: Callable[[list[str]], list[str]] | None = None,
+    max_attempts: int = 3,
 ) -> None:
     source_by_key = {str(item["source_key"]): item for item in source_batch}
     translated_by_key = {
@@ -205,7 +206,7 @@ def _retry_failed_fields(
 
         translated_values = _translate_unique_texts(
             list(dict.fromkeys(retry_inputs)),
-            translate_chunks,
+            repair_chunks or translate_chunks,
         )
         for fields, field, retry_input in field_inputs:
             fields[field] = translated_values[retry_input]
@@ -223,6 +224,7 @@ def translate_source_batch(
     source_batch: list[dict[str, Any]],
     translate_chunks: Callable[[list[str]], list[str]],
     *,
+    repair_chunks: Callable[[list[str]], list[str]] | None = None,
     existing: list[dict[str, Any]] | None = None,
     checkpoint: Callable[[list[dict[str, Any]]], None] | None = None,
     group_size: int = 20,
@@ -294,7 +296,13 @@ def translate_source_batch(
         )
 
     result = [completed[str(item["source_key"])] for item in source_batch]
-    _retry_failed_fields(source_batch, result, translate_chunks, checkpoint)
+    _retry_failed_fields(
+        source_batch,
+        result,
+        translate_chunks,
+        checkpoint,
+        repair_chunks=repair_chunks,
+    )
     # Reuse the shared checker before any Azure result can be accepted.
     validate_translation_batch(source_batch, result)
     return result

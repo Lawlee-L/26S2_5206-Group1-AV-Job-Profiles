@@ -255,10 +255,10 @@ history from an earlier date and uses it as the base for
 the collection command. Earlier dated deliverables remain unchanged and can be
 used again during the next weekly update.
 
-The translation helpers under `src/av_jobs/translation/` do not call a
-translation service. They find content that appears non-English, prepare a
-small batch for Azure or DeepSeek, verify the returned batch, and merge it back
-without changing other job fields.
+The translation helpers under `src/av_jobs/translation/` find content that
+appears non-English, call Azure Translator or DeepSeek through OpenRouter,
+verify the returned batch, and merge it back without changing other job
+fields.
 
 Check a complete history file:
 
@@ -300,6 +300,31 @@ The Azure helper deduplicates repeated text, splits long descriptions into
 safe request sizes, retries temporary errors, and saves a `.partial.json`
 checkpoint after each completed group. Running the same command again resumes
 from that checkpoint.
+
+DeepSeek can also produce the result file automatically through OpenRouter.
+The default model is `deepseek/deepseek-v4-flash-0731:free`. Each user must
+create and provide their own OpenRouter API key. Do not add the key to the
+Python code, README, `.env` files committed to Git, or GitHub. Run the command
+below and paste the key only when the hidden terminal prompt appears:
+
+```bash
+python -m av_jobs.translation.deepseek \
+  /tmp/translation_source.json \
+  /tmp/translation_result.json
+```
+
+The DeepSeek helper requests structured JSON, disables unnecessary reasoning,
+uses a fast single-pass translation prompt, and preserves the existing JSON
+structure in code. It checks that no records or fields are missing, retries
+temporary API errors, and uses the same `.partial.json` checkpoint and English
+validation as Azure. If a run is interrupted, run the same command again to
+continue from the saved checkpoint. A different OpenRouter model can be tested
+with `--model MODEL_NAME` without changing the source code.
+
+If a record still contains non-English text after three focused repair passes,
+the command prints a warning with its `source_key` and affected fields, saves
+the completed output, and continues without stopping the other records. Input
+errors, invalid API credentials, and missing records remain fatal errors.
 
 Only after validation succeeds, merge it into a new output file:
 
