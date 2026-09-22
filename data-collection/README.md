@@ -133,6 +133,16 @@ history file. It keeps jobs from earlier weeks, including jobs that are no
 longer shown on a company careers page. The stable `source_key` prevents the
 same job from being added more than once.
 
+When an earlier dated `jobs_history_translated.json` exists in `deliverables/`,
+the weekly full run uses that English file as the starting point for the new
+history. Existing jobs keep their translated English title, description, and
+location. Their latest metadata, URL, salary, and posting date are still
+updated from the current collection. Jobs first found in the new weekly run are
+added in their collected language. This means the newly generated
+`jobs_history.json` is the previous English history plus the current week's new
+jobs, so the next translation step only needs to process content that is not
+already English.
+
 ## Run a complete In Scope collection
 
 Before a full run, check the Excel source list:
@@ -233,31 +243,82 @@ final dataset can instead be placed in `deliverables/`, as explained below.
 ## English history deliverables
 
 English history datasets are stored in dated folders under `deliverables/`.
-The latest dataset is:
+After a translated history is reviewed, save it as:
 
 ```text
-deliverables/2026-09-13/jobs_history_translated.json
+deliverables/<run-date>/jobs_history_translated.json
 ```
 
-It contains 4,475 cumulative job records from the local
-`jobs_history.json`: 3,986 active jobs, 489 inactive jobs, and 312 jobs first
-found in the 13 September collection. The earlier 6 September dataset is kept
-in its own dated folder for reference.
+The next complete weekly collection automatically finds the latest translated
+history from an earlier date and uses it as the base for
+`data/history/jobs_history.json`. The translation itself is not performed by
+the collection command. Earlier dated deliverables remain unchanged and can be
+used again during the next weekly update.
 
-Non-English text in `advertised_job_title`, `job_description`, and `location`
-is translated into English. During a weekly update, a previous translation can
-be reused when the source text has not changed. Only new or changed
-non-English text needs a new translation. Text already written in English is
-kept. In the 13 September update, 312 jobs were newly collected. Most were
-already in English; 41 records contained 54 new or changed fields that required
-translation.
+The translation helpers under `src/av_jobs/translation/` find content that
+appears non-English, call Azure Translator, verify the returned batch, and
+merge it back without changing other job fields.
 
-The translation does not change `metadata`, `job_url`, `salary`, or
-`date_posted`. Missing source values remain `null`. Validation checks confirm
-that the JSON structure and unique `source_key` values are preserved and that
-required translated fields are not empty. Clear translation issues, such as
-incorrect company names or untranslated text, are corrected before the file
-is submitted.
+Check a complete history file:
+
+```bash
+python -m av_jobs.translation.language_check \
+  data/history/jobs_history.json \
+  --output /tmp/non_english_jobs.json
+```
+
+To prepare only jobs first found in one weekly collection:
+
+```bash
+python -m av_jobs.translation.workflow prepare \
+  data/history/jobs_history.json \
+  /tmp/translation_source.json \
+  --first-seen-date 2026-09-19
+```
+
+After Azure returns the same JSON structure with English values, validate it
+before merging:
+
+```bash
+python -m av_jobs.translation.workflow validate \
+  /tmp/translation_source.json \
+  /tmp/translation_result.json
+```
+
+Azure Translator can produce the result file directly. The key is requested
+through a hidden terminal prompt and is never written to the repository:
+
+```bash
+python -m av_jobs.translation.azure \
+  /tmp/translation_source.json \
+  /tmp/translation_result.json \
+  --region australiaeast
+```
+
+The Azure helper deduplicates repeated text, splits long descriptions into
+safe request sizes, retries temporary errors, and saves a `.partial.json`
+checkpoint after each completed group. Running the same command again resumes
+from that checkpoint.
+
+If a record still contains non-English text after three focused repair passes,
+the command prints a warning with its `source_key` and affected fields, saves
+the completed output, and continues without stopping the other records. Input
+errors, invalid API credentials, and missing records remain fatal errors.
+
+Only after validation succeeds, merge it into a new output file:
+
+```bash
+python -m av_jobs.translation.workflow merge \
+  data/history/jobs_history.json \
+  /tmp/translation_source.json \
+  /tmp/translation_result.json \
+  deliverables/2026-09-19/jobs_history_translated.json
+```
+
+Validation checks that every `source_key` and requested field is returned,
+that translated values are not empty, and that no non-English text is still
+detected. It cannot judge whether a translation is semantically perfect, so a
+small human review is still recommended.
 
 The original `data/history/jobs_history.json` remains local and is not included
 in GitHub. Personal translation API keys are also not stored in this

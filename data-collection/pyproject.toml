@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Collect and standardize autonomous-vehicle job postings."
 requires-python = ">=3.11"
 dependencies = [
+  "langdetect>=1.0.9",
   "openpyxl>=3.1",
   "pandas>=2.2",
   "requests>=2.32",
@@ -21,4 +22,3 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-

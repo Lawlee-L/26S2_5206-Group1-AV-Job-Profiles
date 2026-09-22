@@ -9,6 +9,11 @@ from av_jobs.models import StandardJob
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
+TRANSLATED_FIELDS = (
+    "advertised_job_title",
+    "job_description",
+    "location",
+)
 
 
 def _write_json(path: Path, payload: Any) -> None:
@@ -51,6 +56,8 @@ def merge_history_records(
     current_jobs: list[dict[str, Any]],
     run_date: str,
     successful_source_ids: set[str] | None = None,
+    *,
+    preserve_existing_translation: bool = False,
 ) -> list[dict[str, Any]]:
     """Keep old jobs, add new jobs, and update jobs seen again."""
     records: dict[str, dict[str, Any]] = {}
@@ -77,9 +84,17 @@ def merge_history_records(
             if isinstance(previous_metadata, dict):
                 first_seen = str(previous_metadata.get("first_seen_date") or run_date)
 
+        updated_data = dict(job.get("data") or {})
+        if previous and preserve_existing_translation:
+            previous_data = previous.get("data")
+            if isinstance(previous_data, dict):
+                for field in TRANSLATED_FIELDS:
+                    if field in previous_data:
+                        updated_data[field] = previous_data[field]
+
         updated_job = {
             "metadata": dict(metadata),
-            "data": dict(job.get("data") or {}),
+            "data": updated_data,
         }
         updated_job["metadata"]["first_seen_date"] = first_seen
         updated_job["metadata"]["last_seen_date"] = run_date
@@ -96,11 +111,21 @@ def update_job_history(
     *,
     successful_source_ids: set[str] | None = None,
     data_dir: Path = DATA_DIR,
+    deliverables_dir: Path | None = None,
 ) -> Path:
-    """Merge one complete collection into the cumulative history file."""
+    """Merge a collection onto the latest earlier English history when available."""
     history_path = data_dir / "history" / "jobs_history.json"
-    if history_path.exists():
-        loaded = json.loads(history_path.read_text(encoding="utf-8"))
+    resolved_deliverables_dir = deliverables_dir or data_dir.parent / "deliverables"
+    translated_candidates = sorted(
+        path
+        for path in resolved_deliverables_dir.glob("*/jobs_history_translated.json")
+        if path.parent.name < run_date
+    )
+    translated_path = translated_candidates[-1] if translated_candidates else None
+
+    base_path = translated_path if translated_path else history_path
+    if base_path.exists():
+        loaded = json.loads(base_path.read_text(encoding="utf-8"))
         history = loaded if isinstance(loaded, list) else []
     else:
         history = []
@@ -111,6 +136,7 @@ def update_job_history(
         current_jobs,
         run_date,
         successful_source_ids,
+        preserve_existing_translation=translated_path is not None,
     )
     _write_json(history_path, merged)
     return history_path

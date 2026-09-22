@@ -1,4 +1,5 @@
 import json
+from dataclasses import replace
 from pathlib import Path
 
 from av_jobs.models import JobData, JobMetadata, StandardJob
@@ -88,6 +89,65 @@ def test_same_day_rerun_preserves_new_job_flag() -> None:
     assert history[0]["metadata"]["last_seen_date"] == "2026-09-13"
     assert history[0]["metadata"]["is_new_in_latest_run"] is True
     assert history[0]["metadata"]["is_active"] is True
+
+
+def test_weekly_history_reuses_previous_english_translation(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    deliverables_dir = tmp_path / "deliverables"
+    translated_path = (
+        deliverables_dir / "2026-09-13" / "jobs_history_translated.json"
+    )
+    translated_path.parent.mkdir(parents=True)
+
+    translated_old = make_job(
+        "job-1",
+        "Control Algorithm Engineer",
+        "2026-09-13T00:00:00Z",
+    ).to_dict()
+    translated_old["data"]["job_description"] = "English description"
+    translated_old["data"]["location"] = "Shanghai"
+    translated_old["metadata"]["first_seen_date"] = "2026-09-13"
+    translated_old["metadata"]["last_seen_date"] = "2026-09-13"
+    translated_path.write_text(json.dumps([translated_old]), encoding="utf-8")
+
+    current_old = make_job(
+        "job-1",
+        "控制算法工程师",
+        "2026-09-19T00:00:00Z",
+    )
+    current_old = replace(
+        current_old,
+        data=replace(
+            current_old.data,
+            job_description="中文描述",
+            location="上海市",
+            job_url="https://example.com/job-1-updated",
+        ),
+    )
+    current_new = make_job(
+        "job-2",
+        "新岗位",
+        "2026-09-19T00:00:00Z",
+    )
+
+    path = update_job_history(
+        "2026-09-19",
+        [current_old, current_new],
+        successful_source_ids={"example_greenhouse"},
+        data_dir=data_dir,
+        deliverables_dir=deliverables_dir,
+    )
+    history = json.loads(path.read_text(encoding="utf-8"))
+    by_key = {item["metadata"]["source_key"]: item for item in history}
+
+    assert by_key["job-1"]["data"]["advertised_job_title"] == "Control Algorithm Engineer"
+    assert by_key["job-1"]["data"]["job_description"] == "English description"
+    assert by_key["job-1"]["data"]["location"] == "Shanghai"
+    assert by_key["job-1"]["data"]["job_url"] == "https://example.com/job-1-updated"
+    assert by_key["job-1"]["metadata"]["last_seen_date"] == "2026-09-19"
+    assert by_key["job-1"]["metadata"]["is_new_in_latest_run"] is False
+    assert by_key["job-2"]["data"]["advertised_job_title"] == "新岗位"
+    assert by_key["job-2"]["metadata"]["is_new_in_latest_run"] is True
 
 
 def test_rebuild_history_combines_existing_snapshots(tmp_path: Path) -> None:
