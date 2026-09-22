@@ -320,6 +320,10 @@ that translated values are not empty, and that no non-English text is still
 detected. It cannot judge whether a translation is semantically perfect, so a
 small human review is still recommended.
 
+Translation updates only `advertised_job_title`, `job_description`, and
+`location`. It does not change `metadata`, `job_url`, `salary`, or
+`date_posted`. Missing source values remain `null`.
+
 The original `data/history/jobs_history.json` remains local and is not included
 in GitHub. Personal translation API keys are also not stored in this
 repository.
