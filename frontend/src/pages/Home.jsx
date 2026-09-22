@@ -87,82 +87,45 @@ export default function Home() {
       </header>
 
       {/* HERO */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <h1>
-            Discover Autonomous
-            <br />
-            Vehicle Jobs.
-            <br />
-            Track Skills. Grow Your
-            <br />
-            Future.
-          </h1>
+<section className="hero-section">
 
-          <p>
-            A centralized platform for AV job opportunities, skill
-            <br />
-            demand insights, and industry trends.
-          </p>
+  <div className="hero-content">
+    <h1>
+      Discover Autonomous
+      <br />
+      Vehicle Jobs.
+      <br />
+      Track Skills. Grow Your
+      <br />
+      Future.
+    </h1>
 
-          <div className="hero-buttons">
-            <Link to="/jobs" className="btn-primary">
-              Browse Jobs
-            </Link>
+    <p>
+      A centralized platform for AV job opportunities, skill
+      <br />
+      demand insights, and industry trends.
+    </p>
 
-            <a href="#insights" className="btn-outline">
-              View Insights
-            </a>
-          </div>
-        </div>
+    <div className="hero-buttons">
+      <Link to="/jobs" className="btn-primary">
+        Browse Jobs
+      </Link>
 
-        {/* Autonomous vehicle visual */}
-        <div className="hero-image">
-          <div className="sky-glow"></div>
+      <a href="#insights" className="btn-outline">
+        View Insights
+      </a>
+    </div>
+  </div>
 
-          <div className="city-building building-one">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
+  <div className="hero-image">
+    <img
+      src="/av-car.png"
+      alt="Autonomous vehicle in a smart city"
+      className="hero-car-image"
+    />
+  </div>
 
-          <div className="city-building building-two">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-
-          <div className="city-building building-three">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-
-          <div className="road"></div>
-
-          <div className="sensor sensor-one"></div>
-          <div className="sensor sensor-two"></div>
-          <div className="sensor sensor-three"></div>
-
-          <div className="av-car">
-            <div className="car-lidar"></div>
-
-            <div className="car-roof">
-              <div className="car-window"></div>
-            </div>
-
-            <div className="car-body">
-              <div className="head-light"></div>
-            </div>
-
-            <div className="wheel wheel-left"></div>
-            <div className="wheel wheel-right"></div>
-          </div>
-        </div>
-      </section>
+</section>
 
       {/* OPPORTUNITIES */}
       <section className="home-section opportunities">

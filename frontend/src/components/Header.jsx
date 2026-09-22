@@ -13,9 +13,9 @@ export default function Header({ buttonText = "View Jobs", buttonTo = "/jobs" })
       <nav className="nav-links">
         <NavLink to="/">Home</NavLink>
         <NavLink to="/jobs">Jobs</NavLink>
-        <a href="#companies">Companies</a>
-        <a href="#insights">Insights</a>
-        <a href="#about">About</a>
+        <a href="#companies">About</a>
+        <a href="#insights">Help</a>
+        <a href="#about">Team And Conditions</a>
       </nav>
 
       <Link className="nav-cta" to={buttonTo}>{buttonText}</Link>
