@@ -5,9 +5,9 @@ This repository is the central workspace for the CITS5206 Group 1 project. It is
 
 | Name | Student ID | GitHub Username | Role |
 |---|---:|---|---|
-| Li Luo | 24250049 | `Lawlee-L` | Current Team Lead and Facilitator Liaison |
+| Li Luo | 24250049 | `Lawlee-L` | Team Lead and Facilitator Liaison |
 | Nyx Chen | 24290498 | `hot-tofu-curd` | Future Team Lead and Team Member |
-| Seonjeong Jeong | 24732339 | `seon-jeongx2` | Future Team Lead and Team Member |
+| Seonjeong Jeong | 24732339 | `seon-jeongx2` | Current Team Lead and Team Member |
 | Sunjol Singh Paul | 24433446 | `sunjol` | Client Liaison and Team Member |
 | Thushamini Chathusika Hewa Pathegamage | 24562882 | `Chathushika2000` | Team Member |
 | Leon Nel Nel | 24268801 | `DemionNeo1` | Team Member |
