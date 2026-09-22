@@ -305,6 +305,20 @@ the command prints a warning with its `source_key` and affected fields, saves
 the completed output, and continues without stopping the other records. Input
 errors, invalid API credentials, and missing records remain fatal errors.
 
+For an output named `/tmp/translation_result.json`, Azure may create these
+files:
+
+```text
+/tmp/translation_result.json          Complete translation output
+/tmp/translation_result.partial.json  Resumable checkpoint
+/tmp/translation_result.passed.json   Records that passed English validation
+/tmp/translation_result.review.json   Records and fields that still need review
+```
+
+The `.passed.json` and `.review.json` files are created only when some content
+still needs review after all three repair passes. These temporary translation
+files should not be uploaded to GitHub.
+
 Only after validation succeeds, merge it into a new output file:
 
 ```bash
@@ -440,9 +454,9 @@ Completed:
 - GM USA source test: 49 jobs collected
 - Inceptio China source test: 100 jobs collected
 - Tensor Global source test: 99 jobs collected
-- 49 automated tests passed
-- Latest complete run: 3,986 active jobs from 36 sources
-- Latest cumulative history: 4,475 jobs, including 312 newly found jobs
+- 61 automated tests passed
+- Latest complete run: 4,047 standardized jobs from 36 sources
+- Latest cumulative history: 4,842 jobs, including 367 newly found jobs
 
 The collection and standardization work for the current `In Scope` sources is
 complete. MySQL database loading belongs to the later backend export workstream.
@@ -462,4 +476,4 @@ created again by running the pipeline. They are already excluded by
 
 The dated files under `deliverables/` are different: they are selected English
 datasets for the project, so they are intended to be included in GitHub. The
-latest file is `deliverables/2026-09-13/jobs_history_translated.json`.
+latest file is `deliverables/2026-09-19/jobs_history_translated.json`.
