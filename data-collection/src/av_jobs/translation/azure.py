@@ -358,6 +358,10 @@ def main() -> None:
             checkpoint=lambda records: _write_list(partial_path, records),
         )
     except ValueError as error:
+        # Translation-quality warnings should not stop the completed batch.
+        if not str(error).startswith("Non-English content remains"):
+            raise
+
         saved = _load_list(partial_path) if partial_path.exists() else []
         failed = _find_failed_fields(saved)
         if not failed:
@@ -376,14 +380,22 @@ def main() -> None:
             for item in saved
             if str(item.get("source_key")) in failed
         ]
-        # Keep successful output separate from fields that still need review.
+        # Save everything, while also separating safe and review-only results.
+        _write_list(args.output, saved)
         _write_list(passed_path, passed)
         _write_list(review_path, review)
+        for source_key, fields in sorted(failed.items()):
+            print(
+                f"[WARNING] source_key={source_key}; "
+                f"fields={','.join(sorted(fields))}; "
+                "non-English content remains after 3 repair passes."
+            )
         print(f"English validation passed: {len(passed)} records")
         print(f"Still needs review after retries: {len(review)} records")
+        print(f"Completed output: {args.output}")
         print(f"Passed results: {passed_path}")
         print(f"Review results: {review_path}")
-        raise SystemExit(str(error)) from None
+        return
 
     _write_list(args.output, result)
     print(f"Azure translation complete: {len(result)} records")

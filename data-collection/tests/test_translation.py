@@ -1,3 +1,6 @@
+import json
+import sys
+
 import pytest
 import requests
 
@@ -229,3 +232,49 @@ def test_azure_request_retries_a_network_timeout(monkeypatch) -> None:
 
     assert result == ["English text"]
     assert attempts == 2
+
+
+def test_azure_main_saves_review_results_without_failing(
+    tmp_path, monkeypatch, capsys
+) -> None:
+    source_path = tmp_path / "source.json"
+    output_path = tmp_path / "result.json"
+    source_batch = [
+        {
+            "source_key": "job-1",
+            "company": "Example",
+            "fields": {"advertised_job_title": "软件工程师"},
+        }
+    ]
+    saved = [
+        {
+            "source_key": "job-1",
+            "company": "Example",
+            "fields": {"advertised_job_title": "软件 Engineer"},
+        }
+    ]
+    source_path.write_text(json.dumps(source_batch), encoding="utf-8")
+
+    def fake_translate_source_batch(*args, checkpoint, **kwargs):
+        checkpoint(saved)
+        raise ValueError("Non-English content remains for source_key values: ['job-1']")
+
+    monkeypatch.setattr(
+        azure_module, "translate_source_batch", fake_translate_source_batch
+    )
+    monkeypatch.setattr(azure_module.getpass, "getpass", lambda prompt: "test-key")
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["azure.py", str(source_path), str(output_path), "--region", "australiaeast"],
+    )
+
+    azure_module.main()
+
+    review_path = tmp_path / "result.review.json"
+    passed_path = tmp_path / "result.passed.json"
+    assert json.loads(output_path.read_text(encoding="utf-8")) == saved
+    assert json.loads(passed_path.read_text(encoding="utf-8")) == []
+    review = json.loads(review_path.read_text(encoding="utf-8"))
+    assert review[0]["failed_fields"] == ["advertised_job_title"]
+    assert "[WARNING] source_key=job-1" in capsys.readouterr().out
