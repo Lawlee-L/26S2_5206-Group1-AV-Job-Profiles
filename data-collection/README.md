@@ -478,6 +478,23 @@ Completed:
 - Latest complete run: 4,047 standardized jobs from 36 sources
 - Latest cumulative history: 4,842 jobs, including 367 newly found jobs
 
+The 63 automated tests cover:
+
+- source configuration, the standard job structure, and collector field mapping
+- job URLs, descriptions, locations, salaries, pagination, and source-specific
+  edge cases
+- cumulative history updates, duplicate prevention, same-day reruns, and reuse
+  of existing English translations by `source_key`
+- detection of non-English fields without incorrectly flagging English place
+  names, technical titles, or formatting symbols
+- translation-batch preparation, validation, Azure request batching,
+  deduplication, retry handling, and preservation of the JSON structure
+- interrupted-run recovery and separation of successful translations from
+  records that still need review
+- the weekly workflow, including merging validated translations, retaining the
+  original text for failed records, skipping Azure when no translation is
+  needed, and removing stale temporary review files
+
 The collection and standardization work for the current `In Scope` sources is
 complete. MySQL database loading belongs to the later backend export workstream.
 
