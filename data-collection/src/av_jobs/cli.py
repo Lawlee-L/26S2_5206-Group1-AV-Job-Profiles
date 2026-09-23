@@ -6,6 +6,7 @@ from collections import Counter
 from av_jobs.config import DEFAULT_CONFIG_PATH, load_sources
 from av_jobs.pipeline import run_pipeline
 from av_jobs.storage import rebuild_job_history
+from av_jobs.weekly import run_weekly_workflow
 
 
 def check_config() -> int:
@@ -29,6 +30,13 @@ def build_parser() -> argparse.ArgumentParser:
     collect_parser.add_argument("--platform")
     collect_parser.add_argument("--source-id")
     collect_parser.add_argument("--run-date")
+    weekly_parser = subparsers.add_parser(
+        "weekly-update",
+        help="Collect, translate, validate, and create the weekly deliverable",
+    )
+    weekly_parser.add_argument("--region", required=True)
+    weekly_parser.add_argument("--run-date")
+    weekly_parser.add_argument("--endpoint")
     return parser
 
 
@@ -52,6 +60,15 @@ def main() -> int:
         print(f"Standardized jobs: {len(jobs)}")
         print(f"Output: {output_path}")
         return 0 if all(result.status != "failed" for result in results) else 1
+    if args.command == "weekly-update":
+        options = {
+            "region": args.region,
+            "run_date": args.run_date,
+        }
+        if args.endpoint:
+            options["endpoint"] = args.endpoint
+        run_weekly_workflow(**options)
+        return 0
     raise AssertionError(f"Unhandled command: {args.command}")
 
 

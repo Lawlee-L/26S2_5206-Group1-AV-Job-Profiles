@@ -255,6 +255,26 @@ history from an earlier date and uses it as the base for
 the collection command. Earlier dated deliverables remain unchanged and can be
 used again during the next weekly update.
 
+### One-command weekly workflow
+
+The complete weekly process can be started with one command:
+
+```bash
+av-jobs weekly-update --run-date 2026-09-26 --region australiaeast
+```
+
+This command collects and standardises the current jobs, updates the cumulative
+history, detects non-English fields, requests the Azure key through a hidden
+prompt when translation is needed, validates the returned translations, and
+creates `deliverables/<run-date>/jobs_history_translated.json`.
+
+Working translation files are stored locally under
+`data/translation/<run-date>/`. If a field still needs review after three
+repair attempts, successful translations are merged and the original value is
+retained for the affected field. The record and field name are saved in
+`translation_result.review.json` and printed as a warning. Invalid input, a
+missing API key, and Azure connection or authentication errors remain fatal.
+
 The translation helpers under `src/av_jobs/translation/` find content that
 appears non-English, call Azure Translator, verify the returned batch, and
 merge it back without changing other job fields.
@@ -454,7 +474,7 @@ Completed:
 - GM USA source test: 49 jobs collected
 - Inceptio China source test: 100 jobs collected
 - Tensor Global source test: 99 jobs collected
-- 61 automated tests passed
+- 63 automated tests passed
 - Latest complete run: 4,047 standardized jobs from 36 sources
 - Latest cumulative history: 4,842 jobs, including 367 newly found jobs
 
