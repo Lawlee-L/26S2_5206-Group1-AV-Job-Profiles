@@ -93,6 +93,10 @@ def run_weekly_workflow(
     resolved_date = run_date or date.today().isoformat()
     resolved_deliverables = deliverables_dir or PROJECT_ROOT / "deliverables"
 
+    print(
+        f"[1/4] Collecting jobs for {resolved_date}. This may take several minutes; "
+        "keep the terminal open while collection is in progress."
+    )
     jobs, source_results, standardized_path = collect_pipeline(run_date=resolved_date)
     for result in source_results:
         suffix = f" ({result.error})" if result.error else ""
@@ -113,6 +117,7 @@ def run_weekly_workflow(
             "Their previous history records remain unchanged."
         )
 
+    print("[2/4] Updating job history and checking for non-English fields.")
     history_path = data_dir / "history" / "jobs_history.json"
     history = _load_list(history_path)
     source_batch = prepare_translation_batch(history)
@@ -137,10 +142,17 @@ def run_weekly_workflow(
 
     translated_batch: list[dict[str, Any]] = []
     if source_batch:
+        print(
+            f"[3/4] Translating {len(source_batch)} record(s) with Azure Translator."
+        )
         if translate_chunks is None:
             key = getpass.getpass("Paste Azure Translator KEY 1 (hidden): ").strip()
             if not key:
                 raise ValueError("Azure Translator key is required")
+            print(
+                "Azure key received. Translation may take several minutes; "
+                "keep the terminal open while it is in progress."
+            )
 
             def translate_chunks(texts: list[str]) -> list[str]:
                 return _request_translation(
@@ -162,6 +174,7 @@ def run_weekly_workflow(
                 raise
             translated_batch = _load_list(partial_path)
     else:
+        print("[3/4] No non-English fields found; Azure translation is not needed.")
         partial_path.unlink(missing_ok=True)
     _write_list(result_path, translated_batch)
 
@@ -187,6 +200,7 @@ def run_weekly_workflow(
     deliverable_path = (
         resolved_deliverables / resolved_date / "jobs_history_translated.json"
     )
+    print("[4/4] Writing the final translated history deliverable.")
     _write_list(deliverable_path, merged)
 
     print(f"Standardized jobs: {len(jobs)}")
