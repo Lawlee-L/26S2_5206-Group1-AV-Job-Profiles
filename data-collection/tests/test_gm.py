@@ -24,6 +24,7 @@ def make_source() -> SourceConfig:
 
 
 def test_gm_feed_keeps_only_marked_jobs() -> None:
+    """Verify that only GM jobs with the AV marker are retained."""
     feed = """
     <source>
       <job><title>AV Engineer</title><description><![CDATA[<p>Build AV tools.</p><p>#GM-AV-1</p>]]></description></job>
@@ -36,12 +37,14 @@ def test_gm_feed_keeps_only_marked_jobs() -> None:
 
 
 def test_gm_salary_reads_clear_range() -> None:
+    """Verify that only an explicit GM salary range is extracted."""
     description = "The salary range for this role is $128,700 to $261,300."
     assert gm_salary(description) == "$128,700 to $261,300"
     assert gm_salary("No salary amount is provided.") is None
 
 
 def test_gm_location_keeps_remote_type() -> None:
+    """Verify that GM location text preserves the remote-work type."""
     raw_job = {
         "city": "Austin",
         "state": "Texas",
@@ -52,6 +55,7 @@ def test_gm_location_keeps_remote_type() -> None:
 
 
 def test_gm_mapping_uses_public_feed_fields() -> None:
+    """Verify that public GM feed fields map to the standard structure."""
     raw_job = {
         "title": "AV Software Engineer",
         "requisitionid": "JR-123",

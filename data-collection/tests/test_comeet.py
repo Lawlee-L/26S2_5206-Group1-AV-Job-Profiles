@@ -23,6 +23,7 @@ def make_source() -> SourceConfig:
 
 
 def test_comeet_adds_full_details() -> None:
+    """Verify that the Comeet endpoint requests full job details."""
     result = endpoint_with_details(make_source().endpoint)
     assert "token=public" in result
     assert "details=true" in result
@@ -30,6 +31,7 @@ def test_comeet_adds_full_details() -> None:
 
 
 def test_comeet_joins_description_sections() -> None:
+    """Verify that ordered Comeet description sections are combined."""
     raw = {
         "details": [
             {"name": "Requirements", "value": "<p>Know Python.</p>", "order": 2},
@@ -43,6 +45,7 @@ def test_comeet_joins_description_sections() -> None:
 
 
 def test_comeet_mapping() -> None:
+    """Verify that a Comeet job maps to the standard structure."""
     raw = {
         "uid": "0C.F6C",
         "name": "Embedded Software Engineer",

@@ -3,6 +3,7 @@ from av_jobs.config import SourceConfig
 
 
 def test_lever_mapping() -> None:
+    """Verify that a Lever job maps to the standard structure."""
     source = SourceConfig(
         source_id="example_lever",
         company="Example",
@@ -33,6 +34,7 @@ def test_lever_mapping() -> None:
 
 
 def test_lever_uses_list_sections_when_main_description_is_empty() -> None:
+    """Verify that list sections replace an empty Lever description."""
     source = SourceConfig(
         source_id="example_lever",
         company="Example",

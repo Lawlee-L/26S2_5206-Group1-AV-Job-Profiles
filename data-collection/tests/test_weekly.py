@@ -29,6 +29,7 @@ def make_record(source_key: str, title: str) -> dict:
 
 
 def test_weekly_workflow_merges_passed_and_retains_review_original(tmp_path) -> None:
+    """Verify that valid translations merge while review fields stay original."""
     data_dir = tmp_path / "data"
     deliverables_dir = tmp_path / "deliverables"
     history = [
@@ -72,6 +73,7 @@ def test_weekly_workflow_merges_passed_and_retains_review_original(tmp_path) -> 
 
 
 def test_weekly_workflow_skips_azure_when_history_is_already_english(tmp_path) -> None:
+    """Verify that English-only history skips Azure and clears stale files."""
     data_dir = tmp_path / "data"
     deliverables_dir = tmp_path / "deliverables"
     history = [make_record("job-1", "Software Engineer")]

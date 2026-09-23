@@ -23,6 +23,7 @@ def make_source() -> SourceConfig:
 
 
 def test_smartrecruiters_page_url_keeps_country() -> None:
+    """Verify that pagination preserves the SmartRecruiters country filter."""
     result = smartrecruiters_page_url(make_source().endpoint, limit=100, offset=200)
     assert "country=us" in result
     assert "limit=100" in result
@@ -30,6 +31,7 @@ def test_smartrecruiters_page_url_keeps_country() -> None:
 
 
 def test_smartrecruiters_description_skips_company_text() -> None:
+    """Verify that company boilerplate is excluded from job descriptions."""
     raw = {
         "jobAd": {
             "sections": {
@@ -45,6 +47,7 @@ def test_smartrecruiters_description_skips_company_text() -> None:
 
 
 def test_smartrecruiters_mapping() -> None:
+    """Verify that a SmartRecruiters job maps to the standard structure."""
     raw = {
         "id": "job-123",
         "name": "Vehicle Software Engineer",

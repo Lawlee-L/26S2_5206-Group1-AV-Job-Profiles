@@ -24,6 +24,7 @@ def make_source() -> SourceConfig:
 
 
 def test_jobylon_job_urls_are_unique() -> None:
+    """Verify that duplicate Jobylon job links are removed."""
     widget = """
     url: '/jobs/123-example-engineer/',
     url: '/jobs/123-example-engineer/',
@@ -36,6 +37,7 @@ def test_jobylon_job_urls_are_unique() -> None:
 
 
 def test_jobylon_json_ld_reads_job_posting() -> None:
+    """Verify that Jobylon job details are read from JobPosting JSON-LD."""
     page = """
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"JobPosting","title":"Engineer"}
@@ -45,6 +47,7 @@ def test_jobylon_json_ld_reads_job_posting() -> None:
 
 
 def test_jobylon_location_uses_street_address() -> None:
+    """Verify that Jobylon locations include the available street address."""
     raw = {
         "jobLocation": [
             {
@@ -59,6 +62,7 @@ def test_jobylon_location_uses_street_address() -> None:
 
 
 def test_jobylon_mapping() -> None:
+    """Verify that a Jobylon job maps to the standard structure."""
     raw = {
         "@type": "JobPosting",
         "title": "Autonomous Vehicle Engineer",

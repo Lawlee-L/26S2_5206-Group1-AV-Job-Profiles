@@ -3,6 +3,7 @@ from av_jobs.config import SourceConfig
 
 
 def test_greenhouse_mapping() -> None:
+    """Verify that a Greenhouse job maps to the standard structure."""
     source = SourceConfig(
         source_id="example_greenhouse",
         company="Example",
@@ -34,6 +35,7 @@ def test_greenhouse_mapping() -> None:
 
 
 def test_greenhouse_endpoint_always_requests_content() -> None:
+    """Verify that Greenhouse requests always include full job content."""
     assert endpoint_with_content(
         "https://boards-api.greenhouse.io/v1/boards/vay/jobs"
     ).endswith("?content=true")

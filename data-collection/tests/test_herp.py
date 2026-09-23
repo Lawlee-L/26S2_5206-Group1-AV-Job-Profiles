@@ -24,6 +24,7 @@ def make_source() -> SourceConfig:
 
 
 def test_herp_job_urls_are_unique() -> None:
+    """Verify that duplicate and non-job HERP links are removed."""
     page = """
     <a href="/v1/example/job-one">One</a>
     <a href="/v1/example/job-one">One again</a>
@@ -37,6 +38,7 @@ def test_herp_job_urls_are_unique() -> None:
 
 
 def test_herp_detail_data_reads_json_scripts() -> None:
+    """Verify that HERP job and page data are read from JSON scripts."""
     page = """
     <script id="herp-react-props" type="application/json">
     {"salary":{"type":"text/plain","text":"JPY 500,000 per month"}}
@@ -51,12 +53,14 @@ def test_herp_detail_data_reads_json_scripts() -> None:
 
 
 def test_herp_location_uses_page_data() -> None:
+    """Verify that HERP page location text overrides the fallback address."""
     raw_job = {"jobLocation": {"address": "Tokyo"}}
     page_data = {"location": {"type": "text/plain", "text": "Tokyo and remote"}}
     assert herp_location(raw_job, page_data) == "Tokyo and remote"
 
 
 def test_herp_mapping() -> None:
+    """Verify that a HERP job maps to the standard structure."""
     raw_job = {
         "@type": "JobPosting",
         "title": "Autonomous Driving Engineer",
