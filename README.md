@@ -5,22 +5,23 @@ This repository is the central workspace for the CITS5206 Group 1 project. It is
 
 | Name | Student ID | GitHub Username | Role |
 |---|---:|---|---|
-| Li Luo | 24250049 | `Lawlee-L` | Current Team Lead and Facilitator Liaison |
+| Li Luo | 24250049 | `Lawlee-L` | Team Lead and Facilitator Liaison |
 | Nyx Chen | 24290498 | `hot-tofu-curd` | Future Team Lead and Team Member |
-| Seonjeong Jeong | 24732339 | `seon-jeongx2` | Future Team Lead and Team Member |
+| Seonjeong Jeong | 24732339 | `seon-jeongx2` | Current Team Lead and Team Member |
 | Sunjol Singh Paul | 24433446 | `sunjol` | Client Liaison and Team Member |
 | Thushamini Chathusika Hewa Pathegamage | 24562882 | `Chathushika2000` | Team Member |
 | Leon Nel Nel | 24268801 | `DemionNeo1` | Team Member |
 
-The Team Lead role will rotate from **Li Luo** to **Nyx Chen** and then to **Seonjeong Jeong** during the project.
+The Team Lead role will rotate from **Li Luo** to **Seonjeong Jeong** and then to **Nyx Chen** during the project.
 ## Repository Structure
 
 ```text
 .
-├── Meeting Minutes/
-├── data-collection/
-├── team-guidelines/
-└── README.md
+├── Meeting Minutes/     Team and client meeting records
+├── data-collection/     Job collection, translation, validation, and datasets
+├── team-guidelines/     Team processes, responsibilities, and project planning
+├── .gitignore           Files and local data excluded from GitHub
+└── README.md            Project overview and repository guide
 ```
 
 ## Meeting Minutes
@@ -36,7 +37,9 @@ The assigned minute-taker should follow the template and upload the completed mi
 
 ## Data Collection
 
-This folder is used to store project data and data-collection work. It will be organised further after the MVP and technical approach are confirmed.
+This folder contains the project’s weekly job data collection and translation workflow. It includes source configuration, collectors for supported recruitment platforms, data standardisation, cumulative job-history management, non-English content detection, Azure translation, validation, and dated English datasets for downstream analysis.
+
+Generated raw data, weekly snapshots, run reports, and working history files are stored locally. Only reviewed English datasets under `deliverables/` are intended to be uploaded to GitHub.
 
 ## Team Guidelines
 
@@ -60,4 +63,4 @@ Team members are expected to:
 
 ## Current Project Stage
 
-The team is currently investigating company careers websites, evaluating possible data-collection methods, preparing the proposed MVP, and working towards Project Deliverable 1.
+The project has progressed from initial investigation to implementation and integration. The team is developing and testing the data collection, translation, data cleaning, job classification, database, and dashboard components. The current focus is on connecting these components into a reliable end-to-end workflow, validating data quality, refining the MVP, and incorporating feedback from the client and facilitators.
