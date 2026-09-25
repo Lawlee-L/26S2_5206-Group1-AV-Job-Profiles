@@ -37,7 +37,7 @@ CREATE TABLE import_batches (
 CREATE TABLE import_rejections (
   import_rejection_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   import_batch_id BIGINT UNSIGNED NOT NULL,
-  row_number INT UNSIGNED NULL,
+  source_row_number INT UNSIGNED NULL,
   source_key VARCHAR(191) NULL,
   error_code VARCHAR(64) NOT NULL,
   error_message TEXT NOT NULL,

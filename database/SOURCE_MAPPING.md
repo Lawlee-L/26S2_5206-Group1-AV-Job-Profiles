@@ -8,9 +8,9 @@ canonical collection dataset.
 
 Current source:
 
-`data-collection/deliverables/2026-09-06/jobs_history_translated.json`
+`data-collection/deliverables/2026-09-19/jobs_history_translated.json`
 
-The file contains 4,163 unique `source_key` values. `source_key` is the only
+The file contains 4,842 unique `source_key` values. `source_key` is the only
 approved cross-stage join key.
 
 | Input field | Destination | Rule |
@@ -35,7 +35,7 @@ approved cross-stage join key.
 
 The current history file is cumulative rather than a complete set of weekly
 snapshots. Its first database load should create a synthetic collection run,
-for example `history-2026-09-06`. Future weekly pipeline runs should insert
+for example `history-2026-09-19`. Future weekly pipeline runs should insert
 real `job_observations`.
 
 ## 2. `postings_enriched.csv` / `postings_enriched.json`
