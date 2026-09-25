@@ -25,6 +25,7 @@ def make_source() -> SourceConfig:
 
 
 def test_tensor_job_urls_are_unique() -> None:
+    """Verify that duplicate and non-job Tensor links are removed."""
     page = """
     <a href="/careers">Careers</a>
     <a href="/careers/jd01">First job</a>
@@ -38,6 +39,7 @@ def test_tensor_job_urls_are_unique() -> None:
 
 
 def test_tensor_detail_reads_description_locations_and_salary() -> None:
+    """Verify that Tensor detail pages provide text, locations, and salary."""
     page = """
     <h1 class="cms-job-title">Perception Engineer</h1>
     <div class="w-layout-grid grid-33">
@@ -64,6 +66,7 @@ def test_tensor_detail_reads_description_locations_and_salary() -> None:
 
 
 def test_tensor_mapping_keeps_missing_date_null() -> None:
+    """Verify that a missing Tensor posting date remains null."""
     raw_job = {
         "title": "Perception Engineer",
         "description": "Build autonomous driving software.",
@@ -88,6 +91,7 @@ def test_tensor_mapping_keeps_missing_date_null() -> None:
 
 
 def test_tensor_collector_reads_all_links(monkeypatch) -> None:
+    """Verify that the Tensor collector reads every listed job page."""
     list_page = '<a href="/careers/jd01">One</a><a href="/careers/jd02">Two</a>'
     detail_one = """
     <h1 class="cms-job-title">One</h1>

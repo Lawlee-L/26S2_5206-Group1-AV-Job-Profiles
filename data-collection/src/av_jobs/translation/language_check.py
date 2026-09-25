@@ -78,15 +78,15 @@ def detect_non_english(
 def find_non_english_fields(data: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
     """Return the translated fields in one job that appear to be non-English."""
     findings: dict[str, dict[str, Any]] = {}
-    description_finding = detect_non_english(data.get("job_description"))
     for field in TRANSLATABLE_FIELDS:
         value = data.get(field)
         if field == "job_description":
-            finding = description_finding
+            finding = detect_non_english(value)
         elif isinstance(value, str) and _non_latin_language(value):
             finding = detect_non_english(value, allow_short=True)
         elif field == "advertised_job_title" and isinstance(value, str):
-            # Avoid treating short English technical titles as another language.
+            # Preserve proper place names such as Köln and Düsseldorf. For Latin
+            # script, only job titles have enough context for useful detection.
             letters = "".join(character for character in value if character.isalpha())
             has_non_ascii_letter = any(
                 character.isalpha() and not character.isascii()
@@ -96,10 +96,9 @@ def find_non_english_fields(data: Mapping[str, Any]) -> dict[str, dict[str, Any]
             if has_non_ascii_letter or is_long_single_word:
                 finding = detect_non_english(value, allow_short=True)
             else:
-                finding = description_finding
+                finding = None
         else:
-            # Short place names are unreliable input for statistical detection.
-            finding = description_finding
+            finding = None
 
         if finding and isinstance(value, str) and value.strip():
             findings[field] = {"value": value, **finding}

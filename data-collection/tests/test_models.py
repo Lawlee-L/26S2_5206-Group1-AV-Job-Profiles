@@ -2,6 +2,7 @@ from av_jobs.models import JobData, JobMetadata, StandardJob, build_source_key
 
 
 def test_standard_job_has_two_layers() -> None:
+    """Verify that standard jobs keep metadata and job data separate."""
     source_key = build_source_key(
         platform="greenhouse",
         company="Avride",
@@ -41,4 +42,3 @@ def test_standard_job_has_two_layers() -> None:
         "salary",
         "date_posted",
     }
-

@@ -29,6 +29,7 @@ def make_job(source_key: str, title: str, collected_at: str) -> StandardJob:
 
 
 def test_history_keeps_old_jobs_and_adds_new_jobs(tmp_path: Path) -> None:
+    """Verify that weekly history keeps old jobs and adds new ones."""
     first_job = make_job("job-1", "First title", "2026-09-01T00:00:00Z")
     update_job_history("2026-09-01", [first_job], data_dir=tmp_path)
 
@@ -51,6 +52,7 @@ def test_history_keeps_old_jobs_and_adds_new_jobs(tmp_path: Path) -> None:
 
 
 def test_history_updates_existing_job_without_a_duplicate() -> None:
+    """Verify that an existing job is updated without duplication."""
     old = make_job("job-1", "Old title", "2026-09-01T00:00:00Z").to_dict()
     old["metadata"]["first_seen_date"] = "2026-09-01"
     old["metadata"]["last_seen_date"] = "2026-09-01"
@@ -72,6 +74,7 @@ def test_history_updates_existing_job_without_a_duplicate() -> None:
 
 
 def test_same_day_rerun_preserves_new_job_flag() -> None:
+    """Verify that a same-day rerun keeps the new-job flag."""
     first_run = make_job("job-1", "First title", "2026-09-13T01:00:00Z").to_dict()
     first_history = merge_history_records([], [first_run], "2026-09-13")
 
@@ -92,6 +95,7 @@ def test_same_day_rerun_preserves_new_job_flag() -> None:
 
 
 def test_weekly_history_reuses_previous_english_translation(tmp_path: Path) -> None:
+    """Verify that weekly history reuses earlier English job fields."""
     data_dir = tmp_path / "data"
     deliverables_dir = tmp_path / "deliverables"
     translated_path = (
@@ -151,6 +155,7 @@ def test_weekly_history_reuses_previous_english_translation(tmp_path: Path) -> N
 
 
 def test_rebuild_history_combines_existing_snapshots(tmp_path: Path) -> None:
+    """Verify that saved weekly snapshots rebuild one cumulative history."""
     first_path = tmp_path / "standardized" / "2026-09-01" / "jobs.json"
     second_path = tmp_path / "standardized" / "2026-09-08" / "jobs.json"
     first_path.parent.mkdir(parents=True)

@@ -24,6 +24,7 @@ def make_source() -> SourceConfig:
 
 
 def test_hotjob_detail_endpoint() -> None:
+    """Verify that the HotJob list endpoint converts to a detail endpoint."""
     assert hotjob_detail_endpoint(make_source().endpoint) == (
         "https://wecruit.hotjob.cn/wecruit/positionInfo/"
         "listPositionDetail/SU123?iSaJAx=isAjax"
@@ -31,6 +32,7 @@ def test_hotjob_detail_endpoint() -> None:
 
 
 def test_hotjob_public_url() -> None:
+    """Verify that a public HotJob URL is created from the source data."""
     assert hotjob_public_url(make_source(), "abc123") == (
         "https://wecruit.hotjob.cn/SU123/pb/"
         "posDetail.html?postId=abc123&postType=society"
@@ -38,6 +40,7 @@ def test_hotjob_public_url() -> None:
 
 
 def test_hotjob_description() -> None:
+    """Verify that HotJob description sections are combined."""
     raw = {
         "workContent": "<p>Build vehicle software.</p>",
         "serviceCondition": "Know Python.",
@@ -49,6 +52,7 @@ def test_hotjob_description() -> None:
 
 
 def test_hotjob_mapping() -> None:
+    """Verify that a HotJob record maps to the standard structure."""
     raw = {
         "postId": "abc123",
         "postName": "Autonomous Driving Engineer",

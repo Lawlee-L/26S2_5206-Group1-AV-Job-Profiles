@@ -11,7 +11,10 @@ from typing import Any, Callable
 
 import requests
 
-from av_jobs.translation.language_check import find_non_english_records
+from av_jobs.translation.language_check import (
+    detect_non_english,
+    find_non_english_records,
+)
 from av_jobs.translation.workflow import validate_translation_batch
 
 
@@ -51,6 +54,7 @@ def _request_translation(
     key: str,
     region: str,
     endpoint: str,
+    source_language: str | None = None,
     max_retries: int = 7,
 ) -> list[str]:
     url = endpoint.rstrip("/") + "/translate"
@@ -61,6 +65,8 @@ def _request_translation(
         "X-ClientTraceId": str(uuid.uuid4()),
     }
     params = {"api-version": "3.0", "to": "en"}
+    if source_language:
+        params["from"] = source_language
     body = [{"Text": text} for text in texts]
 
     for attempt in range(max_retries + 1):
@@ -182,7 +188,6 @@ def _retry_failed_fields(
     repair_chunks: Callable[[list[str]], list[str]] | None = None,
     max_attempts: int = 3,
 ) -> None:
-    source_by_key = {str(item["source_key"]): item for item in source_batch}
     translated_by_key = {
         str(item["source_key"]): item for item in translated_batch
     }
@@ -193,29 +198,57 @@ def _retry_failed_fields(
             return
 
         retry_inputs: list[str] = []
-        field_inputs: list[tuple[dict[str, Any], str, str]] = []
+        repair_plans: list[
+            tuple[dict[str, Any], str, list[str], list[tuple[int, str]]]
+        ] = []
         for source_key, fields in failed.items():
-            source_fields = source_by_key[source_key]["fields"]
             translated_fields = translated_by_key[source_key]["fields"]
             for field in fields:
-                value = source_fields[field] if attempt == 0 else translated_fields[field]
-                # Separators can make Azure treat a mixed-language title as an ID.
-                value = re.sub(r"(?<=\w):(?=\w)", " ", value.replace("_", " "))
-                retry_inputs.append(value)
-                field_inputs.append((translated_fields, field, value))
+                value = translated_fields[field]
+                parts = re.split(r"(\n+)", value)
+                segments: list[tuple[int, str]] = []
+                for index, part in enumerate(parts):
+                    if not part.strip() or not detect_non_english(
+                        part,
+                        allow_short=True,
+                    ):
+                        continue
+                    # Separators can make Azure treat a title as an identifier.
+                    prepared = re.sub(
+                        r"(?<=\w):(?=\w)",
+                        " ",
+                        part.replace("_", " "),
+                    )
+                    retry_inputs.append(prepared)
+                    segments.append((index, prepared))
+
+                # Statistical detection can occasionally flag the full field even
+                # when no individual line is long enough to classify reliably.
+                if not segments:
+                    prepared = re.sub(
+                        r"(?<=\w):(?=\w)",
+                        " ",
+                        value.replace("_", " "),
+                    )
+                    parts = [value]
+                    retry_inputs.append(prepared)
+                    segments.append((0, prepared))
+                repair_plans.append((translated_fields, field, parts, segments))
 
         translated_values = _translate_unique_texts(
             list(dict.fromkeys(retry_inputs)),
             repair_chunks or translate_chunks,
         )
-        for fields, field, retry_input in field_inputs:
-            fields[field] = translated_values[retry_input]
+        for translated_fields, field, parts, segments in repair_plans:
+            for index, retry_input in segments:
+                parts[index] = translated_values[retry_input]
+            translated_fields[field] = "".join(parts)
 
         # Keep repaired fields in the same resumable checkpoint.
         if checkpoint:
             checkpoint(translated_batch)
         print(
-            f"Retried {len(field_inputs)} field(s) that still appeared non-English "
+            f"Retried {len(repair_plans)} field(s) that still appeared non-English "
             f"(repair pass {attempt + 1}/{max_attempts})."
         )
 

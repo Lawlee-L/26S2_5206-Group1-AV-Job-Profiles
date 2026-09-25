@@ -23,6 +23,7 @@ def make_source() -> SourceConfig:
 
 
 def test_aimotive_job_urls_are_unique() -> None:
+    """Verify that duplicate AImotive job links are removed."""
     page = """
     <div class="position-list-item">
       <a href="https://aimotive.com/w/example-engineer"><h3>Engineer</h3></a>
@@ -35,6 +36,7 @@ def test_aimotive_job_urls_are_unique() -> None:
 
 
 def test_aimotive_detail_reads_public_fields() -> None:
+    """Verify that public AImotive detail fields are extracted."""
     page = """
     <span data-lfr-editable-id="post-location">Budapest, Hungary</span>
     <h1 data-lfr-editable-id="post-title">AI Engineer</h1>
@@ -50,6 +52,7 @@ def test_aimotive_detail_reads_public_fields() -> None:
 
 
 def test_aimotive_mapping_keeps_missing_fields_null() -> None:
+    """Verify that missing AImotive values remain null after mapping."""
     raw_job = {
         "title": "AI Engineer",
         "description": "Build driving software.",

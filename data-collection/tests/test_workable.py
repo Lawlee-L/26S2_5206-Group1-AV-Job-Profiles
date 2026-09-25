@@ -19,6 +19,7 @@ def make_source() -> SourceConfig:
 
 
 def test_workable_mapping() -> None:
+    """Verify that a Workable job maps to the standard structure."""
     raw = {
         "title": "Autonomous Driving Engineer",
         "shortcode": "ABC123",
@@ -49,6 +50,7 @@ def test_workable_mapping() -> None:
 
 
 def test_workable_joins_multiple_locations() -> None:
+    """Verify that visible Workable locations are combined."""
     raw = {
         "title": "Engineer",
         "shortcode": "XYZ789",
@@ -69,5 +71,6 @@ def test_workable_joins_multiple_locations() -> None:
 
 
 def test_workable_salary_requires_a_number() -> None:
+    """Verify that vague compensation text is not stored as salary."""
     description = "We offer competitive compensation and useful benefits."
     assert workable_salary(description) is None

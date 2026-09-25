@@ -24,6 +24,7 @@ def make_source() -> SourceConfig:
 
 
 def test_moka_page_url_keeps_existing_values() -> None:
+    """Verify that Moka pagination preserves existing query parameters."""
     result = moka_page_url(make_source().endpoint, limit=100, offset=200)
     assert "siteId=123456" in result
     assert "limit=100" in result
@@ -31,11 +32,13 @@ def test_moka_page_url_keeps_existing_values() -> None:
 
 
 def test_moka_job_url() -> None:
+    """Verify that a public Moka job URL is built correctly."""
     result = moka_job_url(make_source(), "job-123")
     assert result == "https://app.mokahr.com/social-recruitment/example/123456#/job/job-123"
 
 
 def test_moka_mapping() -> None:
+    """Verify that a Moka job maps to the standard structure."""
     raw = {
         "id": "job-123",
         "title": "Planning Engineer",
@@ -61,6 +64,7 @@ def test_moka_mapping() -> None:
 
 
 def test_moka_collects_more_than_one_page(monkeypatch) -> None:
+    """Verify that the Moka collector reads every available result page."""
     first_page = {
         "jobs": [{"id": "1", "title": "One"}, {"id": "2", "title": "Two"}],
         "total": 3,
@@ -85,4 +89,3 @@ def test_moka_collects_more_than_one_page(monkeypatch) -> None:
     assert len(jobs) == 3
     assert "offset=0" in requested_urls[0]
     assert "offset=100" in requested_urls[1]
-

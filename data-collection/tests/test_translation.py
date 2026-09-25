@@ -37,6 +37,7 @@ def make_record(
 
 
 def test_finds_latin_and_non_latin_languages() -> None:
+    """Verify detection of non-English Latin and non-Latin text."""
     records = [
         make_record(
             "german",
@@ -66,6 +67,7 @@ def test_finds_latin_and_non_latin_languages() -> None:
 
 
 def test_does_not_flag_english_place_names_or_technical_titles() -> None:
+    """Verify that English place names and technical titles are not flagged."""
     records = [
         make_record(
             "english",
@@ -79,6 +81,7 @@ def test_does_not_flag_english_place_names_or_technical_titles() -> None:
 
 
 def test_does_not_treat_japanese_bullet_as_japanese_text() -> None:
+    """Verify that Japanese-style bullets alone do not trigger detection."""
     records = [
         make_record(
             "english-bullets",
@@ -91,7 +94,38 @@ def test_does_not_treat_japanese_bullet_as_japanese_text() -> None:
     assert find_non_english_records(records) == []
 
 
+def test_does_not_flag_english_fields_because_description_is_japanese() -> None:
+    """Verify that each field is checked independently for its own language."""
+    records = [
+        make_record(
+            "mixed",
+            "Software Engineer",
+            "自動運転ソフトウェアを開発します。",
+            "Tokyo, Japan",
+        )
+    ]
+
+    findings = find_non_english_records(records)
+
+    assert findings[0]["fields"].keys() == {"job_description"}
+
+
+def test_preserves_accented_proper_place_names() -> None:
+    """Verify that official Latin-script place names are not translated."""
+    records = [
+        make_record(
+            "german-location",
+            "Software Engineer",
+            "We build autonomous driving software.",
+            "Düsseldorf, Nordrhein-Westfalen, Germany",
+        )
+    ]
+
+    assert find_non_english_records(records) == []
+
+
 def test_date_filter_only_returns_weekly_jobs() -> None:
+    """Verify that the date filter selects only the requested week's jobs."""
     records = [
         make_record("old", "软件工程师", "负责自动驾驶软件开发。", first_seen_date="2026-09-13"),
         make_record("new", "软件工程师", "负责自动驾驶软件开发。"),
@@ -103,6 +137,7 @@ def test_date_filter_only_returns_weekly_jobs() -> None:
 
 
 def test_prepares_validates_and_merges_translation() -> None:
+    """Verify translation preparation, validation, and source-key merging."""
     records = [make_record("job-1", "软件工程师", "负责自动驾驶软件开发。", "上海市")]
     source_batch = prepare_translation_batch(records)
     translated_batch = [
@@ -125,6 +160,7 @@ def test_prepares_validates_and_merges_translation() -> None:
 
 
 def test_validation_rejects_missing_or_untranslated_output() -> None:
+    """Verify rejection of missing records and untranslated output."""
     records = [make_record("job-1", "软件工程师", "负责自动驾驶软件开发。", "上海市")]
     source_batch = prepare_translation_batch(records)
 
@@ -136,6 +172,7 @@ def test_validation_rejects_missing_or_untranslated_output() -> None:
 
 
 def test_azure_batch_splits_deduplicates_and_preserves_structure() -> None:
+    """Verify Azure splitting, deduplication, and structure preservation."""
     long_text = "German text " * 500
     source_batch = [
         {
@@ -169,6 +206,7 @@ def test_azure_batch_splits_deduplicates_and_preserves_structure() -> None:
 
 
 def test_azure_batch_rejects_remaining_non_english_text() -> None:
+    """Verify that Azure output with non-English text is rejected."""
     source_batch = [
         {
             "source_key": "job-1",
@@ -182,6 +220,7 @@ def test_azure_batch_rejects_remaining_non_english_text() -> None:
 
 
 def test_azure_batch_retries_only_the_failed_field() -> None:
+    """Verify that repair passes retry only the failed field."""
     source_batch = [
         {
             "source_key": "job-1",
@@ -204,7 +243,38 @@ def test_azure_batch_retries_only_the_failed_field() -> None:
     assert calls == [["软件_工程师"], ["软件 工程师"]]
 
 
+def test_azure_batch_repairs_only_non_english_lines_in_mixed_field() -> None:
+    """Verify that mixed output retries only lines that remain non-English."""
+    source_batch = [
+        {
+            "source_key": "job-1",
+            "company": "Example",
+            "fields": {
+                "job_description": "English heading\n日本語の説明\nEnglish ending"
+            },
+        }
+    ]
+    calls: list[list[str]] = []
+
+    def fake_translate(texts: list[str]) -> list[str]:
+        calls.append(texts)
+        if texts == ["日本語の説明"]:
+            return ["Japanese description"]
+        return texts
+
+    result = translate_source_batch(source_batch, fake_translate)
+
+    assert result[0]["fields"]["job_description"] == (
+        "English heading\nJapanese description\nEnglish ending"
+    )
+    assert calls == [
+        ["English heading\n日本語の説明\nEnglish ending"],
+        ["日本語の説明"],
+    ]
+
+
 def test_azure_request_retries_a_network_timeout(monkeypatch) -> None:
+    """Verify that a temporary Azure network timeout is retried."""
     attempts = 0
 
     class SuccessfulResponse:
@@ -237,6 +307,7 @@ def test_azure_request_retries_a_network_timeout(monkeypatch) -> None:
 def test_azure_main_saves_review_results_without_failing(
     tmp_path, monkeypatch, capsys
 ) -> None:
+    """Verify that unresolved Azure fields are saved for review."""
     source_path = tmp_path / "source.json"
     output_path = tmp_path / "result.json"
     source_batch = [

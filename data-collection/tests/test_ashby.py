@@ -3,6 +3,7 @@ from av_jobs.config import SourceConfig
 
 
 def test_ashby_mapping() -> None:
+    """Verify that an Ashby job maps to the standard structure."""
     source = SourceConfig(
         source_id="example_ashby",
         company="Example",
@@ -33,6 +34,7 @@ def test_ashby_mapping() -> None:
 
 
 def test_ashby_ignores_empty_compensation_objects() -> None:
+    """Verify that empty Ashby compensation data produces no salary."""
     source = SourceConfig(
         source_id="example_ashby",
         company="Example",
@@ -61,6 +63,7 @@ def test_ashby_ignores_empty_compensation_objects() -> None:
 
 
 def test_ashby_prefers_nested_salary_summary() -> None:
+    """Verify that Ashby's nested salary summary is preferred."""
     source = SourceConfig(
         source_id="example_ashby",
         company="Example",
