@@ -94,6 +94,36 @@ def test_does_not_treat_japanese_bullet_as_japanese_text() -> None:
     assert find_non_english_records(records) == []
 
 
+def test_does_not_flag_english_fields_because_description_is_japanese() -> None:
+    """Verify that each field is checked independently for its own language."""
+    records = [
+        make_record(
+            "mixed",
+            "Software Engineer",
+            "自動運転ソフトウェアを開発します。",
+            "Tokyo, Japan",
+        )
+    ]
+
+    findings = find_non_english_records(records)
+
+    assert findings[0]["fields"].keys() == {"job_description"}
+
+
+def test_preserves_accented_proper_place_names() -> None:
+    """Verify that official Latin-script place names are not translated."""
+    records = [
+        make_record(
+            "german-location",
+            "Software Engineer",
+            "We build autonomous driving software.",
+            "Düsseldorf, Nordrhein-Westfalen, Germany",
+        )
+    ]
+
+    assert find_non_english_records(records) == []
+
+
 def test_date_filter_only_returns_weekly_jobs() -> None:
     """Verify that the date filter selects only the requested week's jobs."""
     records = [
@@ -211,6 +241,36 @@ def test_azure_batch_retries_only_the_failed_field() -> None:
 
     assert result[0]["fields"]["advertised_job_title"] == "Software Engineer"
     assert calls == [["软件_工程师"], ["软件 工程师"]]
+
+
+def test_azure_batch_repairs_only_non_english_lines_in_mixed_field() -> None:
+    """Verify that mixed output retries only lines that remain non-English."""
+    source_batch = [
+        {
+            "source_key": "job-1",
+            "company": "Example",
+            "fields": {
+                "job_description": "English heading\n日本語の説明\nEnglish ending"
+            },
+        }
+    ]
+    calls: list[list[str]] = []
+
+    def fake_translate(texts: list[str]) -> list[str]:
+        calls.append(texts)
+        if texts == ["日本語の説明"]:
+            return ["Japanese description"]
+        return texts
+
+    result = translate_source_batch(source_batch, fake_translate)
+
+    assert result[0]["fields"]["job_description"] == (
+        "English heading\nJapanese description\nEnglish ending"
+    )
+    assert calls == [
+        ["English heading\n日本語の説明\nEnglish ending"],
+        ["日本語の説明"],
+    ]
 
 
 def test_azure_request_retries_a_network_timeout(monkeypatch) -> None:

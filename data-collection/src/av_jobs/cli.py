@@ -6,7 +6,7 @@ from collections import Counter
 from av_jobs.config import DEFAULT_CONFIG_PATH, load_sources
 from av_jobs.pipeline import run_pipeline
 from av_jobs.storage import rebuild_job_history
-from av_jobs.weekly import run_weekly_workflow
+from av_jobs.weekly import repair_weekly_translation, run_weekly_workflow
 
 
 def check_config() -> int:
@@ -37,6 +37,13 @@ def build_parser() -> argparse.ArgumentParser:
     weekly_parser.add_argument("--region", required=True)
     weekly_parser.add_argument("--run-date")
     weekly_parser.add_argument("--endpoint")
+    repair_parser = subparsers.add_parser(
+        "repair-translation",
+        help="Repair and merge an existing weekly translation without collection",
+    )
+    repair_parser.add_argument("--region", required=True)
+    repair_parser.add_argument("--run-date", required=True)
+    repair_parser.add_argument("--endpoint")
     return parser
 
 
@@ -68,6 +75,15 @@ def main() -> int:
         if args.endpoint:
             options["endpoint"] = args.endpoint
         run_weekly_workflow(**options)
+        return 0
+    if args.command == "repair-translation":
+        options = {
+            "region": args.region,
+            "run_date": args.run_date,
+        }
+        if args.endpoint:
+            options["endpoint"] = args.endpoint
+        repair_weekly_translation(**options)
         return 0
     raise AssertionError(f"Unhandled command: {args.command}")
 

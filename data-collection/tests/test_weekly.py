@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from av_jobs.pipeline import SourceRunResult
-from av_jobs.weekly import run_weekly_workflow
+from av_jobs.weekly import repair_weekly_translation, run_weekly_workflow
 
 
 def write_json(path: Path, value: object) -> None:
@@ -108,4 +108,45 @@ def test_weekly_workflow_skips_azure_when_history_is_already_english(tmp_path) -
     assert json.loads(result.deliverable_path.read_text(encoding="utf-8")) == history
     assert not (work_dir / "translation_result.partial.json").exists()
     assert not (work_dir / "translation_result.passed.json").exists()
+    assert not (work_dir / "translation_result.review.json").exists()
+
+
+def test_repair_translation_updates_deliverable_without_collection(tmp_path) -> None:
+    """Verify that a saved review can be repaired and merged without collection."""
+    data_dir = tmp_path / "data"
+    deliverables_dir = tmp_path / "deliverables"
+    work_dir = data_dir / "translation" / "2026-09-25"
+    history = [make_record("job-1", "Software Engineer")]
+    history[0]["data"]["job_description"] = "日本語の説明"
+    source = [
+        {
+            "source_key": "job-1",
+            "company": "Example",
+            "fields": {"job_description": "日本語の説明"},
+        }
+    ]
+    partial = [
+        {
+            "source_key": "job-1",
+            "company": "Example",
+            "fields": {"job_description": "日本語の説明"},
+        }
+    ]
+    write_json(data_dir / "history" / "jobs_history.json", history)
+    write_json(work_dir / "translation_source.json", source)
+    write_json(work_dir / "translation_result.partial.json", partial)
+    write_json(work_dir / "translation_result.review.json", partial)
+
+    result = repair_weekly_translation(
+        region="australiaeast",
+        run_date="2026-09-25",
+        data_dir=data_dir,
+        deliverables_dir=deliverables_dir,
+        translate_chunks=lambda texts: ["Japanese description" for _ in texts],
+    )
+
+    final = json.loads(result.deliverable_path.read_text(encoding="utf-8"))
+    assert final[0]["data"]["job_description"] == "Japanese description"
+    assert result.collected_jobs == 0
+    assert result.review_records == 0
     assert not (work_dir / "translation_result.review.json").exists()

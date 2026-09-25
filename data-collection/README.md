@@ -149,6 +149,18 @@ endpoint. A single-source command is only a diagnostic check; it does not add
 the result to the combined snapshot. After the source succeeds, rerun the full
 `weekly-update` command to regenerate the official weekly deliverable.
 
+If collection already finished but translation still has review records, repair
+only the saved translation and update the same deliverable without collecting
+the websites again:
+
+```bash
+av-jobs repair-translation --run-date 2026-09-25 --region australiaeast
+```
+
+This command reuses the saved source batch and checkpoint, retranslates only
+the remaining non-English content, validates it, and merges successful repairs
+into the dated deliverable by `source_key`.
+
 The complete workflow stops when no source succeeds, the input history is
 invalid, the Azure key is missing or rejected, or Azure cannot be reached after
 its request retries.
@@ -161,7 +173,11 @@ safe request sizes, retries temporary API errors, and saves a checkpoint after
 each completed group.
 
 If translated text still appears non-English, the program retries only the
-affected fields up to three times. After those attempts:
+affected fields up to three times. For long mixed-language fields, only the
+lines that still appear non-English are sent again, then the field is rebuilt
+and validated before it can be merged. Repair requests also provide Azure with
+the detected source language so bilingual lines are not mistaken for English.
+After those attempts:
 
 - valid translations are merged into the history;
 - the original value is retained for any field that still needs review;
@@ -366,7 +382,7 @@ Run the test suite with:
 pytest
 ```
 
-The current suite contains 63 passing tests covering:
+The current suite contains 67 passing tests covering:
 
 - source configuration and the standard job structure;
 - collector mappings, URLs, descriptions, locations, salaries, and pagination;

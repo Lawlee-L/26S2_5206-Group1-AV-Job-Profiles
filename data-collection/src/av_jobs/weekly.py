@@ -16,6 +16,7 @@ from av_jobs.translation.azure import (
     _request_translation,
     translate_source_batch,
 )
+from av_jobs.translation.language_check import detect_non_english
 from av_jobs.translation.workflow import (
     merge_translation_batch,
     prepare_translation_batch,
@@ -29,6 +30,57 @@ class WeeklyWorkflowResult:
     collected_jobs: int
     translation_records: int
     review_records: int
+
+
+def _azure_translators(
+    *,
+    region: str,
+    endpoint: str,
+) -> tuple[
+    Callable[[list[str]], list[str]],
+    Callable[[list[str]], list[str]],
+]:
+    """Prompt once and return normal and language-guided Azure callbacks."""
+    key = getpass.getpass("Paste Azure Translator KEY 1 (hidden): ").strip()
+    if not key:
+        raise ValueError("Azure Translator key is required")
+    print(
+        "Azure key received. Translation may take several minutes; "
+        "keep the terminal open while it is in progress."
+    )
+
+    def translate_chunks(texts: list[str]) -> list[str]:
+        return _request_translation(
+            texts,
+            key=key,
+            region=region,
+            endpoint=endpoint,
+        )
+
+    def repair_chunks(texts: list[str]) -> list[str]:
+        repaired = [""] * len(texts)
+        grouped: dict[str | None, list[tuple[int, str]]] = {}
+        for index, text in enumerate(texts):
+            finding = detect_non_english(text, allow_short=True)
+            language = str(finding["language"]) if finding else None
+            # Azure uses zh-Hans rather than the detector's generic zh code.
+            if language == "zh":
+                language = "zh-Hans"
+            grouped.setdefault(language, []).append((index, text))
+
+        for language, items in grouped.items():
+            values = _request_translation(
+                [text for _, text in items],
+                key=key,
+                region=region,
+                endpoint=endpoint,
+                source_language=language,
+            )
+            for (index, _), value in zip(items, values, strict=True):
+                repaired[index] = value
+        return repaired
+
+    return translate_chunks, repair_chunks
 
 
 def _load_list(path: Path) -> list[dict[str, Any]]:
@@ -141,31 +193,22 @@ def run_weekly_workflow(
     _write_list(source_path, source_batch)
 
     translated_batch: list[dict[str, Any]] = []
+    repair_chunks: Callable[[list[str]], list[str]] | None = None
     if source_batch:
         print(
             f"[3/4] Translating {len(source_batch)} record(s) with Azure Translator."
         )
         if translate_chunks is None:
-            key = getpass.getpass("Paste Azure Translator KEY 1 (hidden): ").strip()
-            if not key:
-                raise ValueError("Azure Translator key is required")
-            print(
-                "Azure key received. Translation may take several minutes; "
-                "keep the terminal open while it is in progress."
+            translate_chunks, repair_chunks = _azure_translators(
+                region=region,
+                endpoint=endpoint,
             )
-
-            def translate_chunks(texts: list[str]) -> list[str]:
-                return _request_translation(
-                    texts,
-                    key=key,
-                    region=region,
-                    endpoint=endpoint,
-                )
 
         try:
             translated_batch = translate_source_batch(
                 source_batch,
                 translate_chunks,
+                repair_chunks=repair_chunks,
                 existing=existing,
                 checkpoint=lambda records: _write_list(partial_path, records),
             )
@@ -212,6 +255,91 @@ def run_weekly_workflow(
         run_date=resolved_date,
         deliverable_path=deliverable_path,
         collected_jobs=len(jobs),
+        translation_records=len(source_batch),
+        review_records=len(review),
+    )
+
+
+def repair_weekly_translation(
+    *,
+    region: str,
+    run_date: str,
+    endpoint: str = DEFAULT_ENDPOINT,
+    data_dir: Path = DATA_DIR,
+    deliverables_dir: Path | None = None,
+    translate_chunks: Callable[[list[str]], list[str]] | None = None,
+) -> WeeklyWorkflowResult:
+    """Repair an existing weekly translation without collecting jobs again."""
+    resolved_deliverables = deliverables_dir or PROJECT_ROOT / "deliverables"
+    history_path = data_dir / "history" / "jobs_history.json"
+    work_dir = data_dir / "translation" / run_date
+    source_path = work_dir / "translation_source.json"
+    result_path = work_dir / "translation_result.json"
+    partial_path = work_dir / "translation_result.partial.json"
+    passed_path = work_dir / "translation_result.passed.json"
+    review_path = work_dir / "translation_result.review.json"
+
+    for required in (history_path, source_path, partial_path):
+        if not required.exists():
+            raise FileNotFoundError(f"Required translation file not found: {required}")
+
+    history = _load_list(history_path)
+    source_batch = _load_list(source_path)
+    existing = _load_list(partial_path)
+    repair_chunks: Callable[[list[str]], list[str]] | None = None
+    if translate_chunks is None:
+        translate_chunks, repair_chunks = _azure_translators(
+            region=region,
+            endpoint=endpoint,
+        )
+
+    print(
+        f"Repairing the existing {run_date} translation; "
+        "job collection will not run."
+    )
+    try:
+        translated_batch = translate_source_batch(
+            source_batch,
+            translate_chunks,
+            repair_chunks=repair_chunks,
+            existing=existing,
+            checkpoint=lambda records: _write_list(partial_path, records),
+        )
+    except ValueError as error:
+        if not str(error).startswith("Non-English content remains"):
+            raise
+        translated_batch = _load_list(partial_path)
+    _write_list(result_path, translated_batch)
+
+    merged, passed, review = merge_completed_translations(
+        history,
+        source_batch,
+        translated_batch,
+    )
+    if review:
+        _write_list(passed_path, passed)
+        _write_list(review_path, review)
+        for item in review:
+            print(
+                f"[WARNING] source_key={item['source_key']}; "
+                f"fields={','.join(item['failed_fields'])}; "
+                "original content was retained."
+            )
+    else:
+        passed_path.unlink(missing_ok=True)
+        review_path.unlink(missing_ok=True)
+
+    deliverable_path = (
+        resolved_deliverables / run_date / "jobs_history_translated.json"
+    )
+    _write_list(deliverable_path, merged)
+    print(f"Translation records: {len(source_batch)}")
+    print(f"Records needing review: {len(review)}")
+    print(f"Updated deliverable: {deliverable_path}")
+    return WeeklyWorkflowResult(
+        run_date=run_date,
+        deliverable_path=deliverable_path,
+        collected_jobs=0,
         translation_records=len(source_batch),
         review_records=len(review),
     )
