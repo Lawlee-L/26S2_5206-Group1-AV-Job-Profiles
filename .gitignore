@@ -9,3 +9,4 @@ data-collection/data/standardized/
 data-collection/data/run_reports/
 *.egg-info/
 data-collection/data/history/
+node_modules/
