@@ -1,0 +1,13 @@
+# Secrets and local settings
+.env
+
+# Environments and caches
+.venv/
+__pycache__/
+.cache/
+
+# Data and results (not published)
+*.json
+*.sqlite
+*.db
+output*/

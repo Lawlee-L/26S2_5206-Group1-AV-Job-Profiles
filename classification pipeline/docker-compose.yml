@@ -1,0 +1,23 @@
+# Local MySQL for the AV job-profiles database.
+#   docker compose up -d      start (the first start loads schema.mysql.sql)
+#   docker compose down       stop; the data survives in the mysql-data volume
+#   docker compose down -v    stop AND delete the data (the schema reloads next start)
+# Passwords come from .env: MYSQL_ROOT_PASSWORD and MYSQL_PASSWORD.
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: av-job-profiles-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?add MYSQL_ROOT_PASSWORD to .env}
+      MYSQL_DATABASE: av_job_profiles
+      MYSQL_USER: avjobs
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?add MYSQL_PASSWORD to .env}
+    command: --default-time-zone=+00:00
+    ports:
+      - "127.0.0.1:3306:3306"   # reachable from this Mac only
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./schema.mysql.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+
+volumes:
+  mysql-data:
