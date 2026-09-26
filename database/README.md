@@ -24,7 +24,8 @@ All application and database timestamps must use UTC.
 
 ## 2. End-to-end data flow
 
-The 4,163 collected records do not go directly into one large Dashboard table.
+The 4,842 records in the 19 September 2026 collection history do not go
+directly into one large Dashboard table.
 They pass through five stages. Each stage adds information while keeping the
 previous stage traceable.
 
@@ -65,7 +66,7 @@ collection_runs
   -> job_observations         immutable per-run history
 ```
 
-All 4,163 canonical records can be loaded into `jobs`, even if classification
+All 4,842 canonical records can be loaded into `jobs`, even if classification
 has not finished. `jobs` remains the source of truth for what was actually
 advertised.
 
@@ -93,7 +94,7 @@ The job remains one row in `jobs`. Its many skills become separate relational
 links in `job_skills`; the description and URL are not copied into every skill
 row.
 
-Current classification samples cover fewer jobs than the 4,163 canonical
+Current classification samples cover fewer jobs than the 4,842 canonical
 records. A job without a matched analysis remains in `jobs` and is counted as
 unclassified. A classification row without an exact `source_key` match goes to
 `import_rejections`; it is never matched by row number or similar title.
@@ -246,7 +247,7 @@ the authority for exact SQL types, nullability, indexes, and constraints.
 | Table | Purpose | Main contents | Relationship and writer |
 | --- | --- | --- | --- |
 | `import_batches` | Record and audit every file/database load so an import can be reproduced and checked. | `import_batch_id`, batch type, source filename, SHA-256 checksum, status, total/accepted/rejected counts, metadata and timestamps. | Parent of imported `jobs`, `job_analyses`, and rejection rows. Written by Nyx's importer. |
-| `import_rejections` | Keep invalid rows and explicit failure reasons instead of silently dropping or guessing data. | Rejection ID, batch ID, input row number, optional `source_key`, error code/message, and original row as JSON. | Many rejection rows belong to one `import_batches` row. Written only by the importer/validator. |
+| `import_rejections` | Keep invalid rows and explicit failure reasons instead of silently dropping or guessing data. | Rejection ID, batch ID, `source_row_number` from the input file, optional `source_key`, error code/message, and original row as JSON. | Many rejection rows belong to one `import_batches` row. Written only by the importer/validator. |
 
 These tables explain where database rows came from and prevent invalid data
 from disappearing silently.
@@ -321,8 +322,8 @@ UNIQUE (source_id, source_job_id) when a source job ID exists
 ```
 
 Importing the same source job twice is therefore rejected or handled as an
-update rather than creating a second `jobs` row. The current history contains
-4,163 records and 4,163 unique `source_key` values.
+update rather than creating a second `jobs` row. The 19 September 2026 history
+contains 4,842 records and 4,842 unique `source_key` values.
 
 Other repeatable data is scoped by version:
 
