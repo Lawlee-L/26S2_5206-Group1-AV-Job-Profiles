@@ -1,0 +1,38 @@
+{
+  "input": "jobs_history_translated.json",
+  "n_input_rows": 5139,
+  "n_after_dedupe": 4518,
+  "n_duplicates_removed": 621,
+  "limit": null,
+  "n_records": 4518,
+  "n_llm_failures": 0,
+  "model": "openai/gpt-6-luna",
+  "prompt_version": "p5-72e4e4cb",
+  "temperature": 0.0,
+  "n_api_postings": 4468,
+  "n_cached": 50,
+  "prompt_tokens": 9784390,
+  "output_tokens": 3153137,
+  "cost_usd": 2.109752,
+  "embedding_model": "all-MiniLM-L6-v2",
+  "embedded_text": "role_summary+responsibilities+skills",
+  "min_cluster_size": 8,
+  "min_samples": 2,
+  "groups": {
+    "av_relevant": {
+      "n_postings": 2902,
+      "n_clusters": 114,
+      "n_noise": 596
+    },
+    "not_av_relevant": {
+      "n_postings": 1616,
+      "n_clusters": 70,
+      "n_noise": 229
+    }
+  },
+  "languages": {
+    "English": 4518
+  },
+  "started_at": "2026-09-26T15:01:51+00:00",
+  "runtime_seconds": 2226.3
+}

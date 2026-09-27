@@ -7,7 +7,5 @@ __pycache__/
 .cache/
 
 # Data and results (not published)
-*.json
 *.sqlite
 *.db
-output*/
