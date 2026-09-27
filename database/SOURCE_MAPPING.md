@@ -1,16 +1,17 @@
 # Current Source-to-Database Mapping
 
-This mapping covers the current collection history and Sunjol's experimental
-classification files. The analysis files are samples and must not replace the
-canonical collection dataset.
+This mapping covers Li's latest cumulative collection snapshot and the output
+contract expected from Sunjol's v2 pipeline. Older classification samples are
+not interchangeable with the v2 output and must not replace the canonical job
+history.
 
 ## 1. Collection history JSON
 
 Current source:
 
-`data-collection/deliverables/2026-09-19/jobs_history_translated.json`
+`data-collection/deliverables/2026-09-25/jobs_history_translated.json`
 
-The file contains 4,842 unique `source_key` values. `source_key` is the only
+The file contains 5,139 unique `source_key` values. `source_key` is the only
 approved cross-stage join key.
 
 | Input field | Destination | Rule |
@@ -33,15 +34,101 @@ approved cross-stage join key.
 | `data.salary` | `jobs.salary_raw` | Do not guess currency or interval. |
 | `data.date_posted` | `jobs.date_posted` | Parse when valid; otherwise NULL. |
 
+The supplied Li snapshot has no hash fields. The importer calculates two
+different fingerprints and stores both in `jobs` and each
+`job_observations` snapshot:
+
+| Database field | What is hashed | Algorithm and purpose |
+| --- | --- | --- |
+| `content_hash` | The job description after the same Unicode, punctuation, bullet, and whitespace normalization used by classification-pipeline `clean.py` v2. | 40-character SHA-1. Matches the pipeline's exact-description deduplication/cache key and proves which description version an analysis read. |
+| `record_hash_sha256` | Canonical title, full description, job URL, raw location, raw salary, and posting date. | 64-character SHA-256. Detects any change to those collected fields; it is not a job ID and is not used for classifier deduplication. |
+
+`job_analyses.input_content_hash` stores the 40-character description hash for
+the exact description version consumed by that analysis. The same `source_key`
+still identifies and joins the job; none of these hashes replaces it. The hash
+contract is versioned as `av-job-hash-v1` in importer provenance. Do not
+truncate, compare, or reuse one hash as the other.
+
 The current history file is cumulative rather than a complete set of weekly
-snapshots. Its first database load should create a synthetic collection run,
-for example `history-2026-09-19`. Future weekly pipeline runs should insert
-real `job_observations`.
+snapshots. Each file import creates a synthetic collection run; its run key
+includes the snapshot date and file digest so distinct files from one day do
+not collide. The current `collected_at` written to observations is a synthetic
+end-of-day timestamp, not proof of the actual scrape time. A later history
+phase must separate actual observation, snapshot-generation, and import times
+before the team relies on fine-grained trend charts.
 
-## 2. `postings_enriched.csv` / `postings_enriched.json`
+## 2. Sunjol v2 pipeline output contract
 
-The current sample has 533 classified jobs. Resolve every record to `jobs` by
-`source_key` before inserting analysis data.
+The importer expects all files from one full run, produced from the same Li
+snapshot. Do not use `--limit` for an importable run.
+
+### `postings_all.json`
+
+One row per successfully analysed, deduplicated input. Every row must keep the
+exact input `source_key` and the full `record` object. The importer matches it
+to `jobs` by `source_key`, then validates company, title, URL, location, date,
+source file checksum and per-record hashes, and the cluster assignment. It stores relevance,
+confidence label, reason, responsibilities, seniority, experience and evidence
+in `job_analyses`; skill names/evidence become `skills` and `job_skills`. The
+complete model record remains in `raw_response_json`.
+
+The v2-specific fields are retained separately for backend queries:
+
+| Pipeline field | Database destination | Rule |
+| --- | --- | --- |
+| `record.role_summary` | `job_analyses.role_summary` | Store the concise role summary. |
+| `record.responsibilities` | `job_analyses.responsibilities_json` | Preserve the structured array; also keep the legacy readable text in `technical_responsibilities`. |
+| `record.requirements` | `job_analyses.requirements_json` | Preserve the structured array without flattening it. |
+| `record.language_of_posting` | `job_analyses.language_of_posting` | Keep the detected/source language. |
+| `input_content_hash` or `content_hash`, if exported | Validate against the source description SHA-1 | Optional in the current file contract; the importer calculates and stores `job_analyses.input_content_hash` from the exact source row if omitted. |
+| Per-posting `served_by`, `prompt_tokens`, `output_tokens`, `cost_usd`, if exported | Matching `job_analyses` columns | Preserve per-call provenance/usage when present; absent values remain NULL. |
+
+Aggregate `prompt_tokens`, `output_tokens`, and `cost_usd` from
+`run_metadata.json` are stored on `analysis_runs`. Imported output is marked as
+`result_origin='imported'`; a numeric reuse ID from another local SQLite/MySQL
+database is not treated as a valid foreign key in this database.
+
+### `run_metadata.json`
+
+Required to confirm which input and pipeline run produced the output. The
+importer reconciles `n_input_rows`, `n_after_dedupe`, `n_duplicates_removed`,
+`n_records`, and `n_llm_failures` against the detail files and verifies the
+input filename and row total.
+
+### `duplicates_removed.csv`
+
+Required to record each intentional exclusion. `source_key` and
+`duplicate_of_source_key` must both exist in Li's snapshot; cross-company
+matches and cyclic chains are blocked for review. The importer preserves each
+original direct link, including duplicate-to-duplicate chains, instead of
+silently flattening them; both endpoints remain available as source jobs.
+Links are written to `job_deduplication_links`; no source job is deleted.
+
+### `llm_failures.csv`
+
+Required even when it contains only a header. Each failure must have a known
+`source_key` and an error. Failed model rows are retained as
+`job_analyses.analysis_status = 'failed'` and are not given skills or clusters.
+
+### Group `cluster_summary.csv` files
+
+Import both `av_relevant/cluster_summary.csv` and
+`not_av_relevant/cluster_summary.csv`. The importer recalculates each cluster's
+membership count from `postings_all.json`; mismatches block the import. Non-AV
+noise ID `-1` is stored as `-2` because one dashboard release references one
+combined cluster run. Both remain marked as noise.
+
+The v2 run is importable only when successful rows, duplicate links, and failed
+rows account for every input key exactly once. The prior 533-row experiment
+files are documented separately below and are not joinable to Li's current
+source keys.
+
+## 3. Legacy `postings_enriched.csv` / `postings_enriched.json`
+
+The older sample has 533 classified jobs with `sha1:...` keys. A check against
+the 25 September collection file found zero exact key matches. It must not be
+imported or matched by title/row number. The field map below describes its
+shape only.
 
 | Input field | Destination | Rule |
 | --- | --- | --- |
@@ -63,7 +150,7 @@ The current sample has 533 classified jobs. Resolve every record to `jobs` by
 | `cluster_id` | `job_cluster_assignments` | Resolve inside one cluster run. |
 | `cluster_lean` | validation against `clusters.lean` | Cluster-level attribute, not a permanent job field. |
 
-## 3. `cluster_summary.csv`
+## 4. Legacy `cluster_summary.csv`
 
 The current sample contains 30 regular clusters and one noise cluster (`-1`).
 Cluster labels are not yet complete, so nullable naming fields are intentional.
@@ -89,7 +176,7 @@ A human-created name uses `label_source = 'manual'`. Neither path overwrites an
 older revision. Only an approved revision is copied into the current label
 fields in `clusters` and exposed through the dashboard views.
 
-## 4. `gpt_oss_answers.json`
+## 5. Legacy `gpt_oss_answers.json`
 
 The current file contains only 14 experimental LLM responses. It lacks
 `source_key`, so it must not be bulk-loaded until each result is linked to an

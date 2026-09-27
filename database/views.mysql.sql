@@ -1,4 +1,4 @@
--- Dashboard-facing views. Run after schema.mysql.sql.
+-- Dashboard-facing views. Run after a fresh schema install or completed table migrations.
 
 USE av_job_profiles;
 

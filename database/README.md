@@ -24,7 +24,7 @@ All application and database timestamps must use UTC.
 
 ## 2. End-to-end data flow
 
-The 4,842 records in the 19 September 2026 collection history do not go
+The 5,139 records in the 25 September 2026 collection history do not go
 directly into one large Dashboard table.
 They pass through five stages. Each stage adds information while keeping the
 previous stage traceable.
@@ -66,7 +66,7 @@ collection_runs
   -> job_observations         immutable per-run history
 ```
 
-All 4,842 canonical records can be loaded into `jobs`, even if classification
+All 5,139 canonical records can be loaded into `jobs`, even if classification
 has not finished. `jobs` remains the source of truth for what was actually
 advertised.
 
@@ -94,10 +94,13 @@ The job remains one row in `jobs`. Its many skills become separate relational
 links in `job_skills`; the description and URL are not copied into every skill
 row.
 
-Current classification samples cover fewer jobs than the 4,842 canonical
-records. A job without a matched analysis remains in `jobs` and is counted as
-unclassified. A classification row without an exact `source_key` match goes to
-`import_rejections`; it is never matched by row number or similar title.
+The 25 September 2026 classification output accounts for all 5,139 source
+records: 4,518 classified postings and 621 same-company duplicate links.
+Duplicates stay in `jobs`, with their run-specific decisions recorded in
+`job_deduplication_links`. A job without a matched analysis or duplicate
+decision remains in `jobs` and is counted as unclassified. A classification
+row without an exact `source_key` match goes to `import_rejections`; it is
+never matched by row number or similar title.
 
 ### Stage 3: place analysed jobs into clusters
 
@@ -248,6 +251,7 @@ the authority for exact SQL types, nullability, indexes, and constraints.
 | --- | --- | --- | --- |
 | `import_batches` | Record and audit every file/database load so an import can be reproduced and checked. | `import_batch_id`, batch type, source filename, SHA-256 checksum, status, total/accepted/rejected counts, metadata and timestamps. | Parent of imported `jobs`, `job_analyses`, and rejection rows. Written by Nyx's importer. |
 | `import_rejections` | Keep invalid rows and explicit failure reasons instead of silently dropping or guessing data. | Rejection ID, batch ID, `source_row_number` from the input file, optional `source_key`, error code/message, and original row as JSON. | Many rejection rows belong to one `import_batches` row. Written only by the importer/validator. |
+| `import_job_undo` | Keep a before-image for every job inserted or changed by a collection import so that the latest batch can be reversed safely. | Batch ID, `source_key`, insert/update action, previous job row as JSON, and fingerprint of the imported row. | One batch has zero or more undo rows. Written by the importer and retained after rollback as audit evidence. |
 
 These tables explain where database rows came from and prevent invalid data
 from disappearing silently.
@@ -260,8 +264,8 @@ from disappearing silently.
 | `job_sources` | Describe each configured careers source from which jobs are collected. | Stable `source_id`, `company_id`, platform/ATS, region, endpoint, enabled flag and source configuration JSON. | One source belongs to one company and publishes many `jobs`; it also has one result per collection run. Written from the checked source configuration. |
 | `collection_runs` | Version one complete or partial execution of the collection pipeline. | Run ID/key, status, pipeline version, Git commit, source scope, notes, start/end timestamps. | Parent of `source_run_results` and `job_observations`. Written once per collection execution. |
 | `source_run_results` | Distinguish a genuinely removed job from a source that simply failed during collection. | Composite run/source key, success/failure/skipped status, job count, error message, snapshot path and completion time. | Joins `collection_runs` to `job_sources`. Written by Li's collection pipeline. |
-| `jobs` | Store the latest canonical state of every known source advertisement for fast backend access. | Internal `job_id`, unique `source_key`, source job ID, title, description, URL, raw/normalised location, raw/normalised salary, posting/seen/collection dates, active/new flags and content hash. | One job belongs to one source and has many observations and analysis versions. Upserted by the collection importer; classification must not overwrite it. |
-| `job_observations` | Preserve what one job looked like in each collection run for history, change detection and trend charts. | Observation ID, job/run IDs, title, description, URL, raw location/salary, posting and collection dates, active-at-run flag, content hash and optional raw payload. | Unique per `(job_id, collection_run_id)`. Appended by the collection importer and never edited as current state. |
+| `jobs` | Store the latest canonical state of every known source advertisement for fast backend access. | Internal `job_id`, unique `source_key`, source job ID, title, description, URL, raw/normalised location, raw/normalised salary, posting/seen/collection dates, active/new flags, classifier `content_hash` (SHA-1), and change-detection `record_hash_sha256`. | One job belongs to one source and has many observations and analysis versions. Upserted by the collection importer; classification must not overwrite it. |
+| `job_observations` | Preserve what one job looked like in each collection run for history, change detection and trend charts. | Observation ID, job/run IDs, title, description, URL, raw location/salary, posting and collection dates, active-at-run flag, both hashes and optional raw payload. | Unique per `(job_id, collection_run_id)`. Appended by the collection importer and never edited as current state. |
 
 `jobs` is optimised for current Dashboard reads. `job_observations` preserves
 history for trend charts, auditing, and detecting changed/removed jobs.
@@ -270,8 +274,9 @@ history for trend charts, auditing, and detecting changed/removed jobs.
 
 | Table | Purpose | Main contents | Relationship and writer |
 | --- | --- | --- | --- |
-| `analysis_runs` | Make each LLM, dictionary, hybrid or manual classification reproducible and distinguishable from later versions. | Run ID/key, method, provider/model/version, prompt/taxonomy/code versions, source dataset version, parameters, status, notes and timestamps. | One run produces many `job_analyses` and may feed clustering. Created by Sunjol's classification process. |
-| `job_analyses` | Store derived interpretation of one canonical job without changing the source job. | Analysis ID, job/run IDs, result origin and reuse pointer, AV relevance/confidence/reason, responsibilities/evidence, generic title, seniority, experience, raw model response, status and import batch. | Unique per `(job_id, analysis_run_id)`; parent of `job_skills` and cluster assignments. Written by the classifier/importer. |
+| `analysis_runs` | Make each LLM, dictionary, hybrid or manual classification reproducible and distinguishable from later versions. | Run ID/key, method, provider/model/version, prompt/taxonomy/code versions, source dataset version, parameters, aggregate prompt/output tokens and cost when available, status, notes and timestamps. | One run produces many `job_analyses` and may feed clustering. Created by Sunjol's classification process. |
+| `job_analyses` | Store derived interpretation of one canonical job without changing the source job. | Analysis ID, job/run IDs, result origin and reuse pointer, AV relevance/confidence/reason, role summary, structured responsibilities/requirements, language, per-job input hash and model usage, seniority, experience, raw model response, status and import batch. | Unique per `(job_id, analysis_run_id)`; parent of `job_skills` and cluster assignments. Written by the classifier/importer. |
+| `job_deduplication_links` | Record which same-company postings the pipeline deliberately excluded as exact or near duplicates for one analysis run. | Analysis run, duplicate job, kept job, duplicate type, similarity and source row index. | Many links belong to one analysis run; both job IDs remain in `jobs`. Written by the analysis importer. |
 | `skills` | Maintain a reusable canonical vocabulary so equivalent skills can be counted consistently. | Numeric `skill_id`, canonical and normalised names, skill type, description and active flag. | Referenced by both `job_skills` and `cluster_skills`. Maintained by the classification/taxonomy process. |
 | `skill_aliases` | Map alternative text forms to one canonical skill without losing the form found in source/model output. | Alias ID, `skill_id`, original alias text, normalised alias and alias source. | Many aliases belong to one `skills` row. Maintained with the skill taxonomy. |
 | `job_skills` | Represent the many-to-many relationship between analysed jobs and skills for filtering and aggregation. | `job_analysis_id`, `skill_id`, raw extracted text, confidence, evidence and rank. | Composite key `(job_analysis_id, skill_id)`. Written when an analysis result is loaded; never stored as one semicolon string. |
@@ -322,8 +327,8 @@ UNIQUE (source_id, source_job_id) when a source job ID exists
 ```
 
 Importing the same source job twice is therefore rejected or handled as an
-update rather than creating a second `jobs` row. The 19 September 2026 history
-contains 4,842 records and 4,842 unique `source_key` values.
+update rather than creating a second `jobs` row. The 25 September 2026 history
+contains 5,139 records and 5,139 unique `source_key` values.
 
 Other repeatable data is scoped by version:
 
@@ -599,17 +604,19 @@ Use one transaction per batch where practical:
 4. `collection_runs` and `source_run_results`
 5. `jobs` and `job_observations`
 6. `analysis_runs` and `job_analyses`
-7. `skills`, `skill_aliases`, and `job_skills`
-8. `cluster_runs`, `clusters`, assignments, and `cluster_skills`
-9. `cluster_label_revisions`, then the approved label cache in `clusters`
-10. draft `dashboard_releases`
-11. QA validation, approval, and publication
+7. `job_deduplication_links`
+8. `skills`, `skill_aliases`, and `job_skills`
+9. `cluster_runs`, `clusters`, assignments, and `cluster_skills`
+10. `cluster_label_revisions`, then the approved label cache in `clusters`
+11. draft `dashboard_releases`
+12. QA validation, approval, and publication
 
 ## 13. Non-negotiable data rules
 
 - Join collection and analysis using `source_key`, never row number or fuzzy title.
 - Keep original source text even when normalised fields exist.
-- Keep noise cluster `-1`; do not silently discard it.
+- Keep noise assignments. When the two classifier populations are combined into
+  one cluster run, AV noise remains `-1` and non-AV noise is stored as `-2`.
 - Treat `cluster_number` as scoped to one cluster run.
 - Do not turn `High` into an invented numeric confidence.
 - Split semicolon-delimited skills before loading `job_skills`.
@@ -617,16 +624,224 @@ Use one transaction per batch where practical:
 - LLM/manual labels are append-only; approval changes only current cache/pointer.
 - Publish only completed, fully validated runs.
 
-## 14. Files and deployment
+## 14. Weekly import, backup, restore, and rollback
+
+`weekly_import.py` remains the compatibility launcher and current MySQL
+operation engine. The import use cases are exposed separately through
+`database/importer/`: typed file contracts, an `ImporterService` application
+API, a backend protocol, and separate CLI/MySQL adapters. A future GUI should
+call the service rather than parse command-line arguments or issue SQL. The
+backend protocol is also the extension point for another storage engine.
+
+The importer requires Python and the MySQL client tools (`mysql` and
+`mysqldump`). Install its connector with:
+
+```text
+python -m pip install -r database/requirements-import.txt
+```
+
+Set `AVDB_HOST`, `AVDB_PORT`, `AVDB_USER`, `AVDB_PASSWORD`, and `AVDB_NAME` in
+the local environment or secret manager. Never commit credentials. Choose one
+schema setup path:
+
+- **New, empty database:** apply `schema.mysql.sql`, then `views.mysql.sql`.
+  The current schema already includes the results of migrations 001–004. Do
+  not replay those migrations: 001 and 002 create tables that already exist.
+- **Existing database with tables or data:** do not run `schema.mysql.sql` over
+  the existing tables. Take a full backup, restore it into an isolated MySQL
+  instance, inspect the existing table/column definitions, and apply only the
+  missing migrations in numeric order. Validate row counts, keys, hash
+  columns, and importer schema checks on that restored copy before applying
+  the same changes to the target database. After a successful upgrade, apply
+  `views.mysql.sql` to refresh the dashboard views. Migrations 001 and 002 are
+  one-time scripts and are not safe to replay blindly.
+
+Migration files use `USE av_job_profiles`; an isolated test instance must use
+that database name unless the scripts are deliberately adapted and reviewed.
+The repository currently has no migration-version ledger, so an existing
+database's migration state must be established from its actual schema before
+recording any migration as applied. Do not infer it from a successful command
+on another database. Migration 004 preserves the previous 64-character record
+hash by renaming it to `record_hash_sha256`, then establishes the 40-character
+classifier `content_hash` and adds structured result/provenance fields. The
+importer checks expected lengths and case-sensitive collations before writing;
+it refuses a mismatched schema rather than truncate hashes or case-fold IDs.
+
+Migration 004 uses MySQL client `DELIMITER` directives for guarded, schema-aware
+changes; apply it with the MySQL command-line client, not by sending the whole
+file as one prepared SQL statement through a Python connector:
+
+```text
+mysql -u USER -p < database/migrations/004_unified_hash_and_analysis_contract.sql
+```
+
+For old rows, migration 004 does not invent a classifier hash: new SHA-1 values
+and `input_content_hash` are populated on the next source/analysis import.
+Existing record SHA-256 values are preserved where their old meaning matches
+the six-field contract.
+
+### Stable importer boundary
+
+The command line is only one caller of the import service. `CollectionFiles`
+and `AnalysisFiles` are immutable input descriptions; `ImporterService` accepts
+those inputs and delegates each use case to the injected `ImportBackend`
+protocol. `importer/cli.py` owns argument parsing and terminal/audit output;
+`importer/mysql_backend.py` adapts the service API to the current MySQL
+operation engine. A GUI should put the service behind its controller/view-model,
+show returned summaries, and map `ImportErrorSafe` or backend errors to
+user-facing messages. It should not duplicate validation, backup, rollback, or
+SQL logic. CLI operation reports are produced by the CLI adapter; GUI audit
+presentation can be added as a separate adapter without changing import use
+cases.
+
+```python
+from pathlib import Path
+
+from database.importer import AnalysisFiles, CollectionFiles, ImporterService, MySQLImporterBackend
+
+service = ImporterService(MySQLImporterBackend())
+preview = service.plan_collection(CollectionFiles(snapshot=Path("jobs.json")))
+```
+
+The API does not require a weekly cadence: the same operations can be called
+for manual tests, frequent runs, scheduled jobs, or GUI actions. The current
+cumulative-file importer can distinguish different snapshots by file digest,
+but it synthesizes each observation time as 23:59:59 on the snapshot date; do
+not use that timestamp for intra-day trends. Separating actual collection,
+snapshot, import, and publication times remains a later history/publishing task.
+
+### Hash contract
+
+`source_key` remains the job identifier and the only cross-stage join key.
+Hashes are fingerprints, not IDs:
+
+| Field | Hashes | Purpose |
+| --- | --- | --- |
+| `jobs.content_hash` / `job_observations.content_hash` | Normalized job description, SHA-1, 40 hex characters | Matches classification-pipeline v2's exact-description dedupe and identifies the description seen by an analysis. |
+| `jobs.record_hash_sha256` / `job_observations.record_hash_sha256` | Title, full description, URL, raw location, raw salary, posting date, SHA-256, 64 hex characters | Detects changes in canonical source fields; this is not used for classification dedupe. |
+| `job_analyses.input_content_hash` | The same SHA-1 description hash for the input consumed by that analysis | Analysis provenance and stale-result checks. |
+
+The hashing implementation and version are in `database/importer/hashing.py`
+(`av-job-hash-v1`). The matching pipeline normalization is copied from its
+current v2 contract; any future normalization change must increment the
+contract version and be coordinated with the classifier before import.
+
+### Reconciliation with the Classification-pipeline schema
+
+The classification PR's `content_hash` is adopted as the 40-character SHA-1
+description hash. The importer's former 64-character `content_hash` meaning is
+preserved under the explicit name `record_hash_sha256`. The PR's structured
+`role_summary`, `responsibilities_json`, `requirements_json`, `language_of_posting`,
+`input_content_hash`, and model-usage columns are also part of the canonical
+schema.
+
+Two shapes remain intentionally different because they model different history:
+
+- Keep `job_deduplication_links` scoped to `analysis_run_id`. Deduplication can
+  change from one run to another, so a mutable `jobs.duplicate_of_job_id` would
+  make an old run appear to have today's duplicate decision.
+- Keep the current release's single `cluster_run_id` contract for now. The
+  classifier PR's separate `cluster_runs.population` requires a corresponding
+  dashboard-release/API change before AV and non-AV populations can be bound as
+  two distinct cluster runs. Do not silently store two populations in one run
+  or add an unused column as if that change were complete.
+
+The unified MySQL schema in this directory is the importer/backend contract;
+the classifier's local SQLite schema is a pipeline implementation detail, not a
+second competing production schema.
+
+### Check a weekly collection snapshot
+
+```text
+python database/weekly_import.py plan-collection --input data-collection/deliverables/2026-09-25/jobs_history_translated.json --previous data-collection/deliverables/2026-09-19/jobs_history_translated.json
+```
+
+This validates unique keys and compares the snapshots without connecting to
+MySQL. `import-collection` makes a compressed full backup first, then upserts
+by exact `source_key` and appends one `job_observations` row per input job.
+Unchanged jobs are left untouched. Missing keys never deactivate jobs. The
+current Li export is cumulative and does not include per-source run results, so
+the importer records a synthetic `partial` collection run and does not invent
+source success/failure records.
+
+Every parsed command—including a validation/plan command or a failed operation—
+also writes a local audit record. By default, one detailed JSON report is saved
+per run under `database/operation_logs/reports/`, and a compact JSON Lines log
+is appended to `database/operation_logs/logs/weekly_import.jsonl`. Reports
+include the operation ID, timestamps, duration, safe CLI arguments, outcome,
+counts/hashes returned by the command, and any error. Database credentials are
+not copied into these records. This local directory is Git-ignored. Use
+`--audit-dir <path>` after any command to choose another local audit directory.
+The command also prints the report and log paths. These files complement the
+database `import_batches` audit rows; they are not a replacement for backups.
+
+```text
+python database/weekly_import.py import-collection --input data-collection/deliverables/2026-09-25/jobs_history_translated.json
+```
+
+The file SHA-256 prevents accidental re-import of the same source file. A
+database advisory lock serialises import commands. Each changed/inserted job
+gets an undo record in `import_job_undo`; a failed SQL transaction makes no
+partial data visible.
+
+### Validate and import one Sunjol run
+
+Use the exact Li snapshot passed to Sunjol and all outputs from the same full
+run. The importer blocks sample/partial runs, unknown or mismatched keys,
+cross-company deduplication, cyclic duplicate links, missing outcomes, and
+cluster count mismatches. It records successful analyses, failed analyses,
+dedupe links, skills, cluster memberships, model/cost metadata, the pipeline
+commit, and a draft dashboard release. Cluster names remain blank until labels
+are proposed and reviewed; no release is published automatically.
+
+```text
+python database/weekly_import.py plan-analysis --postings path/to/postings_all.json --metadata path/to/run_metadata.json --source-input data-collection/deliverables/2026-09-25/jobs_history_translated.json --av-summary path/to/av_relevant/cluster_summary.csv --other-summary path/to/not_av_relevant/cluster_summary.csv --duplicates path/to/duplicates_removed.csv --failures path/to/llm_failures.csv
+```
+
+After the plan reconciles, run `import-analysis` with the same arguments. It
+also creates a full backup before writing. The analysis is joined only by
+`source_key`; `row_index` is retained for traceability and never used as a key.
+Pass the exact classification pipeline Git commit as `--git-commit <sha>` so
+the analysis record identifies the code that produced the files.
+
+### Undo and restore
+
+`rollback` reverses only the latest successful/partial import batch. It makes a
+new full backup first, verifies the compressed dump is readable, records its
+SHA-256, and checks that imported jobs have not changed since the
+batch, no later analysis depends on them, and no dashboard release or approved
+cluster label depends on the batch. It preserves the batch/undo audit trail and
+does not remove pre-existing rows. Restore always targets a new database name;
+it validates the backup before loading and refuses to overwrite an existing
+database. Backups are written to `database/backups/` by default; that local-only
+directory is Git-ignored:
+
+```text
+python database/weekly_import.py rollback
+python database/weekly_import.py backup
+python database/weekly_import.py restore --file path/to/av_job_profiles_TIMESTAMP.sql.gz --target-db av_job_profiles_restore
+```
+
+## 15. Files and deployment
 
 - `schema.mysql.sql`: tables, keys, constraints, and indexes.
+- `weekly_import.py`: current MySQL operation engine and command-line compatibility launcher.
+- `importer/`: service API, typed input contracts, backend protocol, MySQL and CLI adapters, stable errors, and hash rules.
+- `migrations/`: one-time migrations for reversible imports, analysis dedupe links, exact key comparison, and the unified classifier/hash contract.
+- `requirements-import.txt`: MySQL connector required by the importer.
 - `views.mysql.sql`: stable read contract for the backend.
-- `SOURCE_MAPPING.md`: field-level mapping from current team files.
+- `SOURCE_MAPPING.md`: collection and classification field mapping and import contract.
+
+For a **new, empty database only**:
 
 ```bash
 mysql -u USER -p < database/schema.mysql.sql
 mysql -u USER -p < database/views.mysql.sql
 ```
+
+For an **existing database**, follow the backup, test-restore, schema-inspection,
+and selective-migration procedure in Section 14. Apply `views.mysql.sql` only
+after the necessary table migrations have succeeded.
 
 Database credentials must come from environment variables or the deployment
 platform's secret manager. They must not be committed to GitHub.

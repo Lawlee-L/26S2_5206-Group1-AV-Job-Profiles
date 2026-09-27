@@ -29,7 +29,7 @@ CREATE TABLE import_batches (
   PRIMARY KEY (import_batch_id),
   UNIQUE KEY uq_import_batch_file (batch_type, file_sha256),
   CONSTRAINT chk_import_batch_status
-    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial')),
+    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial', 'rolled_back')),
   CONSTRAINT chk_import_batch_counts
     CHECK (accepted_rows + rejected_rows <= total_rows)
 ) ENGINE=InnoDB;
@@ -38,7 +38,7 @@ CREATE TABLE import_rejections (
   import_rejection_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   import_batch_id BIGINT UNSIGNED NOT NULL,
   source_row_number INT UNSIGNED NULL,
-  source_key VARCHAR(191) NULL,
+  source_key VARCHAR(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   error_code VARCHAR(64) NOT NULL,
   error_message TEXT NOT NULL,
   raw_record JSON NULL,
@@ -49,6 +49,25 @@ CREATE TABLE import_rejections (
   CONSTRAINT fk_import_rejections_batch
     FOREIGN KEY (import_batch_id) REFERENCES import_batches (import_batch_id)
     ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Before-images make a committed weekly import reversible without restoring
+-- the entire database or overwriting work added by another owner.
+CREATE TABLE import_job_undo (
+  import_batch_id BIGINT UNSIGNED NOT NULL,
+  source_key VARCHAR(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  change_kind VARCHAR(8) NOT NULL,
+  previous_row_json JSON NULL,
+  applied_row_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  PRIMARY KEY (import_batch_id, source_key),
+  CONSTRAINT fk_import_job_undo_batch
+    FOREIGN KEY (import_batch_id) REFERENCES import_batches (import_batch_id)
+    ON DELETE CASCADE,
+  CONSTRAINT chk_import_job_undo_kind
+    CHECK (change_kind IN ('insert', 'update')),
+  CONSTRAINT chk_import_job_undo_before
+    CHECK ((change_kind = 'insert' AND previous_row_json IS NULL)
+       OR (change_kind = 'update' AND previous_row_json IS NOT NULL))
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------------
@@ -128,9 +147,9 @@ CREATE TABLE source_run_results (
 
 CREATE TABLE jobs (
   job_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  source_key VARCHAR(191) NOT NULL,
+  source_key VARCHAR(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   source_id VARCHAR(64) NOT NULL,
-  source_job_id VARCHAR(255) NULL,
+  source_job_id VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   advertised_job_title VARCHAR(512) NULL,
   job_description LONGTEXT NULL,
   job_url VARCHAR(2048) NULL,
@@ -150,7 +169,11 @@ CREATE TABLE jobs (
   latest_collected_at DATETIME(6) NOT NULL,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   is_new_in_latest_run BOOLEAN NOT NULL DEFAULT FALSE,
-  content_hash CHAR(64) NULL,
+  -- Pipeline-compatible SHA-1 of the normalized description; used for exact-text
+  -- deduplication and to prove which description a classifier analysis read.
+  content_hash CHAR(40) CHARACTER SET ascii COLLATE ascii_bin NULL,
+  -- SHA-256 of six canonical source fields; used only for source-record change detection.
+  record_hash_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
   import_batch_id BIGINT UNSIGNED NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
@@ -191,7 +214,8 @@ CREATE TABLE job_observations (
   date_posted DATETIME(6) NULL,
   collected_at DATETIME(6) NOT NULL,
   is_active_at_run BOOLEAN NOT NULL DEFAULT TRUE,
-  content_hash CHAR(64) NULL,
+  content_hash CHAR(40) CHARACTER SET ascii COLLATE ascii_bin NULL,
+  record_hash_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
   raw_payload_json JSON NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (job_observation_id),
@@ -212,7 +236,7 @@ CREATE TABLE job_observations (
 
 CREATE TABLE analysis_runs (
   analysis_run_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  run_key VARCHAR(96) NOT NULL,
+  run_key VARCHAR(96) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   method VARCHAR(32) NOT NULL,
   provider VARCHAR(64) NULL,
   model_name VARCHAR(128) NULL,
@@ -222,6 +246,10 @@ CREATE TABLE analysis_runs (
   code_version VARCHAR(64) NULL,
   source_dataset_version VARCHAR(128) NULL,
   parameters_json JSON NULL,
+  -- Aggregate billed usage for paid model calls in this run, when supplied.
+  prompt_tokens BIGINT UNSIGNED NULL,
+  output_tokens BIGINT UNSIGNED NULL,
+  cost_usd DECIMAL(12,6) NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'pending',
   notes TEXT NULL,
   started_at DATETIME(6) NOT NULL,
@@ -249,17 +277,27 @@ CREATE TABLE job_analyses (
   relevance_confidence_label VARCHAR(24) NULL,
   relevance_reason TEXT NULL,
   technical_responsibilities TEXT NULL,
+  role_summary TEXT NULL,
+  responsibilities_json JSON NULL,
+  requirements_json JSON NULL,
+  language_of_posting VARCHAR(64) NULL,
   generic_job_title VARCHAR(255) NULL,
   seniority_code VARCHAR(32) NULL,
   seniority_raw VARCHAR(128) NULL,
   seniority_source VARCHAR(32) NULL,
   seniority_evidence TEXT NULL,
-  seniority_conflict BOOLEAN NOT NULL DEFAULT FALSE,
+  seniority_conflict BOOLEAN NULL,
   experience_min_years DECIMAL(5,1) NULL,
   experience_max_years DECIMAL(5,1) NULL,
   experience_evidence VARCHAR(1024) NULL,
   key_evidence_json JSON NULL,
   raw_response_json JSON NULL,
+  -- SHA-1 of the exact description version read by this analysis method.
+  input_content_hash CHAR(40) CHARACTER SET ascii COLLATE ascii_bin NULL,
+  served_by VARCHAR(64) NULL,
+  prompt_tokens INT UNSIGNED NULL,
+  output_tokens INT UNSIGNED NULL,
+  cost_usd DECIMAL(10,6) NULL,
   import_batch_id BIGINT UNSIGNED NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (job_analysis_id),
@@ -299,6 +337,35 @@ CREATE TABLE job_analyses (
       OR experience_max_years IS NULL
       OR experience_max_years >= experience_min_years
     )
+) ENGINE=InnoDB;
+
+-- Preserve intentional exact/near deduplication decisions for each analysis run.
+-- This keeps the source job rows while making reduced model coverage auditable.
+CREATE TABLE job_deduplication_links (
+  analysis_run_id BIGINT UNSIGNED NOT NULL,
+  duplicate_job_id BIGINT UNSIGNED NOT NULL,
+  kept_job_id BIGINT UNSIGNED NOT NULL,
+  duplicate_type VARCHAR(8) NOT NULL,
+  similarity DECIMAL(5,4) NOT NULL,
+  source_row_index INT NULL,
+  created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (analysis_run_id, duplicate_job_id),
+  KEY idx_job_deduplication_kept (analysis_run_id, kept_job_id),
+  CONSTRAINT fk_job_deduplication_run
+    FOREIGN KEY (analysis_run_id) REFERENCES analysis_runs (analysis_run_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_job_deduplication_duplicate
+    FOREIGN KEY (duplicate_job_id) REFERENCES jobs (job_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_job_deduplication_kept
+    FOREIGN KEY (kept_job_id) REFERENCES jobs (job_id)
+    ON DELETE CASCADE,
+  CONSTRAINT chk_job_deduplication_pair
+    CHECK (duplicate_job_id <> kept_job_id),
+  CONSTRAINT chk_job_deduplication_type
+    CHECK (duplicate_type IN ('exact', 'near')),
+  CONSTRAINT chk_job_deduplication_similarity
+    CHECK (similarity BETWEEN 0 AND 1)
 ) ENGINE=InnoDB;
 
 CREATE TABLE skills (
