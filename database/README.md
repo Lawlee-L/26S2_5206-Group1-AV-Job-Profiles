@@ -97,15 +97,30 @@ row.
 The 25 September 2026 classification output accounts for all 5,139 source
 records: 4,518 classified postings and 621 same-company duplicate links.
 Duplicates stay in `jobs`, with their run-specific decisions recorded in
-`job_deduplication_links`. A job without a matched analysis or duplicate
-decision remains in `jobs` and is counted as unclassified. A classification
-row without an exact `source_key` match goes to `import_rejections`; it is
-never matched by row number or similar title.
+`job_deduplication_links`. A job with neither an analysis nor a duplicate
+decision remains in `jobs` and is reported as unaccounted. A classification row
+without an exact `source_key` match goes to `import_rejections`; it is never
+matched by row number or similar title.
+
+### Public Dashboard population
+
+Every public Dashboard view is AV-only. It includes a job only when it belongs
+to the published release's collection snapshot, has a successful analysis with
+`av_relevant = TRUE`, and is not marked as a duplicate in that release's
+analysis run. Skills and clusters follow the same population. Non-AV, unknown,
+failed, and duplicate records remain available for internal QA and are not
+exposed through the public Dashboard views.
+
+The sample release contains 2,902 AV-relevant analysed postings; that is a
+validation count, not a constant. New releases calculate their own count. See
+[`METRICS_CONTRACT.md`](METRICS_CONTRACT.md) for the named metrics and QA rules.
 
 ### Stage 3: place analysed jobs into clusters
 
 Clustering uses the complete analysis snapshot and extracted skills. It groups
-similar jobs and records both membership and cluster-level evidence:
+AV and non-AV jobs separately and records the population on each cluster, along
+with membership and cluster-level evidence. The public Dashboard reads only
+the AV population:
 
 ```text
 cluster_runs
@@ -291,13 +306,14 @@ snapshot without another LLM call.
 | Table | Purpose | Main contents | Relationship and writer |
 | --- | --- | --- | --- |
 | `cluster_runs` | Version the grouping operation because cluster numbers and membership can change when data or algorithms change. | Run ID/key, source analysis run, algorithm/version, requested/produced counts, noise flag, parameters, status, notes and timestamps. | One cluster run belongs to an analysis snapshot and produces many `clusters`. Written by the clustering process. |
-| `clusters` | Store one algorithmic group and cache the currently approved human-readable interpretation for Dashboard performance. | Internal `cluster_pk`, run-scoped number, current label pointer/cache, job family, specialisation, lean, noise flag, cached size, technical score, top terms/examples/companies and notes. | Unique per `(cluster_run_id, cluster_number)`; parent of assignments, cluster skills and label revisions. Algorithmic fields come from clustering; approved cache changes only through label approval. |
+| `clusters` | Store one algorithmic group and cache the currently approved human-readable interpretation for Dashboard performance. | Internal `cluster_pk`, run and population scoped number, AV/non-AV population, current label pointer/cache, job family, specialisation, lean, noise flag, cached size, technical score, top terms/examples/companies and notes. | Unique per `(cluster_run_id, population, cluster_number)`; parent of assignments, cluster skills and label revisions. Algorithmic fields come from clustering; approved cache changes only through label approval. |
 | `job_cluster_assignments` | State which cluster contains one analysed job in a particular clustering run. | Analysis ID, analysis/cluster run IDs, cluster PK, membership/distance scores and assignment time. | Unique per `(job_analysis_id, cluster_run_id)`. Written by the clustering process; manual naming must not change it. |
 | `cluster_skills` | Store the ranked skills that characterise a cluster without repeating them in the cluster row. | `cluster_pk`, `skill_id`, rank, score and number of jobs containing the skill. | Composite key `(cluster_pk, skill_id)` linking clusters to canonical skills. Written by clustering/summary generation. |
 | `cluster_label_revisions` | Preserve every LLM proposal, manual label, correction and review decision. | Revision ID/number, cluster PK, source/status, proposed name/family/specialisation, rationale, model/prompt provenance, labeler/reviewer, notes and timestamps. | Many immutable revisions belong to one cluster. LLM/manual processes append proposals; approval updates only the current-label pointer/cache in `clusters`. |
 
 `cluster_number` is not a permanent global ID. It is unique only inside one
-`cluster_run_id`. Cluster `29` in a later run may represent a different group.
+`cluster_run_id` and one `population`. AV and non-AV cluster numbering can
+overlap; cluster `29` in a later run may also represent a different group.
 
 ### 4.5 Dashboard publication table
 
@@ -335,7 +351,7 @@ Other repeatable data is scoped by version:
 - one observation per `(job_id, collection_run_id)`;
 - one analysis per `(job_id, analysis_run_id)`;
 - one skill link per `(job_analysis_id, skill_id)`;
-- one cluster number per `(cluster_run_id, cluster_number)`;
+- one cluster number per `(cluster_run_id, population, cluster_number)`;
 - one cluster assignment per `(job_analysis_id, cluster_run_id)`;
 - one label revision number per `(cluster_pk, revision_number)`.
 
@@ -484,7 +500,9 @@ insert corrections, rerun clustering, and publish a new release.
 
 ## 10. Backend contract
 
-The backend reads the views in `views.mysql.sql`:
+The backend reads the AV-only public views in `views.mysql.sql`. They expose
+only successfully analysed, AV-relevant, non-duplicate jobs in the published
+release's collection snapshot. Non-AV and incomplete results remain internal:
 
 - `v_dashboard_jobs`: job list, filters, classification, and current cluster;
 - `v_dashboard_job_skills`: job-to-skill details;
@@ -615,9 +633,10 @@ Use one transaction per batch where practical:
 
 - Join collection and analysis using `source_key`, never row number or fuzzy title.
 - Keep original source text even when normalised fields exist.
-- Keep noise assignments. When the two classifier populations are combined into
-  one cluster run, AV noise remains `-1` and non-AV noise is stored as `-2`.
-- Treat `cluster_number` as scoped to one cluster run.
+- Keep noise assignments and original cluster numbers. `clusters.population`
+  distinguishes the AV and non-AV groups, so both can retain source noise ID
+  `-1` and regular cluster numbers without collision.
+- Treat `cluster_number` as scoped to one cluster run and one population.
 - Do not turn `High` into an invented numeric confidence.
 - Split semicolon-delimited skills before loading `job_skills`.
 - A failed source run must not deactivate every older job from that source.
@@ -645,7 +664,7 @@ the local environment or secret manager. Never commit credentials. Choose one
 schema setup path:
 
 - **New, empty database:** apply `schema.mysql.sql`, then `views.mysql.sql`.
-  The current schema already includes the results of migrations 001–004. Do
+  The current schema already includes the results of migrations 001–005. Do
   not replay those migrations: 001 and 002 create tables that already exist.
 - **Existing database with tables or data:** do not run `schema.mysql.sql` over
   the existing tables. Take a full backup, restore it into an isolated MySQL
@@ -667,12 +686,20 @@ classifier `content_hash` and adds structured result/provenance fields. The
 importer checks expected lengths and case-sensitive collations before writing;
 it refuses a mismatched schema rather than truncate hashes or case-fold IDs.
 
+Migration 005 backfills `clusters.population` only when every cluster has
+successful, consistently AV or non-AV members. It stops if a cluster is empty,
+mixed, or has unknown/failed members. It then changes cluster-number uniqueness
+to `(cluster_run_id, population, cluster_number)`. Apply it after a backup and
+test restore, then apply `views.mysql.sql` so every public Dashboard view uses
+the AV-only rule. The new-database schema already includes this column and key.
+
 Migration 004 uses MySQL client `DELIMITER` directives for guarded, schema-aware
 changes; apply it with the MySQL command-line client, not by sending the whole
 file as one prepared SQL statement through a Python connector:
 
 ```text
 mysql -u USER -p < database/migrations/004_unified_hash_and_analysis_contract.sql
+mysql -u USER -p < database/migrations/005_av_only_dashboard_population.sql
 ```
 
 For old rows, migration 004 does not invent a classifier hash: new SHA-1 values
@@ -740,11 +767,9 @@ Two shapes remain intentionally different because they model different history:
 - Keep `job_deduplication_links` scoped to `analysis_run_id`. Deduplication can
   change from one run to another, so a mutable `jobs.duplicate_of_job_id` would
   make an old run appear to have today's duplicate decision.
-- Keep the current release's single `cluster_run_id` contract for now. The
-  classifier PR's separate `cluster_runs.population` requires a corresponding
-  dashboard-release/API change before AV and non-AV populations can be bound as
-  two distinct cluster runs. Do not silently store two populations in one run
-  or add an unused column as if that change were complete.
+- Keep one release-scoped `cluster_run_id`, and identify each cluster's
+  population in `clusters.population`. Public views select only AV clusters;
+  non-AV results remain available for internal QA.
 
 The unified MySQL schema in this directory is the importer/backend contract;
 the classifier's local SQLite schema is a pipeline implementation detail, not a
@@ -820,6 +845,7 @@ directory is Git-ignored:
 python database/weekly_import.py rollback
 python database/weekly_import.py backup
 python database/weekly_import.py restore --file path/to/av_job_profiles_TIMESTAMP.sql.gz --target-db av_job_profiles_restore
+python database/weekly_import.py qa-release --release-key <release-key>
 ```
 
 ## 15. Files and deployment
@@ -827,10 +853,11 @@ python database/weekly_import.py restore --file path/to/av_job_profiles_TIMESTAM
 - `schema.mysql.sql`: tables, keys, constraints, and indexes.
 - `weekly_import.py`: current MySQL operation engine and command-line compatibility launcher.
 - `importer/`: service API, typed input contracts, backend protocol, MySQL and CLI adapters, stable errors, and hash rules.
-- `migrations/`: one-time migrations for reversible imports, analysis dedupe links, exact key comparison, and the unified classifier/hash contract.
+- `migrations/`: one-time migrations for reversible imports, analysis dedupe links, exact key comparison, the unified classifier/hash contract, and AV-only Dashboard populations.
 - `requirements-import.txt`: MySQL connector required by the importer.
 - `views.mysql.sql`: stable read contract for the backend.
 - `SOURCE_MAPPING.md`: collection and classification field mapping and import contract.
+- `METRICS_CONTRACT.md`: release counts, QA checks, and the AV-only public display rule.
 
 For a **new, empty database only**:
 

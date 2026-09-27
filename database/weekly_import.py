@@ -414,6 +414,7 @@ def verify_schema(conn) -> None:
                     "(TABLE_NAME='job_analyses' AND COLUMN_NAME IN "
                     "('input_content_hash','role_summary','responsibilities_json','requirements_json',"
                     "'language_of_posting','served_by','prompt_tokens','output_tokens','cost_usd')) OR "
+                    "(TABLE_NAME='clusters' AND COLUMN_NAME IN ('population')) OR "
                     "(TABLE_NAME='analysis_runs' AND COLUMN_NAME IN "
                     "('run_key','prompt_tokens','output_tokens','cost_usd'))) ")
         columns = {(row["TABLE_NAME"], row["COLUMN_NAME"]): row for row in cur.fetchall()}
@@ -427,10 +428,15 @@ def verify_schema(conn) -> None:
         ("job_analyses", "prompt_tokens"), ("job_analyses", "output_tokens"),
         ("job_analyses", "cost_usd"), ("analysis_runs", "run_key"),
         ("analysis_runs", "prompt_tokens"), ("analysis_runs", "output_tokens"),
-        ("analysis_runs", "cost_usd"),
+        ("analysis_runs", "cost_usd"), ("clusters", "population"),
     )
     for key in required_columns:
         if key not in columns:
+            if key == ("clusters", "population"):
+                raise ImportErrorSafe(
+                    "clusters.population is missing; back up the database and apply "
+                    "migration 005_av_only_dashboard_population.sql"
+                )
             raise ImportErrorSafe(f"Required schema column {key[0]}.{key[1]} is missing")
     if columns[("jobs", "source_key")]["CHARACTER_MAXIMUM_LENGTH"] != 191 or not (
             columns[("jobs", "source_key")]["COLLATION_NAME"] or "").endswith("_bin"):
@@ -1017,20 +1023,19 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
                              for summary in group.values() if not summary["is_noise"]),
                          stable_json({"min_samples": metadata.get("min_samples"),
                                       "av_relevant_and_other_clustered_separately": True,
-                                      "non_av_noise_cluster_number": -2}),
-                         "Non-AV clusters are kept in this combined run. Their noise ID -1 is remapped to -2 "
-                         "to preserve both populations in the single-run release schema.", started, completed))
+                                      "cluster_population_field": "clusters.population"}),
+                         "AV and non-AV clusters retain source numbers and are distinguished by population.",
+                         started, completed))
             cluster_run_id = cur.lastrowid
 
             cluster_pks: dict[tuple[str, int], int] = {}
             cluster_sizes: dict[int, int] = {}
             for group, summaries in report["cluster_summaries"].items():
                 for original_id, summary in summaries.items():
-                    db_cluster_id = -2 if group == "not_av_relevant" and original_id == -1 else original_id
-                    cur.execute("INSERT INTO clusters (cluster_run_id,cluster_number,job_family,specialisation,lean,"
+                    cur.execute("INSERT INTO clusters (cluster_run_id,population,cluster_number,job_family,specialisation,lean,"
                                 "is_noise,size_cached,technical_score,top_terms_json,example_titles_json,"
-                                "top_companies_json,notes) VALUES (%s,%s,NULL,NULL,%s,%s,%s,%s,%s,%s,%s,%s)",
-                                (cluster_run_id, db_cluster_id, summary["lean"], summary["is_noise"],
+                                "top_companies_json,notes) VALUES (%s,%s,%s,NULL,NULL,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                (cluster_run_id, group, original_id, summary["lean"], summary["is_noise"],
                                  summary["size"], summary["technical_score"], stable_json(summary["top_terms"]),
                                  stable_json(summary["example_titles"]), stable_json(summary["top_companies"]),
                                  summary["notes"]))

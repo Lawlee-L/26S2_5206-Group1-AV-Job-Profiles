@@ -125,6 +125,9 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
     add_audit_dir(rollback)
     rollback.add_argument("--batch-id", type=int)
     rollback.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
+    release_qa = subs.add_parser("qa-release", help="read-only QA counts for one dashboard release")
+    add_audit_dir(release_qa)
+    release_qa.add_argument("--release-key", required=True)
     return parser
 
 
@@ -156,6 +159,11 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
             result = service.restore(args.file, args.target_db)
         elif args.command == "rollback":
             result = service.rollback(args.batch_id, args.backup_dir)
+        elif args.command == "qa-release":
+            result = service.qa_release(args.release_key)
+            if result.get("status") != "passed":
+                exit_code = 4
+                error = "Release QA checks failed: " + ", ".join(result.get("errors", []))
         else:
             raise ImportErrorSafe("Unknown command")
     except ImportErrorSafe as exc:
@@ -200,5 +208,13 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
                 "local_log": str(log_path),
             }, ensure_ascii=False, indent=2, default=_json_default))
         else:
+            if args.command == "qa-release" and result is not None:
+                print(json.dumps({
+                    "operation_id": operation_id,
+                    "status": "failed",
+                    "result": result,
+                    "local_report": str(report_path),
+                    "local_log": str(log_path),
+                }, ensure_ascii=False, indent=2, default=_json_default))
             print(f"Operation report: {report_path}\nOperation log: {log_path}", file=sys.stderr)
     return exit_code

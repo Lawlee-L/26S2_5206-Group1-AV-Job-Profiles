@@ -114,9 +114,10 @@ Required even when it contains only a header. Each failure must have a known
 
 Import both `av_relevant/cluster_summary.csv` and
 `not_av_relevant/cluster_summary.csv`. The importer recalculates each cluster's
-membership count from `postings_all.json`; mismatches block the import. Non-AV
-noise ID `-1` is stored as `-2` because one dashboard release references one
-combined cluster run. Both remain marked as noise.
+membership count from `postings_all.json`; mismatches block the import. The
+source cluster number is retained as-is and scoped by both `cluster_run_id` and
+`population`, so AV and non-AV clusters may use the same number. Both noise
+clusters retain source number `-1` and are separately identified by population.
 
 The v2 run is importable only when successful rows, duplicate links, and failed
 rows account for every input key exactly once. The prior 533-row experiment
@@ -157,7 +158,8 @@ Cluster labels are not yet complete, so nullable naming fields are intentional.
 
 | Input field | Destination | Rule |
 | --- | --- | --- |
-| `cluster_id` | `clusters.cluster_number` | Scoped by `cluster_run_id`. |
+| `cluster_id` | `clusters.cluster_number` | Scoped by `cluster_run_id` and `population`. |
+| summary group | `clusters.population` | `av_relevant` or `not_av_relevant`, taken from the matching source summary file. |
 | `size` | `clusters.size_cached` | Validate against assignments. |
 | `is_noise` | `clusters.is_noise` | Preserve cluster `-1`. |
 | `technical_score` | `clusters.technical_score` | Range 0–1. |

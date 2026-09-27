@@ -35,3 +35,7 @@ class ImporterService:
 
     def rollback(self, batch_id: int | None, backup_dir: Path) -> dict[str, Any]:
         return self._backend.rollback(batch_id, backup_dir)
+
+    def qa_release(self, release_key: str) -> dict[str, Any]:
+        """Read and validate release metrics without mutating the database."""
+        return self._backend.qa_release(release_key)

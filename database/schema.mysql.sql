@@ -456,6 +456,7 @@ CREATE TABLE cluster_runs (
 CREATE TABLE clusters (
   cluster_pk BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   cluster_run_id BIGINT UNSIGNED NOT NULL,
+  population VARCHAR(24) NOT NULL,
   cluster_number INT NOT NULL,
   current_label_revision_id BIGINT UNSIGNED NULL,
   cluster_name VARCHAR(255) NULL,
@@ -473,7 +474,7 @@ CREATE TABLE clusters (
   updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
     ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (cluster_pk),
-  UNIQUE KEY uq_clusters_run_number (cluster_run_id, cluster_number),
+  UNIQUE KEY uq_clusters_run_population_number (cluster_run_id, population, cluster_number),
   UNIQUE KEY uq_clusters_pk_run (cluster_pk, cluster_run_id),
   KEY idx_clusters_family (job_family, specialisation),
   CONSTRAINT fk_clusters_run
@@ -481,6 +482,8 @@ CREATE TABLE clusters (
     ON DELETE CASCADE,
   CONSTRAINT chk_cluster_lean
     CHECK (lean IS NULL OR lean IN ('technical', 'corporate', 'mixed', 'noise')),
+  CONSTRAINT chk_cluster_population
+    CHECK (population IN ('av_relevant', 'not_av_relevant')),
   CONSTRAINT chk_cluster_technical_score
     CHECK (technical_score IS NULL OR technical_score BETWEEN 0 AND 1)
 ) ENGINE=InnoDB;

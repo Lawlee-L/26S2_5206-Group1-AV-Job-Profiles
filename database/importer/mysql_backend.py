@@ -13,6 +13,7 @@ from types import ModuleType
 from typing import Any
 
 from .contracts import AnalysisFiles, CollectionFiles
+from .release_metrics import release_qa_report
 
 
 class MySQLImporterBackend:
@@ -73,3 +74,12 @@ class MySQLImporterBackend:
 
     def rollback(self, batch_id: int | None, backup_dir: Path) -> dict[str, Any]:
         return self._engine().rollback_latest(batch_id, backup_dir)
+
+    def qa_release(self, release_key: str) -> dict[str, Any]:
+        engine = self._engine()
+        connection = engine.db_connect()
+        try:
+            engine.verify_schema(connection)
+            return release_qa_report(connection, release_key)
+        finally:
+            connection.close()

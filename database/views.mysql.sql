@@ -8,6 +8,7 @@ SELECT
   dr.release_key,
   j.job_id,
   j.source_key,
+  c.company_id,
   c.company_name,
   js.platform,
   js.region AS source_region,
@@ -63,7 +64,21 @@ LEFT JOIN clusters AS cl
 LEFT JOIN cluster_label_revisions AS clr
   ON clr.cluster_label_revision_id = cl.current_label_revision_id
 WHERE dr.status = 'published'
-  AND ja.analysis_status = 'success';
+  AND dr.collection_run_id IS NOT NULL
+  AND ja.analysis_status = 'success'
+  AND ja.av_relevant = TRUE
+  AND EXISTS (
+    SELECT 1
+    FROM job_observations AS jo
+    WHERE jo.job_id = j.job_id
+      AND jo.collection_run_id = dr.collection_run_id
+  )
+  AND NOT EXISTS (
+    SELECT 1
+    FROM job_deduplication_links AS jdl
+    WHERE jdl.analysis_run_id = dr.analysis_run_id
+      AND jdl.duplicate_job_id = j.job_id
+  );
 
 CREATE OR REPLACE VIEW v_dashboard_job_skills AS
 SELECT
@@ -71,6 +86,7 @@ SELECT
   dr.release_key,
   j.job_id,
   j.source_key,
+  c.company_id,
   c.company_name,
   s.skill_id,
   s.canonical_name AS skill_name,
@@ -91,17 +107,33 @@ JOIN job_skills AS js
 JOIN skills AS s
   ON s.skill_id = js.skill_id
 WHERE dr.status = 'published'
-  AND ja.analysis_status = 'success';
+  AND dr.collection_run_id IS NOT NULL
+  AND ja.analysis_status = 'success'
+  AND ja.av_relevant = TRUE
+  AND EXISTS (
+    SELECT 1
+    FROM job_observations AS jo
+    WHERE jo.job_id = j.job_id
+      AND jo.collection_run_id = dr.collection_run_id
+  )
+  AND NOT EXISTS (
+    SELECT 1
+    FROM job_deduplication_links AS jdl
+    WHERE jdl.analysis_run_id = dr.analysis_run_id
+      AND jdl.duplicate_job_id = j.job_id
+  );
 
 CREATE OR REPLACE VIEW v_dashboard_skill_demand AS
 SELECT
+  dashboard_release_id,
+  release_key,
   skill_id,
   skill_name,
   skill_type,
   COUNT(DISTINCT job_id) AS job_count,
-  COUNT(DISTINCT company_name) AS company_count
+  COUNT(DISTINCT company_id) AS company_count
 FROM v_dashboard_job_skills
-GROUP BY skill_id, skill_name, skill_type;
+GROUP BY dashboard_release_id, release_key, skill_id, skill_name, skill_type;
 
 CREATE OR REPLACE VIEW v_dashboard_clusters AS
 SELECT
@@ -119,6 +151,7 @@ SELECT
   clr.labelled_by,
   clr.reviewed_by,
   clr.reviewed_at,
+  cl.population,
   cl.lean,
   cl.is_noise,
   cl.size_cached,
@@ -132,4 +165,26 @@ JOIN clusters AS cl
   ON cl.cluster_run_id = dr.cluster_run_id
 LEFT JOIN cluster_label_revisions AS clr
   ON clr.cluster_label_revision_id = cl.current_label_revision_id
-WHERE dr.status = 'published';
+WHERE dr.status = 'published'
+  AND dr.collection_run_id IS NOT NULL
+  AND cl.population = 'av_relevant'
+  AND EXISTS (
+    SELECT 1
+    FROM job_cluster_assignments AS jca
+    JOIN job_analyses AS ja
+      ON ja.job_analysis_id = jca.job_analysis_id
+     AND ja.analysis_run_id = dr.analysis_run_id
+    JOIN job_observations AS jo
+      ON jo.job_id = ja.job_id
+     AND jo.collection_run_id = dr.collection_run_id
+    WHERE jca.cluster_run_id = dr.cluster_run_id
+      AND jca.cluster_pk = cl.cluster_pk
+      AND ja.analysis_status = 'success'
+      AND ja.av_relevant = TRUE
+      AND NOT EXISTS (
+        SELECT 1
+        FROM job_deduplication_links AS jdl
+        WHERE jdl.analysis_run_id = dr.analysis_run_id
+          AND jdl.duplicate_job_id = ja.job_id
+      )
+  );
