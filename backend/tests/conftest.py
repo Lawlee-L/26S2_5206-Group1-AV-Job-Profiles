@@ -32,6 +32,24 @@ class FakeJobRepository:
             },
         ]
 
+    def list_skills(self):
+        return [
+            {
+                "id": 1,
+                "name": "Python",
+                "type": "tool",
+                "jobCount": 15,
+                "companyCount": 6,
+            },
+            {
+                "id": 2,
+                "name": "C++",
+                "type": "tool",
+                "jobCount": 12,
+                "companyCount": 5,
+            },
+        ]
+
     def get_job(self, source_key):
         if source_key == "greenhouse|example|id:123":
             return {

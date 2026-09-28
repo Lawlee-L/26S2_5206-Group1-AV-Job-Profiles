@@ -130,6 +130,32 @@ class JobRepository:
             for row in rows
         ]
 
+    def list_skills(self):
+        rows = fetch_all(
+            """
+            SELECT
+                skill_id,
+                skill_name,
+                skill_type,
+                job_count,
+                company_count
+            FROM v_dashboard_skill_demand
+            ORDER BY job_count DESC, skill_name ASC
+            """
+        )
+
+        return [
+            {
+                "id": row["skill_id"],
+                "name": row["skill_name"],
+                "type": row["skill_type"],
+                "jobCount": int(row["job_count"]),
+                "companyCount": int(row["company_count"]),
+            }
+            for row in rows
+        ]
+
+
     def get_job(self, source_key):
         row = fetch_one(
             f"""
