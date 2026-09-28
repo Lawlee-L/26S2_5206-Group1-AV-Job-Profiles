@@ -50,6 +50,32 @@ class FakeJobRepository:
             },
         ]
 
+    def list_clusters(self):
+        return [
+            {
+                "id": 10,
+                "number": 3,
+                "name": "Perception and Computer Vision",
+                "jobFamily": "Autonomous Systems",
+                "specialisation": "Perception",
+                "labelSource": "manual",
+                "labelStatus": "approved",
+                "labelRevisionNumber": 2,
+                "labelRationale": "Jobs focus on perception systems.",
+                "lean": "technical",
+                "isNoise": False,
+                "jobCount": 18,
+                "technicalScore": 0.92,
+                "topTerms": ["perception", "camera", "lidar"],
+                "exampleTitles": [
+                    "Perception Engineer",
+                    "Computer Vision Engineer",
+                ],
+                "topCompanies": ["Example AV", "Another AV Company"],
+                "notes": None,
+            }
+        ]
+
     def get_job(self, source_key):
         if source_key == "greenhouse|example|id:123":
             return {

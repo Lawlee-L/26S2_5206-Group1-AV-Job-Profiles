@@ -1,3 +1,4 @@
+import json
 import math
 from collections import defaultdict
 from datetime import date, datetime
@@ -155,6 +156,66 @@ class JobRepository:
             for row in rows
         ]
 
+    def list_clusters(self):
+        rows = fetch_all(
+            """
+            SELECT
+                cluster_pk,
+                cluster_number,
+                cluster_name,
+                job_family,
+                specialisation,
+                label_source,
+                label_status,
+                label_revision_number,
+                label_rationale,
+                lean,
+                is_noise,
+                size_cached,
+                technical_score,
+                top_terms_json,
+                example_titles_json,
+                top_companies_json,
+                notes
+            FROM v_dashboard_clusters
+            ORDER BY
+                is_noise ASC,
+                size_cached DESC,
+                cluster_number ASC
+            """
+        )
+
+        return [
+            {
+                "id": row["cluster_pk"],
+                "number": row["cluster_number"],
+                "name": row["cluster_name"],
+                "jobFamily": row["job_family"],
+                "specialisation": row["specialisation"],
+                "labelSource": row["label_source"],
+                "labelStatus": row["label_status"],
+                "labelRevisionNumber": row["label_revision_number"],
+                "labelRationale": row["label_rationale"],
+                "lean": row["lean"],
+                "isNoise": (
+                    bool(row["is_noise"])
+                    if row["is_noise"] is not None
+                    else None
+                ),
+                "jobCount": (
+                    int(row["size_cached"])
+                    if row["size_cached"] is not None
+                    else 0
+                ),
+                "technicalScore": _json_value(row["technical_score"]),
+                "topTerms": _json_data(row["top_terms_json"]),
+                "exampleTitles": _json_data(row["example_titles_json"]),
+                "topCompanies": _json_data(row["top_companies_json"]),
+                "notes": row["notes"],
+            }
+            for row in rows
+        ]
+
 
     def get_job(self, source_key):
         row = fetch_one(
@@ -293,4 +354,16 @@ def _json_value(value):
         return float(value)
     if isinstance(value, (date, datetime)):
         return value.isoformat()
+    return value
+
+def _json_data(value):
+    if value is None:
+        return []
+
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return []
+
     return value
