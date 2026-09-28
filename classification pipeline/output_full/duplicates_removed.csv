@@ -1,0 +1,622 @@
+source_key,row_index,company,name,duplicate_of_row_index,duplicate_of_source_key,duplicate_type,similarity
+ashby|42dot|id:6c55abef-8799-4187-aa85-747ba982a294,77,42dot,VLA for Physical AI (Talent pool),76,ashby|42dot|id:549b256c-5184-4147-a96a-811a5a03222a,exact,1.0
+ashby|applied intuition|id:89eaa9ff-62a0-4f61-a20f-c66baae841e7,228,Applied Intuition,Solution Engineer,226,ashby|applied intuition|id:ea3df406-c58b-4f8a-80e0-5fb293e7a306,exact,1.0
+ashby|applied intuition|id:794352e7-419f-41b3-954e-427135d0cce9,229,Applied Intuition,Solution Engineer - Tooling (Vehicle Intelligence),227,ashby|applied intuition|id:317c9f7b-9ecf-4a56-a712-fb596a872e78,exact,1.0
+ashby|applied intuition|id:d2d783c1-ec46-446f-92fa-88f7460e9be8,230,Applied Intuition,Solution Engineer - Vehicle OS,225,ashby|applied intuition|id:176c4ad2-1a5a-4011-a440-242d94e319ba,exact,1.0
+ashby|applied intuition|id:823c0b9d-52d7-48c0-9db5-68b5e0a5e6e6,258,Applied Intuition,IT Operations Engineer,208,ashby|applied intuition|id:c7d7ba41-e4aa-429a-9d56-9f946ae5541d,exact,1.0
+ashby|applied intuition|id:8cd214ac-8934-4585-a4d0-c3ab46ba7756,311,Applied Intuition,Software Engineer - Defense Physical AI,249,ashby|applied intuition|id:efb1d3eb-388c-4908-be0a-8af78579db69,exact,1.0
+ashby|applied intuition|id:84cd980d-ad01-4738-9cc8-ddc53d64f71d,353,Applied Intuition,Product Manager - Developer Tooling,152,ashby|applied intuition|id:b537c16e-a8b7-4bf8-8576-008856def76b,exact,1.0
+greenhouse|avride|id:4379567009,484,Avride,Robot Service Technician Assistant -Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379585009,485,Avride,Robot Service Technician Assistant - Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379583009,486,Avride,Robot Service Technician Assistant -Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379582009,487,Avride,Robot Service Technician Assistant -Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379577009,488,Avride,Robot Service Technician Assistant -Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379574009,489,Avride,Robot Service Technician Assistant -Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379571009,490,Avride,Robot Service Technician Assistant -Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379553009,493,Avride,Robot Service Technician Assistant - Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379557009,494,Avride,Robot Service Technician Assistant - Part Time Weekend,492,greenhouse|avride|id:4379550009,exact,1.0
+greenhouse|avride|id:4379566009,495,Avride,Robot Service Technician Assistant -Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379543009,496,Avride,Robot Service Technician Assistant - Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379480009,497,Avride,Robot Service Technician Assistant – Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379473009,498,Avride,Robot Service Technician Assistant – Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379474009,499,Avride,Robot Service Technician Assistant – Part Time Weekend,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379475009,500,Avride,Robot Service Technician Assistant – Part Time Weekend/Contract,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4379476009,501,Avride,Robot Service Technician Assistant – Part Time Weekend,492,greenhouse|avride|id:4379550009,exact,1.0
+greenhouse|avride|id:4379478009,503,Avride,Robot Service Technician Assistant – Part Time Weekend,492,greenhouse|avride|id:4379550009,exact,1.0
+greenhouse|avride|id:4379479009,504,Avride,Robot Service Technician Assistant – Part Time Weekend/Contract,482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4381001009,516,Avride,Robot Service Technician – Full Time/Contract (AM and PM Shifts),515,greenhouse|avride|id:4381005009,exact,1.0
+greenhouse|bot.auto|id:5225684008,539,Bot.Auto,Engineering Technician,538,greenhouse|bot.auto|id:5225683008,exact,1.0
+greenhouse|kodiak|id:4205810009,720,Kodiak,Hardware Quality Industrialization Engineer,719,greenhouse|kodiak|id:4321392009,exact,1.0
+greenhouse|may mobility|id:8714075002,821,May Mobility,Autonomous Vehicle Operations Specialist,820,greenhouse|may mobility|id:8755629002,exact,1.0
+greenhouse|may mobility|id:8733953002,823,May Mobility,Autonomous Vehicle Operations Specialist,820,greenhouse|may mobility|id:8755629002,exact,1.0
+lever|mobileye|id:99456421-9f43-4f5b-98d1-4f2e0695ba04,874,Mobileye,Algorithm Researcher – Autonomous Driving (CTO Group),873,lever|mobileye|id:055a3a86-a6d4-42ae-a09c-8adb41c5b383,exact,1.0
+lever|mobileye|id:ac5edc03-9478-4fef-ae4a-20d2609ca6da,906,Mobileye,Embedded Linux OS Architect,905,lever|mobileye|id:62f6ee02-6f82-4044-819e-c7207995cd24,exact,1.0
+lever|mobileye|id:cbb56190-180f-4d21-8a21-95418a3eb8a5,907,Mobileye,Embedded Linux OS Architect,905,lever|mobileye|id:62f6ee02-6f82-4044-819e-c7207995cd24,exact,1.0
+lever|mobileye|id:fdee723f-1dac-49df-a209-6765d40d3beb,912,Mobileye,Embedded Team Leader -OS Integration & Automation,910,lever|mobileye|id:999d5e75-7d50-42f1-879b-18035226641f,exact,1.0
+lever|mobileye|id:2da0a061-36d1-4c97-b45e-17aee11fb49b,917,Mobileye,Experienced Deep Learning Optimization Engineer- Compilers Team,887,lever|mobileye|id:a0280601-36db-40d7-a52d-996b772d4e84,exact,1.0
+lever|mobileye|id:d41387e9-f9c3-4a72-8f4b-8ecfad129907,925,Mobileye,Experienced SoC Verification Engineer,924,lever|mobileye|id:791a4827-bd3e-4942-9e72-b00176e0334c,exact,1.0
+lever|mobileye|id:f04fed6a-f0f4-4455-900a-be4ccdddc8ee,959,Mobileye,Senior C++ Software Engineer - Integration & Delivery (CTO Team),958,lever|mobileye|id:2c2e26d6-d40a-40d1-b6f8-510781e9a3f4,exact,1.0
+lever|mobileye|id:60c33ad2-695a-43ca-a557-5c204dad5820,962,Mobileye,Senior Deep Learning Researcher,897,lever|mobileye|id:e8c3725e-4403-4982-a458-587c6fa25b8f,exact,1.0
+lever|mobileye|id:c3489228-75ae-4338-a99d-b8be98e6e79b,976,Mobileye,Senior Python Infrastructure Developer,975,lever|mobileye|id:7969248d-a14e-4a4e-a316-ff323f6d49ff,exact,1.0
+lever|mobileye|id:f566122f-06cb-4359-a7cd-49ee17ec9528,986,Mobileye,Senior System Architect for ECU designs,985,lever|mobileye|id:9a5f8911-4fa3-45fd-bc56-48e12533e3f5,exact,1.0
+lever|mobileye|id:89a185bd-9ce6-4a08-a0a7-c16eaac7c80f,989,Mobileye,Senior Technical Product Manager – AV Platform (HW/SW),988,lever|mobileye|id:84adcedb-0384-4662-909b-e20fd90d64ea,exact,1.0
+lever|mobileye|id:818b9690-8c09-4be1-b680-43084a1324a0,993,Mobileye,Senior Thermal Engineer,992,lever|mobileye|id:067d6e5e-f0e2-4cbf-82fd-43c0af539e2b,exact,1.0
+lever|mobileye|id:da38c082-c92f-4287-8d87-ffdb1ad6696f,994,Mobileye,Senior Thermal Engineer,992,lever|mobileye|id:067d6e5e-f0e2-4cbf-82fd-43c0af539e2b,exact,1.0
+lever|mobileye|id:b03336b8-82cc-4bf6-94f3-de291cee51bd,996,Mobileye,Senior Thermal-Mechanical Engineer,995,lever|mobileye|id:4c272b78-4384-4ceb-88d4-22161fba5d30,exact,1.0
+lever|mobileye|id:fb4ade19-941d-4b5d-b3c6-a6faa2f61426,997,Mobileye,Senior Thermal-Mechanical Engineer,995,lever|mobileye|id:4c272b78-4384-4ceb-88d4-22161fba5d30,exact,1.0
+lever|mobileye|id:7494fc97-906c-4ebd-a862-1b6995b82765,1000,Mobileye,Senior Verification Engineer,999,lever|mobileye|id:7418fbe2-8467-4389-b43b-2ae50ef57815,exact,1.0
+lever|mobileye|id:86638ec0-b5f8-4cd5-b3f9-19b1b8932368,1006,Mobileye,Software Linux Integration Engineer - OS team,1005,lever|mobileye|id:45b127ea-6069-420f-81fd-adf236d08de4,exact,1.0
+lever|mobileye|id:90d6a522-a4a1-42ba-a89b-55609a4f8c12,1007,Mobileye,Software Linux Integration Engineer - OS team,1005,lever|mobileye|id:45b127ea-6069-420f-81fd-adf236d08de4,exact,1.0
+lever|mobileye|id:abad479b-d0e5-45b9-b217-ad596fc6aedb,1022,Mobileye,Technical Program Manager,1021,lever|mobileye|id:24b128d9-342e-4127-9dac-cde79f0a8652,exact,1.0
+greenhouse|motional|id:6599414003,1049,Motional,"Principal Engineer, Team Lead- Motion Planning",1048,greenhouse|motional|id:6608351003,exact,1.0
+greenhouse|motional|id:6354724003,1050,Motional,"Principal Engineer Team Lead, Prediction & ML Planner",1047,greenhouse|motional|id:6581329003,exact,1.0
+greenhouse|motional|id:6526950003,1075,Motional,Senior Machine Learning Engineer - Prediction,1073,greenhouse|motional|id:7544316003,exact,1.0
+greenhouse|nuro|id:8172399,1130,Nuro,"Mission Operations Coordinator, Houston (Overnight Shift)",1129,greenhouse|nuro|id:7400446,exact,1.0
+greenhouse|nuro|id:8172373,1132,Nuro,"Mission Operations Coordinator, Santa Clara, CA (Overnight Shift)",1131,greenhouse|nuro|id:7752003,exact,1.0
+greenhouse|nuro|id:8163195,1157,Nuro,"Senior Software Engineer, Sensor Platform",1144,greenhouse|nuro|id:8163202,exact,1.0
+greenhouse|nuro|id:8114868,1176,Nuro,"Shift Supervisor,  Los Angeles, CA",1175,greenhouse|nuro|id:8172372,exact,1.0
+greenhouse|nuro|id:7895637,1203,Nuro,"Technical Lead, Behavior & Triage Labeling",1167,greenhouse|nuro|id:7895639,exact,1.0
+greenhouse|vay|id:4951126101,1273,Vay,Remote Driver (Truck),1272,greenhouse|vay|id:4952705101,exact,1.0
+greenhouse|xpeng|id:8680036002,1543,Xpeng,2027 Campus Recruiting General Intelligence Center Internship Position,1542,greenhouse|xpeng|id:8680015002,exact,1.0
+greenhouse|xpeng|id:8681156002,1545,Xpeng,2027 Campus Recruiting Robotics Center Internship Position,1544,greenhouse|xpeng|id:8680040002,exact,1.0
+lever|zoox|id:7177db75-881c-4107-9cb8-291e91a27b58,1613,Zoox,"Manager, City Operations",1612,lever|zoox|id:6727ef94-9a4b-4275-95c1-863ba7723364,exact,1.0
+lever|zoox|id:8ef1e673-e129-407c-b147-95681a30179c,1614,Zoox,"Manager, City Operations",1612,lever|zoox|id:6727ef94-9a4b-4275-95c1-863ba7723364,exact,1.0
+lever|zoox|id:c303382b-bdc9-4084-a0f5-8448667a3373,1623,Zoox,"Manager, RL Algorithms & Decoder",1620,lever|zoox|id:78853f19-4a0b-49c8-8423-738b51b6b5a5,exact,1.0
+lever|zoox|id:1d37ef04-7968-4cb5-b0ba-be4a99bebd6f,1694,Zoox,"Senior Project Manager, Places & Build",1672,lever|zoox|id:f30603f7-cc6f-41b5-91e5-ead70d880135,exact,1.0
+lever|zoox|id:ff6a9a68-872f-4327-a6dc-c4f6cc6171da,1715,Zoox,Senior Strategic Sourcing Manager,1714,lever|zoox|id:44e0530a-6a48-417e-aa43-1f487ea3001e,exact,1.0
+lever|zoox|id:7d73d483-3e32-421a-9397-4430fdb80bdd,1799,Zoox,"Team Lead, Ground Operations (3rd Shift)",1798,lever|zoox|id:6fd07895-b6af-40d8-82ba-fe1d2174982f,exact,1.0
+lever|zoox|id:b5becce4-2537-4a19-8667-4de657c71b10,1800,Zoox,"Team Lead, Ground Operations (3rd Shift)",1798,lever|zoox|id:6fd07895-b6af-40d8-82ba-fe1d2174982f,exact,1.0
+lever|zoox|id:eed5bd1e-8f24-4180-ac1f-c757d67c775a,1801,Zoox,"Team Lead, Ground Operations (3rd Shift)",1798,lever|zoox|id:6fd07895-b6af-40d8-82ba-fe1d2174982f,exact,1.0
+smartrecruiters|bosch|id:744000145907455,1919,Bosch,Electronics Technician / Safety Technician – Berlin / Brandenburg Area (f/m/div.),1918,smartrecruiters|bosch|id:744000145907909,exact,1.0
+smartrecruiters|bosch|id:744000145907269,1920,Bosch,Electronics Technician / Safety Technician – Berlin / Brandenburg Area (f/m/div.),1918,smartrecruiters|bosch|id:744000145907909,exact,1.0
+smartrecruiters|bosch|id:744000145906214,1921,Bosch,Electronics Technician / Safety Technician – Berlin / Brandenburg Area (f/m/div.),1918,smartrecruiters|bosch|id:744000145907909,exact,1.0
+smartrecruiters|bosch|id:744000145239509,1991,Bosch,Technical System Expert for the Buderus Sales Division North (f/m/div.),1985,smartrecruiters|bosch|id:744000145421360,exact,1.0
+smartrecruiters|bosch|id:744000143049805,2076,Bosch,Painter and varnisher (f/m/div.) - temporary,2070,smartrecruiters|bosch|id:744000143082598,exact,1.0
+smartrecruiters|bosch|id:744000142821975,2089,Bosch,Technical Sales Representative (f/m/div.) Building Automation in the Office,2088,smartrecruiters|bosch|id:744000142828430,exact,1.0
+smartrecruiters|bosch|id:744000142822721,2091,Bosch,Technical Sales Representative (f/m/div.) Building automation in the field,2090,smartrecruiters|bosch|id:744000142820745,exact,1.0
+smartrecruiters|bosch|id:744000141690209,2143,Bosch,Technical Sales Representative (f/m/div.) Building Automation in the Office,2088,smartrecruiters|bosch|id:744000142828430,exact,1.0
+smartrecruiters|bosch|id:744000141685725,2144,Bosch,Technical Sales Representative (f/m/div.) Building Automation in the Office,2088,smartrecruiters|bosch|id:744000142828430,exact,1.0
+smartrecruiters|bosch|id:744000141682516,2146,Bosch,Technical Sales Representative (f/m/div.) Building Automation in the Office,2145,smartrecruiters|bosch|id:744000141687979,exact,1.0
+smartrecruiters|bosch|id:744000141678109,2149,Bosch,Technical Sales Representative (f/m/div.) Building automation in the field,2090,smartrecruiters|bosch|id:744000142820745,exact,1.0
+smartrecruiters|bosch|id:744000141675519,2152,Bosch,Technical Sales Representative (f/m/div.) Building automation in the field,2090,smartrecruiters|bosch|id:744000142820745,exact,1.0
+smartrecruiters|bosch|id:744000141671341,2153,Bosch,Technical Sales Representative (f/m/div.) Building automation in the field,2090,smartrecruiters|bosch|id:744000142820745,exact,1.0
+smartrecruiters|bosch|id:744000141451903,2182,Bosch,Project Manager in Security Technology (f/m/div.),2160,smartrecruiters|bosch|id:744000141647154,exact,1.0
+smartrecruiters|bosch|id:744000139563329,2253,Bosch,Technical Sales Representative (f/m/div.) Building Automation in the Office,2145,smartrecruiters|bosch|id:744000141687979,exact,1.0
+smartrecruiters|bosch|id:744000138851739,2289,Bosch,Expert Corporate Accounting and Reporting Home Comfort – focus on IAS12/IFRS (f/m/div.),2283,smartrecruiters|bosch|id:744000138860214,exact,1.0
+smartrecruiters|bosch|id:744000138851528,2290,Bosch,Expert Corporate Accounting and Reporting Home Comfort – Focus on IAS12/IFRS (f/m/div.),2285,smartrecruiters|bosch|id:744000138858734,exact,1.0
+smartrecruiters|bosch|id:744000136770026,2343,Bosch,Working student in the field of automation technology sales (f/m/div.),2342,smartrecruiters|bosch|id:744000136772849,exact,1.0
+smartrecruiters|bosch|id:744000136772589,2344,Bosch,Working student in the field of automation technology sales (f/m/div.),2342,smartrecruiters|bosch|id:744000136772849,exact,1.0
+smartrecruiters|bosch|id:744000134169020,2420,Bosch,Internship in Special Mechanical Engineering - Design,2410,smartrecruiters|bosch|id:744000134771507,exact,1.0
+smartrecruiters|bosch|id:744000133548872,2429,Bosch,Mandatory internship in Change Management & Organizational Development,2316,smartrecruiters|bosch|id:744000137824092,exact,1.0
+smartrecruiters|bosch|id:744000133504109,2432,Bosch,Internship in Film and Video Communication,2319,smartrecruiters|bosch|id:744000137822958,exact,1.0
+smartrecruiters|bosch|id:744000133052924,2436,Bosch,Practical Course Development of Manufacturing Processes for MEMS Inertial Sensors,2322,smartrecruiters|bosch|id:744000137661718,exact,1.0
+smartrecruiters|bosch|id:744000132575939,2445,Bosch,Mandatory Internship Change Management for Digital Transformation,2321,smartrecruiters|bosch|id:744000137660523,exact,1.0
+smartrecruiters|bosch|id:744000132158558,2453,Bosch,Corporate Accounting and Reporting Expert – Home Comfort Focus on IFRS (f/m/div.),2450,smartrecruiters|bosch|id:744000132159049,exact,1.0
+smartrecruiters|bosch|id:744000132157998,2454,Bosch,Expert Corporate Accounting and Reporting Home Comfort – Focus on IFRS (f/m/div.),2452,smartrecruiters|bosch|id:744000132158789,exact,1.0
+smartrecruiters|bosch|id:744000130376990,2469,Bosch,Internship in process development and monitoring in laser beam welding,2317,smartrecruiters|bosch|id:744000137823668,exact,1.0
+smartrecruiters|bosch|id:744000128553559,2490,Bosch,Internship Scrum Master in the Agile Team,2320,smartrecruiters|bosch|id:744000137821011,exact,1.0
+smartrecruiters|bosch|id:744000128475009,2493,Bosch,Electronics technician / safety technician in the branch customer business for supra-regional use (f/m/div.),2414,smartrecruiters|bosch|id:744000134432440,exact,1.0
+smartrecruiters|bosch|id:744000128473129,2495,Bosch,Electronics technician / safety technician in the branch customer business for supra-regional use (f/m/div.),2491,smartrecruiters|bosch|id:744000128475199,exact,1.0
+smartrecruiters|bosch|id:744000127831869,2499,Bosch,Electronics Technician / I&C Technician (m/f/d),2407,smartrecruiters|bosch|id:744000134812319,exact,1.0
+smartrecruiters|bosch|id:744000124434699,2526,Bosch,Servicetechniker (m/w/d) Gebäudeautomation,2507,smartrecruiters|bosch|id:744000126992509,exact,1.0
+smartrecruiters|bosch|id:744000112405417,2566,Bosch,I&C Technician (f/m/div.) Building Automation,2565,smartrecruiters|bosch|id:744000112412912,exact,1.0
+smartrecruiters|bosch|id:744000112392537,2567,Bosch,I&C Technician (f/m/div.) Building Automation,2565,smartrecruiters|bosch|id:744000112412912,exact,1.0
+smartrecruiters|bosch|id:744000144649119,2668,Bosch,Inspector I,2603,smartrecruiters|bosch|id:744000146554084,exact,1.0
+smartrecruiters|bosch|id:744000144628719,2671,Bosch,"Entry-level Sales and Marketing Representative - Houston, TX - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000144627759,2672,Bosch,"Entry-level Sales and Marketing Representative - Miami, FL - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000144626820,2673,Bosch,Entry-level Sales and Marketing Representative - New Jersey - Diablo Tools - DAT,2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000144626899,2674,Bosch,"Entry-level Sales and Marketing Representative - Los Angeles, CA - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000144626539,2675,Bosch,Entry-level Sales and Marketing Representative - New York City - Diablo Tools - DAT,2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000141742079,2751,Bosch,Electrical Maintenance Technician - 5th shift (weekend shift),2692,smartrecruiters|bosch|id:744000144325499,exact,1.0
+smartrecruiters|bosch|id:744000140885801,2771,Bosch,Multi-Craft Maintenance Technician 1st,2692,smartrecruiters|bosch|id:744000144325499,exact,1.0
+smartrecruiters|bosch|id:744000140549909,2776,Bosch,Inspector I,2603,smartrecruiters|bosch|id:744000146554084,exact,1.0
+smartrecruiters|bosch|id:744000139686012,2785,Bosch,Workshop Sales Representative - Eastern Pennsylvania Area,2688,smartrecruiters|bosch|id:744000144375559,exact,1.0
+smartrecruiters|bosch|id:744000139686059,2787,Bosch,Workshop Sales Representative - New York / New Jersey Area,2688,smartrecruiters|bosch|id:744000144375559,exact,1.0
+smartrecruiters|bosch|id:744000139664339,2792,Bosch,National Account Partner Manager – Linear Technologies,2791,smartrecruiters|bosch|id:744000139662606,exact,1.0
+smartrecruiters|bosch|id:744000137671373,2806,Bosch,Engineer Data (Multiple Positions) (REF291620F),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000136242380,2821,Bosch,Machine Operator: Hammer Drill - 3rd shift,2802,smartrecruiters|bosch|id:744000137962369,exact,1.0
+smartrecruiters|bosch|id:744000136226869,2822,Bosch,Territory Sales Manager (Pro Channel) - Kansas - Diablo Tools,2814,smartrecruiters|bosch|id:744000136804094,exact,1.0
+smartrecruiters|bosch|id:744000134011708,2839,Bosch,Senior Systems Engineer (Multiple Positions) (REF289777D),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000133913925,2841,Bosch,Machine Operator - Specialist III:Brazing - 2nd,2624,smartrecruiters|bosch|id:744000146236987,exact,1.0
+smartrecruiters|bosch|id:744000130829109,2846,Bosch,Sr. Technical Project Manager (Multiple Positions) (REF288319D),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000130281469,2847,Bosch,Development Engineer - Sr (Multiple Positions) (REF288146W),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000130274508,2848,Bosch,Team Leader - Engineering (Multiple Positions) (REF288138P),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000130251119,2849,Bosch,Manufacturing Engineer- SR (Multiple Positions) (REF288132U),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000127214024,2861,Bosch,Controls Systems Engineer (Multiple Positions) (REF286610T),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000127209429,2862,Bosch,Machine Operator - Specialist III:Brazing - 3rd,2680,smartrecruiters|bosch|id:744000144547459,exact,1.0
+smartrecruiters|bosch|id:744000126569614,2863,Bosch,Senior Technical Expert (Multiple Positions) (REF286218G),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000126551708,2864,Bosch,Deep Learning Engineer II (Multiple Positions) (REF286216I),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000126460671,2865,Bosch,Senior Corporate Paralegal,2817,smartrecruiters|bosch|id:744000136530139,exact,1.0
+smartrecruiters|bosch|id:744000125913658,2868,Bosch,Simulation and System Engineer (Multiple Positions) (REF285823I),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000125913418,2869,Bosch,Sr Software Engineer (Multiple Positions) (REF285820X),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000115906037,2880,Bosch,Maintenance Technician 3rd shift,2692,smartrecruiters|bosch|id:744000144325499,exact,1.0
+smartrecruiters|bosch|id:744000115242936,2881,Bosch,Honing Set-Up,2877,smartrecruiters|bosch|id:744000120811912,exact,1.0
+smartrecruiters|bosch|id:744000090539476,2891,Bosch,Senior Technical Lead- End-to-End AI Training Framework,2855,smartrecruiters|bosch|id:744000129052860,exact,1.0
+greenhouse|wayve|id:8622191002,3013,Wayve,"Machine Learning Engineer, ADAS",3012,greenhouse|wayve|id:8622133002,exact,1.0
+greenhouse|wayve|id:8435254002,3015,Wayve,"Machine Learning Engineer, App SW",3014,greenhouse|wayve|id:8568694002,exact,1.0
+greenhouse|wayve|id:8571171002,3018,Wayve,"Machine Learning Engineering Manager, App SW",3017,greenhouse|wayve|id:8568364002,exact,1.0
+lever|mobileye|id:878a21c9-1159-4c3d-957d-d278de51b202,3141,Mobileye,Experienced Deep Learning Algorithm Developer - Road Team,915,lever|mobileye|id:48df21e2-84dd-42e7-9d55-f4121d444df8,exact,1.0
+lever|mobileye|id:1f5b91c7-b459-4a3a-8d28-f8a8e3e79d26,3150,Mobileye,QMS Quality Engineer,943,lever|mobileye|id:76bd5cf5-a8cb-4541-a736-c44ede8ed205,exact,1.0
+lever|mobileye|id:a27fcf94-4475-42bf-84c2-11724aa8e517,3151,Mobileye,QMS Quality Engineer,943,lever|mobileye|id:76bd5cf5-a8cb-4541-a736-c44ede8ed205,exact,1.0
+lever|mobileye|id:e541d405-625b-46b9-902e-e94a09ce042d,3152,Mobileye,QMS Quality Engineer,943,lever|mobileye|id:76bd5cf5-a8cb-4541-a736-c44ede8ed205,exact,1.0
+smartrecruiters|bosch|id:744000147247535,3175,Bosch,Painter and varnisher (f/m/div.) - temporary,2070,smartrecruiters|bosch|id:744000143082598,exact,1.0
+smartrecruiters|bosch|id:744000147229099,3176,Bosch,Painter and varnisher (f/m/div.) - temporary,2070,smartrecruiters|bosch|id:744000143082598,exact,1.0
+smartrecruiters|bosch|id:744000147228084,3177,Bosch,Skilled worker in the field of assembly/testing/machine operation (f/m/div.) - temporary,2461,smartrecruiters|bosch|id:744000131588991,exact,1.0
+smartrecruiters|bosch|id:744000147228199,3178,Bosch,Cutting machine operator (f/m/div.) - temporary,2386,smartrecruiters|bosch|id:744000135260589,exact,1.0
+smartrecruiters|bosch|id:744000147175004,3187,Bosch,Working student in the field of mechanical simulation for Bosch eBike Systems (f/m/div.),1964,smartrecruiters|bosch|id:744000145507319,exact,1.0
+smartrecruiters|bosch|id:744000147156209,3190,Bosch,Bachelor Thesis: Design of a Test Fixture with Pneumatic/Electrical Hand Functions for the Qualification of Needle Adapter Carriers,2074,smartrecruiters|bosch|id:744000143066013,exact,1.0
+smartrecruiters|bosch|id:744000147155080,3191,Bosch,Master Thesis AI-based Sensorless Edrive Control,2350,smartrecruiters|bosch|id:744000136457424,exact,1.0
+smartrecruiters|bosch|id:744000146931144,3194,Bosch,"Internship in the field of change, communication and training management",2326,smartrecruiters|bosch|id:744000137485139,exact,1.0
+smartrecruiters|bosch|id:744000146933399,3195,Bosch,"Internship in the field of change, communication and training management",2325,smartrecruiters|bosch|id:744000137485509,exact,1.0
+smartrecruiters|bosch|id:744000146930829,3197,Bosch,Working student in further education and management development (f/m/div.),2148,smartrecruiters|bosch|id:744000141680983,exact,1.0
+smartrecruiters|bosch|id:744000146918390,3200,Bosch,Mandatory internship in the field of operational excellence in manufacturing,2115,smartrecruiters|bosch|id:744000142063250,exact,1.0
+smartrecruiters|bosch|id:744000147263624,3205,Bosch,HVAC Specialist (Water Source Heat Pumps/Geothermal),2640,smartrecruiters|bosch|id:744000145980969,exact,1.0
+smartrecruiters|bosch|id:744000147265069,3206,Bosch,HVAC Specialist (Water Source Heat Pumps/Geothermal),2640,smartrecruiters|bosch|id:744000145980969,exact,1.0
+smartrecruiters|bosch|id:744000147263729,3207,Bosch,HVAC Specialist (Water Source Heat Pumps/Geothermal),2640,smartrecruiters|bosch|id:744000145980969,exact,1.0
+smartrecruiters|bosch|id:744000147262579,3208,Bosch,HVAC Specialist (Water Source Heat Pumps/Geothermal),2640,smartrecruiters|bosch|id:744000145980969,exact,1.0
+smartrecruiters|bosch|id:744000147260514,3210,Bosch,HVAC Specialist (Water Source Heat Pumps/Geothermal),2640,smartrecruiters|bosch|id:744000145980969,exact,1.0
+smartrecruiters|bosch|id:744000147260229,3211,Bosch,HVAC Specialist (Water Source Heat Pumps/Geothermal),2640,smartrecruiters|bosch|id:744000145980969,exact,1.0
+smartrecruiters|bosch|id:744000147258542,3212,Bosch,Indirect Tax Accountant,2830,smartrecruiters|bosch|id:744000134928949,exact,1.0
+smartrecruiters|bosch|id:744000147258219,3213,Bosch,HVAC Specialist (Water Source Heat Pumps/Geothermal),2640,smartrecruiters|bosch|id:744000145980969,exact,1.0
+smartrecruiters|bosch|id:744000147258079,3214,Bosch,HVAC Specialist (Water Source Heat Pumps/Geothermal),2640,smartrecruiters|bosch|id:744000145980969,exact,1.0
+smartrecruiters|bosch|id:744000147257209,3215,Bosch,HVAC Specialist (Water Source Heat Pumps/Geothermal),2640,smartrecruiters|bosch|id:744000145980969,exact,1.0
+smartrecruiters|bosch|id:744000147251080,3217,Bosch,Applied Solutions Engineer,3216,smartrecruiters|bosch|id:744000147253329,exact,1.0
+smartrecruiters|bosch|id:744000147253009,3218,Bosch,Applied Solutions Engineer,2782,smartrecruiters|bosch|id:744000140075789,exact,1.0
+smartrecruiters|bosch|id:744000147217069,3220,Bosch,Maintenance Technician 2nd/3rd Shift,2750,smartrecruiters|bosch|id:744000141742329,exact,1.0
+smartrecruiters|bosch|id:744000146984459,3226,Bosch,Maintenance Technician - 4 - 10's schedule,2692,smartrecruiters|bosch|id:744000144325499,exact,1.0
+greenhouse|wayve|id:8782028002,3230,Wayve,Technical Program Manager,3229,greenhouse|wayve|id:8781849002,exact,1.0
+hotjob|horizon|id:6a59ee3953b4650cd323696d,3247,Horizon,Parking System Engineer,3246,hotjob|horizon|id:69aa39b610919a570b5f3c60,exact,1.0
+moka|weride|id:e90bea02-2875-4efe-b886-c8133a5e62f9,3474,WeRide,Office Administrator (Singapore),3163,lever|weride|id:2973bf16-d0cb-47d9-9572-df3be8430368,exact,1.0
+moka|weride|id:c61a88db-803f-4d25-9db3-79a6e1500d29,3499,WeRide,Product Data Scientist（GeoOps）,3479,moka|weride|id:30e97455-0059-4d80-8651-5a70bda369a4,exact,1.0
+moka|weride|id:b2cff294-04d3-4893-b580-fbfe2a4e0082,3560,WeRide,Intelligent Driving Vehicle Maintenance Technician (Beijing),3533,moka|weride|id:01aa45d8-92f1-4647-b3f4-fe20b0be28bc,exact,1.0
+moka|weride|id:2cf8681f-3cd7-4121-aaf0-b28ab63bd8b1,3635,WeRide,System Integration Test Development Engineer (Hardware),3588,moka|weride|id:06e032c8-5e91-4530-8928-b674d469c07c,exact,1.0
+moka|weride|id:6529bfcf-da36-4ea9-a6d8-4124da4c2977,3652,WeRide,GR/BD - Singapore,3533,moka|weride|id:01aa45d8-92f1-4647-b3f4-fe20b0be28bc,exact,1.0
+greenhouse|stack av|id:5228497007,3714,Stack AV,CDL | Hourly Pay with OT | FREE Benefits (Operations Specialist),3713,greenhouse|stack av|id:5223840007,exact,1.0
+greenhouse|stack av|id:5223987007,3715,Stack AV,CDL | Hourly Pay with OT | FREE Benefits (Operations Specialist),3713,greenhouse|stack av|id:5223840007,exact,1.0
+moka|inceptio.ai|id:cc7dd07f-8ef3-4e1e-b7d2-968820a9ec08,3850,Inceptio.ai,QA Engineer (Problem Management Direction),3849,moka|inceptio.ai|id:c2627ef4-7bc3-4904-918a-af39be2e0041,exact,1.0
+moka|inceptio.ai|id:6cf6fdeb-8536-4eb8-8439-aef1d0d82f62,3865,Inceptio.ai,QA (Problem Management),3849,moka|inceptio.ai|id:c2627ef4-7bc3-4904-918a-af39be2e0041,exact,1.0
+moka|inceptio.ai|id:25957a75-1b7c-4096-971f-e14f8db31bcf,3879,Inceptio.ai,Sensor Software Development Engineer - 2026 Campus Recruitment,3872,moka|inceptio.ai|id:6c1e1769-4260-45ba-8e11-2cb59d2d97a0,exact,1.0
+moka|inceptio.ai|id:1bde6257-59f9-4a39-baf2-e47096a2ef4b,3917,Inceptio.ai,L4 Test Verification Engineer,3900,moka|inceptio.ai|id:e036fec4-71f5-4e87-a6c1-0e34e2ab7347,exact,1.0
+lever|zoox|id:998ca0ca-4e3a-409f-bc84-f364d5451e01,4076,Zoox,"Software Engineer, Operational Tools",1777,lever|zoox|id:c8ca7105-5044-49ee-88d3-cf6b7145a2ec,exact,1.0
+smartrecruiters|bosch|id:744000147467179,4082,Bosch,Compulsory Internship Simultaneous Engineering,2112,smartrecruiters|bosch|id:744000142086269,exact,1.0
+smartrecruiters|bosch|id:744000147456684,4084,Bosch,Programmer for ABB robot controllers and automation solutions (f/m/div.),2203,smartrecruiters|bosch|id:744000140663484,exact,1.0
+smartrecruiters|bosch|id:744000147437759,4089,Bosch,Internship in Digital Order Management,1837,smartrecruiters|bosch|id:744000146694079,exact,1.0
+smartrecruiters|bosch|id:744000147420909,4094,Bosch,Working student in the field of building security (f/m/div.),2334,smartrecruiters|bosch|id:744000137116037,exact,1.0
+smartrecruiters|bosch|id:744000147605219,4095,Bosch,Global Quality Assurance Leader (Contact Center),2700,smartrecruiters|bosch|id:744000143847939,exact,1.0
+smartrecruiters|bosch|id:744000147605059,4096,Bosch,Global Workforce Management Leader (Contact Center),2699,smartrecruiters|bosch|id:744000143853484,exact,1.0
+smartrecruiters|bosch|id:744000147498529,4099,Bosch,Customer Service Representative (5:00 am - 1:30 pm),3204,smartrecruiters|bosch|id:744000147275189,exact,1.0
+smartrecruiters|bosch|id:744000147495710,4100,Bosch,Customer Service Representative (5:00 am - 1:30 pm),3204,smartrecruiters|bosch|id:744000147275189,exact,1.0
+smartrecruiters|bosch|id:744000147347753,4101,Bosch,Applied HVAC Solutions Engineer,3216,smartrecruiters|bosch|id:744000147253329,exact,1.0
+smartrecruiters|bosch|id:744000147347759,4102,Bosch,Applied HVAC Solutions Engineer,3216,smartrecruiters|bosch|id:744000147253329,exact,1.0
+smartrecruiters|bosch|id:744000147347449,4103,Bosch,Applied HVAC Solutions Engineer,2782,smartrecruiters|bosch|id:744000140075789,exact,1.0
+smartrecruiters|bosch|id:744000147320369,4106,Bosch,Customer Service Representative (5:00 am - 1:30 pm),3204,smartrecruiters|bosch|id:744000147275189,exact,1.0
+smartrecruiters|bosch|id:744000147303849,4107,Bosch,Customer Service Representative (5:00 am - 1:30 pm),3204,smartrecruiters|bosch|id:744000147275189,exact,1.0
+gm|gm|id:JR-202619689,4162,GM,"Software Engineer, AV HIL Platform",3818,gm|gm|id:JR-202602819,exact,1.0
+greenhouse|kodiak|id:4399694009,4202,Kodiak,Accounting Manager,703,greenhouse|kodiak|id:4327498009,exact,1.0
+greenhouse|latitude (ford)|id:8188472,4205,Latitude (Ford),Staff Functional Safety Systems Engineer,813,greenhouse|latitude (ford)|id:8053864,exact,1.0
+greenhouse|may mobility|id:8795020002,4206,May Mobility,Senior Autonomy Technical Project Manager,849,greenhouse|may mobility|id:8639097002,exact,1.0
+lever|mobileye|id:9863bd24-bd51-48c5-9e81-9676db076919,4213,Mobileye,Director of Technical Program Management,4212,lever|mobileye|id:0d871a7b-0d5e-4e38-b896-d3f82ea5eaab,exact,1.0
+lever|mobileye|id:cc867509-5068-4ce0-b4e7-63ce3ee02bee,4214,Mobileye,Director of Technical Program Management,4212,lever|mobileye|id:0d871a7b-0d5e-4e38-b896-d3f82ea5eaab,exact,1.0
+lever|mobileye|id:461ba53a-1ea9-4dac-a213-0a34c3b77d6e,4215,Mobileye,Execution Program Manager,3140,lever|mobileye|id:b6db859a-bb49-4e66-ac3d-d111eeb03bd1,exact,1.0
+lever|mobileye|id:5aeac1a2-386c-4444-ac70-584f3a96a19d,4230,Mobileye,Talent Acquisition Partner - Temporary (1 year),3154,lever|mobileye|id:35d41f76-5f20-4fc8-b108-f761582083f2,exact,1.0
+greenhouse|torc ai|id:8703221002,4244,Torc AI,"Senior, Software Engineer - Autonomy Core Frameworks",1239,greenhouse|torc ai|id:8703219002,exact,1.0
+lever|waabi|id:f07f1b90-8006-4984-b05d-5f591463c602,4252,Waabi,Vehicle Reliability Engineer - Night Shift,1359,lever|waabi|id:4889104b-bb12-4fd7-a332-843fbb45f0a4,exact,1.0
+lever|zoox|id:20e2f23b-030a-49ac-8b00-680d715ddb31,4266,Zoox,"Senior Staff Technical Program Manager - Body, Closures & Chassis",1713,lever|zoox|id:ecca3855-84c8-4fe6-98a3-41cf00f384c6,exact,1.0
+smartrecruiters|bosch|id:744000149032129,4275,Bosch,"Project Lead Business Strategy, Innovation & New Technologies at Bosch Management Consulting (f/m/div.)",1961,smartrecruiters|bosch|id:744000145519954,exact,1.0
+smartrecruiters|bosch|id:744000149000843,4280,Bosch,Deploy Expert Produce to Supply (w/m/div.),1951,smartrecruiters|bosch|id:744000145673644,exact,1.0
+smartrecruiters|bosch|id:744000149001389,4281,Bosch,Process Designer Produce to Supply (w/m/div.),1950,smartrecruiters|bosch|id:744000145676639,exact,1.0
+smartrecruiters|bosch|id:744000148997759,4282,Bosch,Junior Managers Program (Trainee) - Unsolicited Application,2261,smartrecruiters|bosch|id:744000139249824,exact,1.0
+smartrecruiters|bosch|id:744000148996184,4283,Bosch,Junior Managers Program (Trainee) - Unsolicited Application,2262,smartrecruiters|bosch|id:744000139249170,exact,1.0
+smartrecruiters|bosch|id:744000148991919,4285,Bosch,System Integrator for Safety Systems (f/m/div.),2311,smartrecruiters|bosch|id:744000137870316,exact,1.0
+smartrecruiters|bosch|id:744000148990040,4286,Bosch,Service Technician for System Integration (f/m/div.),2433,smartrecruiters|bosch|id:744000133362279,exact,1.0
+smartrecruiters|bosch|id:744000148989659,4287,Bosch,Team Leader Support (Product and Portfolio Management) (f/m/div.) Security Technology,1849,smartrecruiters|bosch|id:744000146494291,exact,1.0
+smartrecruiters|bosch|id:744000148954834,4298,Bosch,PhD - Development of a Novel Lab-on-a-Chip Component for the Analysis and Sorting of Single Cells,2298,smartrecruiters|bosch|id:744000138612250,exact,1.0
+smartrecruiters|bosch|id:744000148953271,4300,Bosch,PhD - Safety Contracts for Physical AI,2339,smartrecruiters|bosch|id:744000137080495,exact,1.0
+smartrecruiters|bosch|id:744000148954980,4304,Bosch,PhD – Generative Models for Closed-loop Synthesis,2323,smartrecruiters|bosch|id:744000137630419,exact,1.0
+smartrecruiters|bosch|id:744000148957620,4306,Bosch,PhD - Scalable and Efficient Reinforcement Learning Methods for Physical AI,2419,smartrecruiters|bosch|id:744000134174990,exact,1.0
+smartrecruiters|bosch|id:744000148957129,4308,Bosch,PhD - Lab on Chip Sample Preparation for Next-Generation Molecular Diagnostics,2273,smartrecruiters|bosch|id:744000139056159,exact,1.0
+smartrecruiters|bosch|id:744000148955120,4309,Bosch,PhD Position – State of Health (SoH) of Electronics,2440,smartrecruiters|bosch|id:744000132860189,exact,1.0
+smartrecruiters|bosch|id:744000148949097,4310,Bosch,Electronics Technician / Electrician with Low-Current Knowledge - Area Biberach an der Riss (f/m/div.),2200,smartrecruiters|bosch|id:744000140685570,exact,1.0
+smartrecruiters|bosch|id:744000148744978,4315,Bosch,Skilled Worker (f/m/div.) in the Manufacturing Environment - Temporary,2069,smartrecruiters|bosch|id:744000143085197,exact,1.0
+smartrecruiters|bosch|id:744000148728704,4318,Bosch,Internship 3D Scene Editing and Generation,2099,smartrecruiters|bosch|id:744000142640509,exact,1.0
+smartrecruiters|bosch|id:744000148678479,4324,Bosch,Internship in Software Testing - Bosch eBike Systems,3186,smartrecruiters|bosch|id:744000147187199,exact,1.0
+smartrecruiters|bosch|id:744000148452909,4335,Bosch,Mandatory internship in the field of software tool development,2222,smartrecruiters|bosch|id:744000140192059,exact,1.0
+smartrecruiters|bosch|id:744000148429979,4340,Bosch,Working student in electrical development (f/m/div.),2558,smartrecruiters|bosch|id:744000118094632,exact,1.0
+smartrecruiters|bosch|id:744000148187320,4350,Bosch,Internship Technical Functions in the Production Plant,2552,smartrecruiters|bosch|id:744000118373639,exact,1.0
+smartrecruiters|bosch|id:744000148165891,4357,Bosch,PreMaster Program - Gap Year -  Marketing Performance & Operations Support,1819,smartrecruiters|bosch|id:744000146894644,exact,1.0
+smartrecruiters|bosch|id:744000148153643,4359,Bosch,Mandatory internship in strategic semiconductor purchasing,2101,smartrecruiters|bosch|id:744000142580599,exact,1.0
+smartrecruiters|bosch|id:744000148151609,4361,Bosch,Mandatory internship in software development for data-based applications in an industrial environment,2545,smartrecruiters|bosch|id:744000120862427,exact,1.0
+smartrecruiters|bosch|id:744000148149629,4362,Bosch,Internship in the field of production management,2199,smartrecruiters|bosch|id:744000140688289,exact,1.0
+smartrecruiters|bosch|id:744000147848280,4375,Bosch,Assembler/Inspector/Wirer of Application Cylinders (f/m/div.),2271,smartrecruiters|bosch|id:744000139058909,exact,1.0
+smartrecruiters|bosch|id:744000147848479,4376,Bosch,Sheet Rails (w/m/div.),2460,smartrecruiters|bosch|id:744000131612140,exact,1.0
+smartrecruiters|bosch|id:744000147848119,4377,Bosch,Warehouse clerk in production supply (f/m/div.),2193,smartrecruiters|bosch|id:744000140839549,exact,1.0
+smartrecruiters|bosch|id:744000147847489,4378,Bosch,Technology Research Engineer for Power Semiconductors (f/m/div.),2348,smartrecruiters|bosch|id:744000136484576,exact,1.0
+smartrecruiters|bosch|id:744000147845059,4379,Bosch,Assembler (f/m/div.) - temporary,2216,smartrecruiters|bosch|id:744000140226029,exact,1.0
+smartrecruiters|bosch|id:744000149078404,4386,Bosch,Rotational Development Program – Finance - Electrified Motion,2834,smartrecruiters|bosch|id:744000134464079,exact,1.0
+smartrecruiters|bosch|id:744000149020634,4389,Bosch,Maintenance Technician - Pay starting at $32.14 an hour plus shift differential on off-shift,2635,smartrecruiters|bosch|id:744000146001939,exact,1.0
+smartrecruiters|bosch|id:744000149015574,4390,Bosch,Controls Technician - Pay starting at $35.48 an hour plus shift differential on off-shift,2638,smartrecruiters|bosch|id:744000145999489,exact,1.0
+smartrecruiters|bosch|id:744000148881439,4392,Bosch,Research Engineer – Accelerated Materials Discovery,4105,smartrecruiters|bosch|id:744000147328139,exact,1.0
+smartrecruiters|bosch|id:744000148836799,4399,Bosch,Territory Account Manager - Remote,2613,smartrecruiters|bosch|id:744000146539450,exact,1.0
+smartrecruiters|bosch|id:744000148584874,4405,Bosch,Production Operator,2598,smartrecruiters|bosch|id:744000146815874,exact,1.0
+smartrecruiters|bosch|id:744000148361429,4417,Bosch,Senior AI Research Scientist- Time-Series Foundational Models,2649,smartrecruiters|bosch|id:744000145603254,exact,1.0
+smartrecruiters|bosch|id:744000148359881,4418,Bosch,AI Research Scientist- Multimodal Foundational Models,2650,smartrecruiters|bosch|id:744000145589689,exact,1.0
+smartrecruiters|bosch|id:744000148329459,4419,Bosch,"Entry-level Sales and Marketing Representative - Denver, CO - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000148329168,4420,Bosch,Entry-level Sales and Marketing Representative - Chicago - Diablo Tools - DAT,2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000148328959,4421,Bosch,"Entry-level Sales and Marketing Representative - Salt Lake City, UT - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000148328729,4422,Bosch,"Entry-level Sales and Marketing Representative - Portland, OR - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000148328539,4423,Bosch,"Entry-level Sales and Marketing Representative - Seattle, WA - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000148328409,4424,Bosch,"Entry-level Sales and Marketing Representative - Columbus, OH - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000148325787,4425,Bosch,"Entry-level Sales and Marketing Representative - Minneapolis, MN - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000148327015,4426,Bosch,Entry-level Sales and Marketing Representative - DMV Area - Diablo Tools - DAT,2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000148229250,4443,Bosch,Machine Operator - Specialist III:Brazing - 2nd,2624,smartrecruiters|bosch|id:744000146236987,exact,1.0
+greenhouse|latitude (ford)|id:8204377,4520,Latitude (Ford),Bench Technician Associate (Contract),778,greenhouse|latitude (ford)|id:8164993,exact,1.0
+greenhouse|latitude (ford)|id:8214410,4524,Latitude (Ford),"Mission Operator - Detroit, MI (Contractor, Overnight Shift)",783,greenhouse|latitude (ford)|id:8141811,exact,1.0
+greenhouse|latitude (ford)|id:8208170,4525,Latitude (Ford),Real Estate & Workplace Services Coordinator II - Physical Security/Facilities (Contract),4204,greenhouse|latitude (ford)|id:8177151,exact,1.0
+greenhouse|may mobility|id:8206410002,4527,May Mobility,Senior Systems Engineer - Sensor Selection,857,greenhouse|may mobility|id:8731010002,exact,1.0
+lever|mobileye|id:f197016b-7b7a-46a2-991d-c48852099048,4537,Mobileye,Embedded Integrator - Temporary,4535,lever|mobileye|id:04853139-2a12-4d1e-8ce3-6d315ec31081,exact,1.0
+lever|mobileye|id:a1d4788f-68d7-46bc-97c4-04c1599f7ff4,4538,Mobileye,Experienced Deep Learning Algorithm Developer – Object Perception Group,916,lever|mobileye|id:de4739b8-eda9-4262-ae5b-c3ee15d86a3c,exact,1.0
+lever|mobileye|id:cf198663-8759-4f08-96c3-e564aca85d8d,4541,Mobileye,Experienced Software Engineer - Data Systems & Tools,4540,lever|mobileye|id:78d2b642-98cd-4eeb-893f-3662c46ae13c,exact,1.0
+lever|mobileye|id:72e986e2-94b4-49f6-be5f-74a48de8a71d,4543,Mobileye,Machine Learning Software Engineer,4542,lever|mobileye|id:1b3f71b9-fe39-41d3-bd43-4ae7ad18f92e,exact,1.0
+lever|mobileye|id:6c2c3630-b6cc-465b-9671-2a5dbbf0017d,4547,Mobileye,Production Quality Engineer,4546,lever|mobileye|id:23239c7c-5aa1-449b-bc44-4b754d4f42c5,exact,1.0
+lever|mobileye|id:ad23da3b-e74e-4b41-84b5-bb8abfa125a6,4548,Mobileye,Production Quality Engineer,4546,lever|mobileye|id:23239c7c-5aa1-449b-bc44-4b754d4f42c5,exact,1.0
+greenhouse|vay|id:4957528101,4574,Vay,Remote Driver (Truck),1272,greenhouse|vay|id:4952705101,exact,1.0
+smartrecruiters|bosch|id:744000150398990,4608,Bosch,Working Student 3D Animation of Sensors Technical Content (f/m/div.),2081,smartrecruiters|bosch|id:744000143030949,exact,1.0
+smartrecruiters|bosch|id:744000149876690,4654,Bosch,"Project Lead Business Strategy, Innovation & New Technologies at Bosch Management Consulting (f/m/div.)",1961,smartrecruiters|bosch|id:744000145519954,exact,1.0
+smartrecruiters|bosch|id:744000149846619,4666,Bosch,Master Thesis Impact of Operating Conditions on Membrane Degradation in PEM Water Electrolysis,1965,smartrecruiters|bosch|id:744000145507259,exact,1.0
+smartrecruiters|bosch|id:744000150435349,4714,Bosch,Weekend shift 4th Setup Machine Operator Floater,2632,smartrecruiters|bosch|id:744000146037859,exact,1.0
+smartrecruiters|bosch|id:744000150368199,4717,Bosch,Maintenance Technician 3rd shift,2692,smartrecruiters|bosch|id:744000144325499,exact,1.0
+smartrecruiters|bosch|id:744000150364243,4720,Bosch,"Entry-level Sales and Marketing Representative - Tampa, FL - Diablo Tools - DAT",2670,smartrecruiters|bosch|id:744000144628789,exact,1.0
+smartrecruiters|bosch|id:744000150340009,4722,Bosch,Industrial Maintenance Technician - 4 - 10's schedule,2692,smartrecruiters|bosch|id:744000144325499,exact,1.0
+smartrecruiters|bosch|id:744000150275429,4723,Bosch,Senior Sales Account Manager - Semiconductor Portfolio,2770,smartrecruiters|bosch|id:744000140993029,exact,1.0
+smartrecruiters|bosch|id:744000150275329,4724,Bosch,Senior Sales Manager - Semiconductors,2789,smartrecruiters|bosch|id:744000139684009,exact,1.0
+smartrecruiters|bosch|id:744000150190470,4731,Bosch,Warehouse Supervisor,4400,smartrecruiters|bosch|id:744000148827290,exact,1.0
+smartrecruiters|bosch|id:744000150174511,4732,Bosch,BiM Shift Coordinator PA2 3rd,2601,smartrecruiters|bosch|id:744000146774929,exact,1.0
+smartrecruiters|bosch|id:744000150132210,4737,Bosch,Mechanical Product Engineer,2661,smartrecruiters|bosch|id:744000145352009,exact,1.0
+smartrecruiters|bosch|id:744000150114608,4738,Bosch,Electro-Mechanical Product Engineer,2727,smartrecruiters|bosch|id:744000142962438,exact,1.0
+smartrecruiters|bosch|id:744000150083990,4739,Bosch,Maintenance Technician 3rd shift,2692,smartrecruiters|bosch|id:744000144325499,exact,1.0
+smartrecruiters|bosch|id:744000150006729,4740,Bosch,AI Research Engineer – Agentic AI,2695,smartrecruiters|bosch|id:744000144172049,exact,1.0
+smartrecruiters|bosch|id:744000149910364,4744,Bosch,Wireless Research Engineer,2619,smartrecruiters|bosch|id:744000146296069,exact,1.0
+smartrecruiters|bosch|id:744000149603299,4751,Bosch,VSL2 Lead Machine Operator 2nd,2759,smartrecruiters|bosch|id:744000141488820,exact,1.0
+smartrecruiters|bosch|id:744000149599671,4752,Bosch,VSL2 Machine Operator 3rd shift,2610,smartrecruiters|bosch|id:744000146545899,exact,1.0
+smartrecruiters|bosch|id:744000149425489,4754,Bosch,Global Workforce Management Leader (Contact Center),2699,smartrecruiters|bosch|id:744000143853484,exact,1.0
+smartrecruiters|bosch|id:744000149375670,4757,Bosch,Global Quality Assurance Leader (Contact Center),2700,smartrecruiters|bosch|id:744000143847939,exact,1.0
+smartrecruiters|bosch|id:744000149338565,4760,Bosch,Product Manager / Sr. Product Manager,4404,smartrecruiters|bosch|id:744000148591539,exact,1.0
+greenhouse|wayve|id:8809540002,4787,Wayve,Staff ML Engineer Gaia,3086,greenhouse|wayve|id:8610095002,exact,1.0
+hotjob|horizon|id:6aacb79815a82a89c3fa2830,4811,Horizon,Intelligent Driving System Engineer SE,4808,hotjob|horizon|id:6aacb873f0cfabf2b4c89980,exact,1.0
+hotjob|horizon|id:6aacb78615a82a89c3fa280e,4812,Horizon,Control Algorithm Engineer,4809,hotjob|horizon|id:6aacb812fea5e04bda6dfd9f,exact,1.0
+gm|gm|id:JR-202620345,4841,GM,Staff Research Scientist,3793,gm|gm|id:JR-202602534,exact,1.0
+ashby|applied intuition|id:f4c0ee25-b4d4-4f3d-b054-e9c1aeb56104,4848,Applied Intuition,Full-Stack Software Engineer -  Command & Control,199,ashby|applied intuition|id:cb3ae67c-49d8-43e8-8acf-1cd94e3f2354,exact,1.0
+ashby|applied intuition|id:99e36fcf-c027-403b-a926-8b73b6b9e2a6,4849,Applied Intuition,Software Engineer - Real-Time Vehicle Telemetry & Visualization,199,ashby|applied intuition|id:cb3ae67c-49d8-43e8-8acf-1cd94e3f2354,exact,1.0
+ashby|applied intuition|id:ba0f8faa-3d34-4839-b26a-7937842f4621,4866,Applied Intuition,Software Engineer - Multi-Agent UAV Autonomy (Defense),111,ashby|applied intuition|id:ec1c4504-6775-4878-a550-aa2be85df29e,exact,1.0
+ashby|aurora|id:dd02f6ff-37ab-4744-acf8-2585fd3f5f24,4876,Aurora,Service Engineering Technician,419,ashby|aurora|id:83e7c9cd-98a6-4224-b7dd-5d0600739776,exact,1.0
+greenhouse|avride|id:4414391009,4879,Avride,Robot Service Technician Assistant – Part Time Weekend (PM Shift),482,greenhouse|avride|id:4379587009,exact,1.0
+greenhouse|avride|id:4414025009,4882,Avride,Robot Service Technician – Full Time/Contract (Wednesday - Sunday PM),4193,greenhouse|avride|id:4402879009,exact,1.0
+greenhouse|latitude (ford)|id:8226738,4899,Latitude (Ford),Bench Technician Associate (Contract),778,greenhouse|latitude (ford)|id:8164993,exact,1.0
+greenhouse|latitude (ford)|id:8231350,4900,Latitude (Ford),HR Generalist Coordinator - HR Operations (Contract),4203,greenhouse|latitude (ford)|id:8191357,exact,1.0
+greenhouse|latitude (ford)|id:8226370,4901,Latitude (Ford),"Mission Operator - Pittsburgh, PA (Contract - Overnight Shift)",787,greenhouse|latitude (ford)|id:8148687,exact,1.0
+greenhouse|latitude (ford)|id:8226947,4904,Latitude (Ford),Prototyping Service Technician (Contract),3134,greenhouse|latitude (ford)|id:8094798,exact,1.0
+lever|mobileye|id:46bc20f4-a59e-41a5-996a-a56761167d8e,4916,Mobileye,Senior Embedded System Architect,4915,lever|mobileye|id:3f07f195-1b22-4c03-85fb-129a488d4b8a,exact,1.0
+lever|mobileye|id:9a8fdfe7-1660-4723-8f22-214cb8646f04,4922,Mobileye,Technical Project Manager,4555,lever|mobileye|id:f6564ba2-6042-4a14-8106-55ec735ecaf0,exact,1.0
+greenhouse|motional|id:8003878003,4923,Motional,Autonomous Driving Test Operator,4556,greenhouse|motional|id:7803014003,exact,1.0
+smartrecruiters|bosch|id:744000151802152,4965,Bosch,Electronics Technician / Safety Technician - Chemnitz Area (f/m/div.),1933,smartrecruiters|bosch|id:744000145700150,exact,1.0
+smartrecruiters|bosch|id:744000151803709,4966,Bosch,Electronics Technician / Safety Technician - Leipzig/Halle Area (f/m/div.),1935,smartrecruiters|bosch|id:744000145699169,exact,1.0
+smartrecruiters|bosch|id:744000151803669,4967,Bosch,Electronics Technician / Safety Technician – Berlin / Brandenburg Area (f/m/div.),1918,smartrecruiters|bosch|id:744000145907909,exact,1.0
+smartrecruiters|bosch|id:744000151802104,4968,Bosch,Electronics Technician / Safety Technician - Berlin / Brandenburg Area (f/m/div.),4348,smartrecruiters|bosch|id:744000148214409,exact,1.0
+smartrecruiters|bosch|id:744000151803489,4969,Bosch,Electronics Technician / Electrician with Low-Current Knowledge - Berlin Area (f/m/div.),1932,smartrecruiters|bosch|id:744000145701965,exact,1.0
+smartrecruiters|bosch|id:744000151803429,4970,Bosch,Electronics Technician / Safety Technician – Berlin / Brandenburg Area (f/m/div.),1918,smartrecruiters|bosch|id:744000145907909,exact,1.0
+smartrecruiters|bosch|id:744000151802244,4971,Bosch,Electronics Technician / Safety Technician – Berlin / Brandenburg Area (f/m/div.),1918,smartrecruiters|bosch|id:744000145907909,exact,1.0
+smartrecruiters|bosch|id:744000151802437,4972,Bosch,Electronics Technician / Safety Technician – Berlin / Brandenburg Area (f/m/div.),1918,smartrecruiters|bosch|id:744000145907909,exact,1.0
+smartrecruiters|bosch|id:744000151796685,4974,Bosch,Electronics Technician / Safety Technician - Ingolstadt Area (f/m/div.),1943,smartrecruiters|bosch|id:744000145687289,exact,1.0
+smartrecruiters|bosch|id:744000151798359,4975,Bosch,Electronics Technician / Safety Technician - Landshut / Vilsbiburg / Altötting Area (f/m/div.),1941,smartrecruiters|bosch|id:744000145694049,exact,1.0
+smartrecruiters|bosch|id:744000151798080,4976,Bosch,Electronics Technician for Maintenance - Area Landsberg a. Lech / Kaufbeuren (f/m/div.),1938,smartrecruiters|bosch|id:744000145696213,exact,1.0
+smartrecruiters|bosch|id:744000151797949,4977,Bosch,Electronics Technician / Safety Technician - Landshut/Freising Area (f/m/div.),1939,smartrecruiters|bosch|id:744000145696149,exact,1.0
+smartrecruiters|bosch|id:744000151795521,4978,Bosch,Electronics Technician / Safety Technician - Munich / Dachau Area (f/m/div.),1940,smartrecruiters|bosch|id:744000145695539,exact,1.0
+smartrecruiters|bosch|id:744000151796385,4979,Bosch,Electronics Technician / Safety Technician - Area Landsberg a. Lech / Kaufbeuren (f/m/div.),1936,smartrecruiters|bosch|id:744000145697759,exact,1.0
+smartrecruiters|bosch|id:744000151797069,4980,Bosch,Electronics Technician / Safety Technician - Area Manching / Pfaffenhofen (f/m/div.),1937,smartrecruiters|bosch|id:744000145697023,exact,1.0
+smartrecruiters|bosch|id:744000151795319,4981,Bosch,Cutting machine operator NC machining incl. deburring activities (f/m/div.),2119,smartrecruiters|bosch|id:744000141929645,exact,1.0
+smartrecruiters|bosch|id:744000151603269,4989,Bosch,Senior Java Developer (m/f/d),2392,smartrecruiters|bosch|id:744000135223858,exact,1.0
+smartrecruiters|bosch|id:744000151562048,4996,Bosch,Technical draftsman (f/m/div.),2559,smartrecruiters|bosch|id:744000117837056,exact,1.0
+smartrecruiters|bosch|id:744000151561689,4998,Bosch,Customer Service Technician Düsseldorf Area (f/m/div.),2141,smartrecruiters|bosch|id:744000141701980,exact,1.0
+smartrecruiters|bosch|id:744000151560169,5001,Bosch,Customer Service Technician Trier Area (f/m/div.),2226,smartrecruiters|bosch|id:744000140151920,exact,1.0
+smartrecruiters|bosch|id:744000151558859,5002,Bosch,Production Employee Indoor Unit Heat Pump (f/m/div.) - temporary,2278,smartrecruiters|bosch|id:744000139001641,exact,1.0
+smartrecruiters|bosch|id:744000151543768,5007,Bosch,Key Account Manager (w/m/div.) – Branch Solutions,2301,smartrecruiters|bosch|id:744000138344739,exact,1.0
+smartrecruiters|bosch|id:744000151532739,5011,Bosch,Key Account Manager Heat Pump for the Sales Regions of Bremen and Lower Saxony (f/m/div.),2295,smartrecruiters|bosch|id:744000138631567,exact,1.0
+smartrecruiters|bosch|id:744000151532669,5012,Bosch,"Sales representative for the sales area Chemnitz, Erzgebirge, Freiberg, Altenburg, Glauchau (f/m/div.)",2294,smartrecruiters|bosch|id:744000138779829,exact,1.0
+smartrecruiters|bosch|id:744000151532000,5013,Bosch,Technical System Expert for the Buderus Sales Division North (f/m/div.),1985,smartrecruiters|bosch|id:744000145421360,exact,1.0
+smartrecruiters|bosch|id:744000151363416,5018,Bosch,"Sales representative for the sales area Arnsberg, Attendorn, Brilon, Menden, Meschede, Schmallenberg, Sundern, Warstein, Winterberg and Iserlohn (f/m/div.)",2211,smartrecruiters|bosch|id:744000140445049,exact,1.0
+smartrecruiters|bosch|id:744000151365019,5019,Bosch,Customer Service Technician in the Goslar/Seesen area (f/m/div.),2225,smartrecruiters|bosch|id:744000140152149,exact,1.0
+smartrecruiters|bosch|id:744000151296789,5037,Bosch,Internship Machine Learning for Predictive Reliability Analytics - Heat Pumps,4671,smartrecruiters|bosch|id:744000149826650,exact,1.0
+smartrecruiters|bosch|id:744000151291709,5040,Bosch,Legal Trainee (f/m/div.) - Elective Station Internal Investigations,2531,smartrecruiters|bosch|id:744000122615229,exact,1.0
+smartrecruiters|bosch|id:744000151027969,5047,Bosch,Key Account Manager Heat Pump for the Sales Regions of Bremen and Lower Saxony (f/m/div.),2295,smartrecruiters|bosch|id:744000138631567,exact,1.0
+smartrecruiters|bosch|id:744000150991125,5056,Bosch,Mandatory internship in the production area quality management,2189,smartrecruiters|bosch|id:744000141182949,exact,1.0
+smartrecruiters|bosch|id:744000150963450,5060,Bosch,Electronics Technician / Safety Technician - Area Fürstenfeldbruck / Dachau (f/m/div.),1949,smartrecruiters|bosch|id:744000145679920,exact,1.0
+smartrecruiters|bosch|id:744000150934829,5065,Bosch,Working student for the topic of climate change (f/m/div.),2117,smartrecruiters|bosch|id:744000142054099,exact,1.0
+smartrecruiters|bosch|id:744000150662484,5073,Bosch,Electronics Technician / Safety Technician - Siegen Area(f/m/div.),5072,smartrecruiters|bosch|id:744000150660011,exact,1.0
+smartrecruiters|bosch|id:744000150641861,5077,Bosch,Mandatory internship in Learning & Skill Management - Bosch Global Real Estate Academy,2118,smartrecruiters|bosch|id:744000142052779,exact,1.0
+smartrecruiters|bosch|id:744000151864309,5082,Bosch,Maintenance Technician - Pay starting at $32.14 an hour plus shift differential on off-shift,2635,smartrecruiters|bosch|id:744000146001939,exact,1.0
+smartrecruiters|bosch|id:744000151864059,5083,Bosch,Controls Technician - Pay starting at $35.48 an hour plus shift differential on off-shift,2638,smartrecruiters|bosch|id:744000145999489,exact,1.0
+smartrecruiters|bosch|id:744000151857044,5085,Bosch,HR Service Intern (Year Round),4398,smartrecruiters|bosch|id:744000148843109,exact,1.0
+smartrecruiters|bosch|id:744000151710621,5087,Bosch,Inventory Specialist,2742,smartrecruiters|bosch|id:744000141962170,exact,1.0
+smartrecruiters|bosch|id:744000151709424,5089,Bosch,Senior Inventory Specialist,2743,smartrecruiters|bosch|id:744000141961580,exact,1.0
+smartrecruiters|bosch|id:744000151687099,5090,Bosch,2027 Spring Logistics / Packaging Engineering Co-op / LOM,2765,smartrecruiters|bosch|id:744000141337803,exact,1.0
+smartrecruiters|bosch|id:744000151670229,5091,Bosch,Machine Operator - 3rd,2793,smartrecruiters|bosch|id:744000139658750,exact,1.0
+smartrecruiters|bosch|id:744000151670119,5092,Bosch,Machine Operator - 2ND SHIFT - CSB,3222,smartrecruiters|bosch|id:744000147063333,exact,1.0
+smartrecruiters|bosch|id:744000151149285,5098,Bosch,Sr. Field Application Engineer,2745,smartrecruiters|bosch|id:744000141841319,exact,1.0
+smartrecruiters|bosch|id:744000151124519,5100,Bosch,Manager - International Trade,2842,smartrecruiters|bosch|id:744000133495010,exact,1.0
+smartrecruiters|bosch|id:744000151118879,5103,Bosch,Global Workforce Management Leader (Contact Center),2699,smartrecruiters|bosch|id:744000143853484,exact,1.0
+smartrecruiters|bosch|id:744000151110052,5105,Bosch,Resident Engineer - Application,5104,smartrecruiters|bosch|id:744000151110519,exact,1.0
+smartrecruiters|bosch|id:744000151106254,5108,Bosch,Indirect Tax Accountant,2830,smartrecruiters|bosch|id:744000134928949,exact,1.0
+smartrecruiters|bosch|id:744000151049068,5110,Bosch,Sr. Systems Integration Engineer (Multiple Positions) (REF296790M),2735,smartrecruiters|bosch|id:744000142649027,exact,1.0
+smartrecruiters|bosch|id:744000150800309,5113,Bosch,AI Research Scientist- Multimodal Foundational Models,2650,smartrecruiters|bosch|id:744000145589689,exact,1.0
+smartrecruiters|bosch|id:744000150747999,5116,Bosch,System Project Lead – Commercial Vehicle Steering,2602,smartrecruiters|bosch|id:744000146756109,exact,1.0
+smartrecruiters|bosch|id:744000150726075,5118,Bosch,Senior Controls Engineer,2875,smartrecruiters|bosch|id:744000121431098,exact,1.0
+greenhouse|wayve|id:8842721002,5127,Wayve,"Platform Engineer, SDO",4779,greenhouse|wayve|id:8790002002,exact,1.0
+ashby|42dot|id:9b9faf37-dcc9-4c54-8b67-1abacdf36478,8,42dot,3D Application Engineer (Automotive 3D Visualization),3,ashby|42dot|id:49f9a5ec-7140-4235-bfec-c471ca884d6e,near,0.9883
+ashby|applied intuition|id:c6991bb3-bb12-489c-bed2-424d8322fb58,359,Applied Intuition,Software Engineer - Cloud Infrastructure,127,ashby|applied intuition|id:4c8f7dd9-57b2-48df-9905-283e477de2d8,near,0.9718
+ashby|applied intuition|id:20ca8365-8984-4816-afdf-c5a7dde1a7f7,280,Applied Intuition,System Safety Engineer,159,ashby|applied intuition|id:59466c8f-a1ff-42b6-9a60-3eeedc95de07,near,0.9608
+ashby|applied intuition|id:332102e4-db8a-4276-9bb4-de7bc92a8f2a,278,Applied Intuition,Senior Software Engineer - Perception,188,ashby|applied intuition|id:a959b5ac-b9d9-444e-8ea9-ef560d1554a9,near,0.9659
+ashby|applied intuition|id:341f8193-19ab-4261-bd20-da7d530fbf9c,299,Applied Intuition,Full-Stack Software Engineer - Autonomy HMI,199,ashby|applied intuition|id:cb3ae67c-49d8-43e8-8acf-1cd94e3f2354,near,0.9744
+ashby|applied intuition|id:71a24489-f841-47d8-a2b6-cfeb2d159e66,4490,Applied Intuition,Autonomy Integration Engineer - Drone Stack,222,ashby|applied intuition|id:36df3851-dd50-4f07-a8e2-5b0e845258b5,near,0.9565
+ashby|applied intuition|id:00eaa332-f855-4963-886c-909ac78bce6d,4491,Applied Intuition,Autonomy Integration Engineer - Drone Stack,222,ashby|applied intuition|id:36df3851-dd50-4f07-a8e2-5b0e845258b5,near,0.9513
+ashby|applied intuition|id:315025c1-2d5f-48d7-8d52-48ac630b98d6,380,Applied Intuition,Product Counsel,223,ashby|applied intuition|id:24f1a371-7cb1-4bb1-91bf-ff39e1fba8e0,near,0.9932
+ashby|applied intuition|id:6ad5c953-a251-4204-82f3-184bb6227513,251,Applied Intuition,Lead Software Engineer - Physical AI,249,ashby|applied intuition|id:efb1d3eb-388c-4908-be0a-8af78579db69,near,0.9943
+ashby|applied intuition|id:8566ecdd-877c-4b62-8203-e10dc5528bad,265,Applied Intuition,Senior C++ Software Engineer - Defense Air,249,ashby|applied intuition|id:efb1d3eb-388c-4908-be0a-8af78579db69,near,0.9724
+ashby|applied intuition|id:73d7da2a-1db9-4e08-a8d8-32232dd9f49d,352,Applied Intuition,Legal Operations Generalist,262,ashby|applied intuition|id:d55130bc-eeca-4c82-973c-d92a25da4fc7,near,0.996
+ashby|applied intuition|id:e10dc74a-12f8-42a3-94db-cf7e7ace9f61,4858,Applied Intuition,"Technical Sourcer, Gen SWE",4855,ashby|applied intuition|id:7e548eda-924d-4b85-b22d-e86ca3481ff6,near,0.9609
+ashby|aurora|id:32303bc7-a0df-4a9f-a47b-83bc6c41712a,4498,Aurora,Staff People Business Partner,394,ashby|aurora|id:bb5da426-44aa-4a22-bd8b-73d8c5511966,near,1.0
+ashby|aurora|id:cc4c7850-740e-4fb9-a7ee-389b42f87541,4506,Aurora,Senior Software Assurance Engineer,410,ashby|aurora|id:7c42aebd-be5c-4f48-91c9-37000e68a726,near,0.9746
+ashby|aurora|id:a9cb8aa5-9774-4f83-8ec6-1e91d42f4ad7,427,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.9798
+ashby|aurora|id:3a46b65a-f508-4b92-a73d-218e8fca7a0f,440,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.9637
+ashby|aurora|id:ac866b90-b238-4d25-9f09-3d9c29dc6702,457,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.9579
+ashby|aurora|id:d43037e8-5f28-44e0-9718-78b26bec436c,458,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.9551
+ashby|aurora|id:cc525d39-dae6-4013-9946-a5e1fc5d6250,4185,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.9547
+ashby|aurora|id:75f7dcfe-7fde-46cb-9a45-da5d8c178ff6,4492,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.9835
+ashby|aurora|id:70eec2a7-30e2-47c0-98ef-3db0e9f0772b,4493,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.9835
+ashby|aurora|id:40faefe1-75b7-464e-b505-caafbaf886d0,4495,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.955
+ashby|aurora|id:bbcae5d7-764c-4975-961c-10e1fc7a1e5d,4504,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.9795
+ashby|aurora|id:f7e63347-f575-4efc-aa31-2fc7d20a80ac,4877,Aurora,Truck Operations Specialist,426,ashby|aurora|id:0e448c03-efd3-449b-9bab-867cdec10c6e,near,0.9831
+ashby|aurora|id:4fdea7df-060f-492e-8f19-1118bfab96b2,459,Aurora,Tactical Development Truck Operator,438,ashby|aurora|id:7a8147e3-5a2b-4c8f-b788-f338f3fa0cd1,near,0.9756
+greenhouse|avride|id:4379588009,483,Avride,Robot Service Technician Assistant,482,greenhouse|avride|id:4379587009,near,0.9925
+greenhouse|avride|id:4379550009,492,Avride,Robot Service Technician Assistant,482,greenhouse|avride|id:4379587009,near,0.9933
+greenhouse|avride|id:4379477009,502,Avride,Robot Service Technician Assistant – Part Time Weekend/Contract,482,greenhouse|avride|id:4379587009,near,0.9798
+greenhouse|avride|id:4288472009,506,Avride,Robot service technician – Full Time/Contract,505,greenhouse|avride|id:4387950009,near,0.9852
+greenhouse|avride|id:4387947009,510,Avride,Robot Service Technician – Full Time/Contract,505,greenhouse|avride|id:4387950009,near,0.9503
+greenhouse|avride|id:4381014009,517,Avride,Robot Service Technician – Full Time/Contract,505,greenhouse|avride|id:4387950009,near,0.9728
+greenhouse|avride|id:4394541009,3130,Avride,Robot service technician – Full Time/Contract,505,greenhouse|avride|id:4387950009,near,0.9899
+greenhouse|avride|id:4402879009,4193,Avride,Robot Service Technician – Full Time/Contract,505,greenhouse|avride|id:4387950009,near,0.9662
+greenhouse|avride|id:4413932009,4880,Avride,Robot Service Technician – Full Time/Contract,505,greenhouse|avride|id:4387950009,near,0.9591
+greenhouse|avride|id:4414013009,4881,Avride,Robot Service Technician – Full Time/Contract (PM Weekday),505,greenhouse|avride|id:4387950009,near,0.9541
+greenhouse|avride|id:4387946009,508,Avride,Robot Service Technician – Full Time/Contract,507,greenhouse|avride|id:4301506009,near,0.9788
+greenhouse|avride|id:4301508009,511,Avride,Robot Service Technician – Full Time/Contract,507,greenhouse|avride|id:4301506009,near,0.9856
+greenhouse|avride|id:4301492009,512,Avride,Robot Service Technician – Full Time/Contract,507,greenhouse|avride|id:4301506009,near,0.9817
+greenhouse|avride|id:4301497009,513,Avride,Robot Service Technician – Full Time/Contract,507,greenhouse|avride|id:4301506009,near,0.9856
+greenhouse|bot.auto|id:5374292008,544,Bot.Auto,Local Driver CDL,543,greenhouse|bot.auto|id:5374307008,near,0.9907
+moka|deeproute|id:563fca43-c09c-4875-ab38-638c6b30d846,607,DeepRoute,Assistant Engineer in Sensor Systems,557,moka|deeproute|id:d6ba53ee-f72f-4e11-9721-4b81d88c758a,near,0.9516
+greenhouse|gatik|id:4556559006,674,Gatik,Mechanical Integration Technician,673,greenhouse|gatik|id:4666036006,near,0.9823
+greenhouse|gatik|id:4713127006,4514,Gatik,Autonomous Vehicle Test Driver,3131,greenhouse|gatik|id:4299357006,near,0.9792
+greenhouse|kodiak|id:4415255009,4892,Kodiak,Autonomous Vehicle Test Specialist,704,greenhouse|kodiak|id:4304159009,near,0.9598
+greenhouse|kodiak|id:4321392009,719,Kodiak,Hardware Quality Industrialization Engineer,718,greenhouse|kodiak|id:4378057009,near,0.9728
+greenhouse|kodiak|id:4304139009,729,Kodiak,Senior Field Truck Technician,723,greenhouse|kodiak|id:4294603009,near,0.9833
+greenhouse|kodiak|id:4292556009,757,Kodiak,"Staff Software Engineer, Behavior Planning",733,greenhouse|kodiak|id:4173361009,near,0.9663
+greenhouse|kodiak|id:4409581009,4517,Kodiak,"Senior, Vehicle Integration Engineer",765,greenhouse|kodiak|id:4173886009,near,0.9628
+greenhouse|latitude (ford)|id:8207634,4519,Latitude (Ford),Automotive Service Technician (Contract),775,greenhouse|latitude (ford)|id:8161926,near,0.9833
+greenhouse|latitude (ford)|id:8226797,4898,Latitude (Ford),Automotive Service Technician (Contract),776,greenhouse|latitude (ford)|id:8148686,near,0.9848
+greenhouse|latitude (ford)|id:8094798,3134,Latitude (Ford),Prototyping Service Technician (Contract),777,greenhouse|latitude (ford)|id:8163143,near,0.9606
+greenhouse|latitude (ford)|id:8119482,798,Latitude (Ford),Senior Software Engineer - High Level OS,780,greenhouse|latitude (ford)|id:8114552,near,0.9725
+greenhouse|latitude (ford)|id:8147128,784,Latitude (Ford),"Mission Operator - Greenville, SC  (Contractor)",783,greenhouse|latitude (ford)|id:8141811,near,0.9642
+greenhouse|latitude (ford)|id:8191357,4203,Latitude (Ford),HR Generalist Coordinator - HR Operations (Contract),788,greenhouse|latitude (ford)|id:8161830,near,0.9721
+greenhouse|latitude (ford)|id:8173295,3135,Latitude (Ford),"Senior Cyber Security Engineer - Automation, Data Center & Networking Security",789,greenhouse|latitude (ford)|id:8081952,near,0.9963
+greenhouse|latitude (ford)|id:8153007,793,Latitude (Ford),"Senior Hardware Engineer,  Radar",792,greenhouse|latitude (ford)|id:8055181,near,0.9957
+greenhouse|latitude (ford)|id:8030930,818,Latitude (Ford),"Triage Associate I, Platform Triage - Second Shift (Contract)",817,greenhouse|latitude (ford)|id:8045278,near,0.9649
+greenhouse|may mobility|id:8533137002,860,May Mobility,Site Operations Manager II,859,greenhouse|may mobility|id:8756629002,near,0.99
+lever|mobileye|id:14e467d6-6412-479d-a827-fb9184522869,952,Mobileye,Senior Algorithm Engineer - Objects Perception,872,lever|mobileye|id:6e32e4d7-2df4-4ff2-b404-a6dba0444e84,near,0.9851
+lever|mobileye|id:de078a5a-f9b1-4f3f-8b02-b19241cbd1c6,890,Mobileye,Corporate Controller,889,lever|mobileye|id:8e12e6c1-44a9-4eb7-b041-9f212505da00,near,0.9814
+lever|mobileye|id:da962759-96d7-4810-9927-351ecc4b6ceb,894,Mobileye,Cyber Security Solution Architect,893,lever|mobileye|id:89b5d584-1a18-4087-a8ca-46172fdf9c29,near,1.0
+lever|mobileye|id:64cad7b5-1016-47e0-901a-4cfb28bcc633,899,Mobileye,Deep Learning Tech Lead,898,lever|mobileye|id:611eada3-803c-4598-8988-26ad846ef2cc,near,0.9532
+lever|mobileye|id:a6add601-41b6-4ac0-96d7-6f733e2af85d,911,Mobileye,Embedded Team Leader -OS Integration & Automation,910,lever|mobileye|id:999d5e75-7d50-42f1-879b-18035226641f,near,0.9935
+lever|mobileye|id:c5d0b91a-8a21-490f-a02b-23b5ebaa2ec5,935,Mobileye,Outstanding Graduate - Machine Learning Engineer,921,lever|mobileye|id:e85566dc-9827-4058-a1d2-cc6a63f7e286,near,0.9571
+lever|mobileye|id:cc56a225-96a9-4f52-9b11-4303447e0a78,923,Mobileye,Experienced Physical Design Engineer,922,lever|mobileye|id:49084f32-4a0d-4641-a034-c22310218bb1,near,0.9536
+lever|mobileye|id:7418fbe2-8467-4389-b43b-2ae50ef57815,999,Mobileye,Senior Verification Engineer,927,lever|mobileye|id:15ecbd22-fd82-431c-93ff-2ece2caf808e,near,0.9955
+lever|mobileye|id:e58368d8-ec21-4e5e-871d-40707762b959,932,Mobileye,ML Software Engineer,931,lever|mobileye|id:da4f0a8d-6af3-4150-9acf-1898e83d5a61,near,0.9767
+lever|mobileye|id:25f2cd2f-fbac-4101-b913-045cdc4458a3,970,Mobileye,Senior ML Data Engineer,960,lever|mobileye|id:ade97368-7948-4dbb-a574-1268ad41cbf0,near,0.9885
+lever|mobileye|id:5d044c94-826e-4685-853f-b70069e3f0a9,971,Mobileye,Senior ML Data Engineer,960,lever|mobileye|id:ade97368-7948-4dbb-a574-1268ad41cbf0,near,0.984
+lever|mobileye|id:6f95360f-6d69-4c40-a0fe-3e8f3a1d6f5c,969,Mobileye,Senior Microsoft Sysadmin,968,lever|mobileye|id:3f7e3421-7963-4d3a-8573-2fb29f8dbade,near,1.0
+lever|mobileye|id:7969248d-a14e-4a4e-a316-ff323f6d49ff,975,Mobileye,Senior Python Infrastructure Developer,974,lever|mobileye|id:68245f41-2091-471c-9d65-6b4747ea02d5,near,1.0
+lever|mobileye|id:b8c0334c-51c5-420f-8fb1-3f8bf641c9cb,979,Mobileye,Senior Software Engineer - Active Sensing Group,978,lever|mobileye|id:ac5f0c5c-3652-478e-aa66-783f70af24b7,near,0.9916
+lever|mobileye|id:9a48ee39-91f4-4722-a6b4-0f2800b4863c,1011,Mobileye,Solution Architect for Embedded Autonomous Vehicle System,1010,lever|mobileye|id:5d23dc1d-fc84-427d-96cf-cd151087561d,near,0.9879
+lever|mobileye|id:b6db859a-bb49-4e66-ac3d-d111eeb03bd1,3140,Mobileye,Execution Program Manager,3139,lever|mobileye|id:8d09a950-7497-409c-a7d2-4a72458435de,near,0.966
+lever|mobileye|id:79932ba7-840a-4c1b-8dca-80722712d51b,3155,Mobileye,Talent Acquisition Partner - Temporary (1 year),3154,lever|mobileye|id:35d41f76-5f20-4fc8-b108-f761582083f2,near,0.9898
+lever|mobileye|id:758f27a6-1204-434a-b55d-8cbef1069d01,4921,Mobileye,Talent Acquisition Partner,3154,lever|mobileye|id:35d41f76-5f20-4fc8-b108-f761582083f2,near,0.979
+lever|mobileye|id:0fa71098-1f99-4528-8f23-5369eec1b7d5,4536,Mobileye,Embedded Integrator - Temporary,4535,lever|mobileye|id:04853139-2a12-4d1e-8ce3-6d315ec31081,near,1.0
+lever|mobileye|id:3f07f195-1b22-4c03-85fb-129a488d4b8a,4915,Mobileye,Senior Embedded System Architect,4914,lever|mobileye|id:2465ade2-5473-448c-a9ee-0b09e8ec9e58,near,0.9685
+greenhouse|motional|id:7803014003,4556,Motional,Autonomous Driving Test Operator,1032,greenhouse|motional|id:7860458003,near,0.9612
+greenhouse|motional|id:8003807003,4927,Motional,"Senior Software Engineer, Data Platform",4926,greenhouse|motional|id:8005081003,near,0.9522
+greenhouse|nuro|id:7976791,1102,Nuro,"Associate Fleet Technician, Los Angeles",1101,greenhouse|nuro|id:7442056,near,0.9664
+greenhouse|nuro|id:7378961,1106,Nuro,"Autonomous Vehicle Operator, Houston (PM Shift, 12-Month Duration)",1105,greenhouse|nuro|id:7943795,near,0.9559
+greenhouse|nuro|id:8104157,1111,Nuro,"Autonomous Vehicle Operator, San Francisco (Overnight Shift, 12-Month Duration)",1108,greenhouse|nuro|id:8172396,near,0.9519
+greenhouse|nuro|id:7939983,1113,Nuro,"Autonomous Vehicle Operator, Santa Clara, (12-Month Duration)",1110,greenhouse|nuro|id:8104145,near,0.9564
+greenhouse|nuro|id:8187131,4243,Nuro,Workday Analyst,1135,greenhouse|nuro|id:8093105,near,0.9602
+greenhouse|nuro|id:6909931,1184,Nuro,"Software Engineer, ML Infrastructure",1147,greenhouse|nuro|id:8011527,near,0.9924
+greenhouse|nuro|id:8122483,1186,Nuro,"Software Engineer, ML Infrastructure Platform",1148,greenhouse|nuro|id:8122477,near,0.9921
+greenhouse|nuro|id:7786521,1189,Nuro,"Software Engineer, Performance Tooling and Infrastructure",1154,greenhouse|nuro|id:7786596,near,0.9921
+greenhouse|nuro|id:7482347,1190,Nuro,"Software Engineer, Routing",1156,greenhouse|nuro|id:6832319,near,0.9846
+greenhouse|nuro|id:7196037,1201,Nuro,"Staff Software Engineer, Routing",1156,greenhouse|nuro|id:6832319,near,0.9663
+greenhouse|nuro|id:8175271,4240,Nuro,"Senior/Staff Engineer, Machine Learning - Online Mapping",1161,greenhouse|nuro|id:6621871,near,0.9813
+greenhouse|nuro|id:8122990,1179,Nuro,"Software Engineer, Applied AI Infrastructure",1164,greenhouse|nuro|id:8097555,near,0.9958
+greenhouse|nuro|id:7895818,1182,Nuro,"Software Engineer, ML Data Infrastructure",1168,greenhouse|nuro|id:7895638,near,0.9557
+greenhouse|nuro|id:8122537,1183,Nuro,"Software Engineer, ML Inference Platform",1169,greenhouse|nuro|id:8122528,near,0.9779
+greenhouse|nuro|id:6916236,1185,Nuro,"Software Engineer, ML Infrastructure, Optimization",1170,greenhouse|nuro|id:8011514,near,0.953
+greenhouse|nuro|id:7238934,1198,Nuro,"Staff/Senior Software Engineer, Offboard Infrastructure",1187,greenhouse|nuro|id:7638789,near,0.9877
+greenhouse|nuro|id:7998327,1199,Nuro,"Staff/Senior Software Engineer, Onboard Infrastructure",1188,greenhouse|nuro|id:7998328,near,0.9838
+greenhouse|torc ai|id:8567703002,1242,Torc AI,Senior Software Engineer - New AI Initiatives,1220,greenhouse|torc ai|id:8567705002,near,0.9693
+greenhouse|torc ai|id:8688973002,1237,Torc AI,Senior Quality Test Engineer,1224,greenhouse|torc ai|id:8687885002,near,0.9627
+lever|waabi|id:91b310b8-a286-4476-8326-e7ed044a50be,1282,Waabi,Autonomous Semi Technician - Swing Shift,1281,lever|waabi|id:6c88edff-7632-45e6-afe0-19bf1704a298,near,0.9756
+lever|waabi|id:357a9513-5900-4b33-9ce8-77ff2d1017c8,1349,Waabi,Test & Evaluation Operator,1348,lever|waabi|id:0a392ba0-7f39-4dcd-a44e-2c810548b1f2,near,0.9746
+lever|waabi|id:8b2b6f2b-d3f4-4a83-a22c-968445d8f4bb,1351,Waabi,Test Engineer,1350,lever|waabi|id:1fb790ab-2a32-4314-a1fd-907f7ce0e6e6,near,0.9859
+lever|weride|id:074a6e4f-79fa-4e48-a9e1-3b28e1bf10e3,1389,WeRide,Vehicle Operations Specialist (Contract),1362,lever|weride|id:67194770-ca27-4291-82ac-a90e58967e29,near,0.952
+moka|weride|id:73374211-7b5f-46b3-9762-80d1960da245,3576,WeRide,Engineering Design and Verification (for L3 Business),3485,moka|weride|id:b033aaae-c105-48f1-a536-fc925e0098ac,near,0.9726
+moka|weride|id:51826f29-e875-46ce-bb0e-8c9125f416c4,3637,WeRide,Hydraulic system engineer,3503,moka|weride|id:f51df3ff-3973-4611-aea7-f2fc33197034,near,0.9673
+moka|weride|id:e4b05d2f-5268-41f8-bf50-8647fc23778a,3523,WeRide,Generalization Test Engineer for Intelligent Driving Systems - Guangzhou/Shanghai,3518,moka|weride|id:99b5223c-e59b-42f4-9c3f-8d4f034de8b7,near,0.9855
+moka|weride|id:c9992b9e-062c-4a2e-939e-6bfc71293ead,3601,WeRide,Senior Project Delivery Manager,3599,moka|weride|id:a45a89bc-ad80-4654-996c-466edc17ecf4,near,0.9944
+lever|woven|id:d569edcd-2f38-432d-92d8-ca32c1f74865,1412,Woven,"Director, Global Head of Total Rewards",1411,lever|woven|id:b04b9959-b190-4ed8-b742-86a6d8983b02,near,0.9569
+lever|woven|id:ad7a3fb5-bd1d-45ee-bfdb-27c08d8f12c3,4579,Woven,"Project Manager, Inventor Activation, Business Planning and Operations for Inventor Garage",1441,lever|woven|id:aa02debe-306a-4173-8ab6-1a98b35d1ad4,near,0.9735
+lever|woven|id:e89b2d87-c2df-4704-b27d-dad75add9acf,1477,Woven,"Staff ML Platform Engineer, AD/ADAS",1459,lever|woven|id:4be9f9b4-962f-4b09-80ea-8e37ca563795,near,0.9523
+lever|woven|id:e1cec56f-71b8-42d5-9ffe-7572b193b54a,1474,Woven,"Software Engineer, Embedded Systems",1466,lever|woven|id:11dea30a-0ace-4a1c-821f-24407da165f5,near,0.9927
+lever|woven|id:8023756e-6471-452e-ab02-786073aca684,1534,Woven,Legal counsel,1533,lever|woven|id:9682f275-aaea-4ebe-9bbd-7269429208e5,near,0.9842
+greenhouse|xpeng|id:8530502002,1557,Xpeng,Senior Staff AI Data Infrastructure/Pipeline Engineer,1549,greenhouse|xpeng|id:8579038002,near,0.9871
+greenhouse|xpeng|id:8446979002,1566,Xpeng,Staff Machine Learning Engineer - AI Foundation,1551,greenhouse|xpeng|id:8446966002,near,0.982
+greenhouse|xpeng|id:7813393002,1567,Xpeng,Staff Machine Learning Engineer - Foundation Model,1552,greenhouse|xpeng|id:7813395002,near,0.9895
+greenhouse|xpeng|id:8710020002,1568,Xpeng,Staff Machine Learning Engineer - LLM Quantization & Deployment,1553,greenhouse|xpeng|id:8710019002,near,0.979
+lever|zoox|id:28a74ce9-92f3-4280-b6a7-730e7ffee5b2,1685,Zoox,"Senior Manager, Perception",1587,lever|zoox|id:3921a393-27c0-4a62-bb4d-2e88d80e45e0,near,0.97
+lever|zoox|id:8c037577-5728-4a7d-bbd4-bd83a3e44614,1605,Zoox,Firmware Validation Engineer - Battery Management Systems,1604,lever|zoox|id:4b00bf61-6547-4c50-be83-5d659176090b,near,0.9582
+lever|zoox|id:170c22c2-24f8-4163-a007-45dec5bdb902,1649,Zoox,Senior / Staff Machine Learning Engineer - Behavior Models for Road Users,1611,lever|zoox|id:d736debf-c361-4a7c-81fd-6c3125ab03c0,near,0.9926
+lever|zoox|id:7dd45151-9d8a-45a4-bb33-86fb88c1995d,1769,Zoox,Software Engineer - Motion Planning,1657,lever|zoox|id:00bede24-f74d-4447-ace1-48638965382e,near,0.9923
+lever|zoox|id:48a6b2ac-0dcb-4481-ab26-386ce62decab,4944,Zoox,"Lead AI Engineer – Enterprise, Data & AI",1664,lever|zoox|id:ba2b9418-e041-43b9-9bb1-b19762a00bd6,near,0.9966
+lever|zoox|id:9abd3543-0d46-4fd8-882c-2fe93d75a51b,1762,Zoox,Sensor Software Engineer - Core Sensors,1698,lever|zoox|id:fa96e7a4-df02-41c3-91c6-248a5bad6fa7,near,0.9885
+lever|zoox|id:51630efc-50f6-461c-8d56-ebed59a5d0d6,1765,Zoox,Software Engineer - C++  GPU Performance,1703,lever|zoox|id:2042bc12-6247-48d5-a9fb-a6e41363a5ce,near,0.9992
+lever|zoox|id:896f37b9-80b7-4077-a937-e499151ce5f2,1779,Zoox,Software Systems Engineer - Security,1708,lever|zoox|id:f8150234-1695-4ed9-a820-c81e66ca693a,near,0.9984
+lever|zoox|id:0c03e57f-fe89-4a65-857e-af7ec6eadadf,4951,Zoox,"Senior Team Lead, Vehicle Technicians",1726,lever|zoox|id:16f95b9e-6520-41bb-9a27-27a5f8f5dcf5,near,0.9843
+lever|zoox|id:fe820d6e-2f38-4f5a-a824-3690dbb58453,4952,Zoox,"Senior Team Lead, Vehicle Technicians",1726,lever|zoox|id:16f95b9e-6520-41bb-9a27-27a5f8f5dcf5,near,0.9843
+lever|zoox|id:b7c1a78f-43b9-4142-bd71-97022a760750,1764,Zoox,Software Engineer - Behavior Capabilities,1745,lever|zoox|id:2d23cf58-a117-4f40-ac98-7c6a691eb273,near,0.9666
+lever|zoox|id:a2e507b6-86b3-4a97-a9bd-63867adb0b1c,4603,Zoox,"Team Lead, Vehicle Operations (2nd Shift)",1802,lever|zoox|id:17b0e746-90f5-40f1-9086-491c99cabd52,near,0.9603
+lever|zoox|id:978e36ef-e8e9-4874-ade6-f33a80e46309,4269,Zoox,Software Engineer - Pipeline Infrastructure & Integration,4264,lever|zoox|id:2ff4b934-b823-4d33-a0c2-3372389aeef7,near,0.9991
+lever|zoox|id:6da52aa7-0ccb-48d0-af25-0889f41ddee5,4270,Zoox,Software Engineer - Robot Software Infrastructure,4265,lever|zoox|id:f62f1083-acff-4862-984e-4d16d2a827a6,near,0.999
+lever|zoox|id:4258cd55-95e1-424e-9fe6-edbec8235281,4598,Zoox,Senior/Staff Technical Program Manager - Compute Hardware,4268,lever|zoox|id:d9496a78-88b3-4c62-bea2-0eb61288aa9c,near,0.9919
+lever|zoox|id:ddba8228-2215-48fd-bc4e-a633bca6b8e4,4272,Zoox,"Team Lead, Readiness & Response",4271,lever|zoox|id:0a46e434-d154-4ac1-8d56-1c75481b3e4b,near,1.0
+lever|zoox|id:e725749e-88f7-48e0-8e4c-8a4a3289b905,4600,Zoox,Software Engineer - Planner Frameworks Pipeline,4597,lever|zoox|id:4cf378f6-fab9-4bdb-a349-4ae70c099b8e,near,0.9983
+smartrecruiters|bosch|id:744000146896459,1817,Bosch,"PreMaster Program - GapYear - Design, Automation & Commissioning of Learning Factories",1816,smartrecruiters|bosch|id:744000146896889,near,1.0
+smartrecruiters|bosch|id:744000147869609,4372,Bosch,Cutting machine operator (f/m/div.) - temporary,1847,smartrecruiters|bosch|id:744000146614779,near,0.9741
+smartrecruiters|bosch|id:744000151605625,4988,Bosch,"Specialist in occupational medicine / company doctor (part-time, f/m/div.)",1853,smartrecruiters|bosch|id:744000146449899,near,0.9887
+smartrecruiters|bosch|id:744000146434359,1856,Bosch,Internship in the field of controlling,1855,smartrecruiters|bosch|id:744000146434450,near,0.9502
+smartrecruiters|bosch|id:744000147423359,4093,Bosch,Internship in the field of marketing and communication,1875,smartrecruiters|bosch|id:744000146165790,near,0.9788
+smartrecruiters|bosch|id:744000150680958,5069,Bosch,Senior ASIC Digital Lead - ATPG & Methodology (f/m/div.),1892,smartrecruiters|bosch|id:744000145959868,near,0.9614
+smartrecruiters|bosch|id:744000145942159,1902,Bosch,Junior Account Manager (m/f/div.) Security Technology,1900,smartrecruiters|bosch|id:744000145942839,near,0.9936
+smartrecruiters|bosch|id:744000147429899,4091,Bosch,Key Account Manager in Technical System Sales with a focus on the housing/real estate industry for the Buderus Sales Area North (f/m/div.),1903,smartrecruiters|bosch|id:744000145937575,near,0.9946
+smartrecruiters|bosch|id:744000145906770,1909,Bosch,Electronics Technician / Safety Technician - Siegen Area(f/m/div.),1908,smartrecruiters|bosch|id:744000145906993,near,0.9514
+smartrecruiters|bosch|id:744000145909675,1911,Bosch,Electronics Technician / Safety Technician - Bochum Area (f/m/div.),1908,smartrecruiters|bosch|id:744000145906993,near,0.9516
+smartrecruiters|bosch|id:744000151002519,5054,Bosch,Electronics Technician / Safety Technician - Menden / Arnsberg Area (f/m/div.),1908,smartrecruiters|bosch|id:744000145906993,near,0.9695
+smartrecruiters|bosch|id:744000151001439,5055,Bosch,Electronics technician / electrician with low-voltage knowledge - Siegen area (f/m/div.),1914,smartrecruiters|bosch|id:744000145909329,near,0.9695
+smartrecruiters|bosch|id:744000150661599,5075,Bosch,Electronics Technician / Safety Technician - Greater Cologne Area,1916,smartrecruiters|bosch|id:744000145908871,near,0.9625
+smartrecruiters|bosch|id:744000150661178,5076,Bosch,Electronics Technician / Safety Technician - Düsseldorf Area (m/f/div.),1917,smartrecruiters|bosch|id:744000145908669,near,0.962
+smartrecruiters|bosch|id:744000146914109,3203,Bosch,Mandatory internship in IT security in manufacturing,1925,smartrecruiters|bosch|id:744000145732359,near,0.9898
+smartrecruiters|bosch|id:744000151586904,4992,Bosch,Electronics Technician / Safety Technician - Bochum Area (f/m/div.),1933,smartrecruiters|bosch|id:744000145700150,near,0.9544
+smartrecruiters|bosch|id:744000150660011,5072,Bosch,Electronics Technician / Safety Technician - Siegen Area(f/m/div.),1933,smartrecruiters|bosch|id:744000145700150,near,0.9543
+smartrecruiters|bosch|id:744000150661899,5074,Bosch,Electronics Technician / Safety Technician - Bonn Area (f/m/div.),1933,smartrecruiters|bosch|id:744000145700150,near,0.9522
+smartrecruiters|bosch|id:744000145696213,1938,Bosch,Electronics Technician for Maintenance - Area Landsberg a. Lech / Kaufbeuren (f/m/div.),1936,smartrecruiters|bosch|id:744000145697759,near,0.9639
+smartrecruiters|bosch|id:744000145686209,1944,Bosch,Electronics Technician for Maintenance - Area Manching / Pfaffenhofen (f/m/div.),1937,smartrecruiters|bosch|id:744000145697023,near,0.959
+smartrecruiters|bosch|id:744000151796517,4973,Bosch,Electronics Technician for Maintenance - Area Manching / Pfaffenhofen (f/m/div.),1937,smartrecruiters|bosch|id:744000145697023,near,0.959
+smartrecruiters|bosch|id:744000150962119,5061,Bosch,Electronics Technician / Service Technician for Safety Technology (f/m/div.) – Fürstenfeldbruck / Dachau Area,1945,smartrecruiters|bosch|id:744000145681989,near,0.955
+smartrecruiters|bosch|id:744000134403209,2415,Bosch,Sales representative for the Buderus branch in Frankfurt (f/m/div.),1984,smartrecruiters|bosch|id:744000145421910,near,0.9504
+smartrecruiters|bosch|id:744000151551674,5004,Bosch,Production Employee (m/f/div.) Assembly & Hydraulic Testing of Hydraulic Valves - temporary,1992,smartrecruiters|bosch|id:744000145208939,near,0.9822
+smartrecruiters|bosch|id:744000148979559,4292,Bosch,"PreMaster Program – Management Assistant in the FC Department, Focus on Controlling (f/m/div.)",2006,smartrecruiters|bosch|id:744000144530229,near,0.9901
+smartrecruiters|bosch|id:744000148978366,4293,Bosch,"PreMaster Program - Management Assistance in FC Area, Focus Controlling",2007,smartrecruiters|bosch|id:744000144528084,near,0.9897
+smartrecruiters|bosch|id:744000150018449,4646,Bosch,Digital SoC ASIC Physical Implementation Engineer (f/m/div.),2014,smartrecruiters|bosch|id:744000144277290,near,0.9985
+smartrecruiters|bosch|id:744000133922149,2421,Bosch,I&C Technician (f/m/div.) Building Automation for Bundeswehr Objects – Hanover Area,2043,smartrecruiters|bosch|id:744000143773629,near,0.9502
+smartrecruiters|bosch|id:744000138594158,2300,Bosch,"Kitchen Assistant (part-time, f/m/div.)",2072,smartrecruiters|bosch|id:744000143077028,near,0.9552
+smartrecruiters|bosch|id:744000141687979,2145,Bosch,Technical Sales Representative (f/m/div.) Building Automation in the Office,2088,smartrecruiters|bosch|id:744000142828430,near,0.9862
+smartrecruiters|bosch|id:744000139534034,2254,Bosch,Technical Sales Representative (f/m/div.) Building Automation in the Office,2088,smartrecruiters|bosch|id:744000142828430,near,0.9798
+smartrecruiters|bosch|id:744000139530095,2255,Bosch,Technical Sales Representative (f/m/div.) Building Automation in the Office,2088,smartrecruiters|bosch|id:744000142828430,near,0.9808
+smartrecruiters|bosch|id:744000123671740,2527,Bosch,Technical Sales Representative (f/m/div.) Building Automation in the Office,2088,smartrecruiters|bosch|id:744000142828430,near,0.9635
+smartrecruiters|bosch|id:744000139570018,2250,Bosch,Technical Sales Representative (f/m/div.) Building automation in the field,2090,smartrecruiters|bosch|id:744000142820745,near,0.9882
+smartrecruiters|bosch|id:744000139569329,2251,Bosch,Technical Sales Representative (f/m/div.) Building automation in the field,2090,smartrecruiters|bosch|id:744000142820745,near,0.9838
+smartrecruiters|bosch|id:744000139566549,2252,Bosch,Technical Sales Representative (f/m/div.) Building automation in the field,2090,smartrecruiters|bosch|id:744000142820745,near,0.9889
+smartrecruiters|bosch|id:744000147257909,3171,Bosch,Technical Sales Representative (m/f/div.) Building Automation in the Field,2090,smartrecruiters|bosch|id:744000142820745,near,0.9956
+smartrecruiters|bosch|id:744000140494870,2207,Bosch,Electronics Technician / Safety Technician - Büchel Area (f/m/div.),2098,smartrecruiters|bosch|id:744000142689789,near,0.9687
+smartrecruiters|bosch|id:744000134432440,2414,Bosch,Electronics technician / safety technician in the branch customer business for supra-regional use (f/m/div.),2201,smartrecruiters|bosch|id:744000140685509,near,0.9864
+smartrecruiters|bosch|id:744000128475199,2491,Bosch,Electronics technician / safety technician in the branch customer business for supra-regional use (f/m/div.),2201,smartrecruiters|bosch|id:744000140685509,near,0.9915
+smartrecruiters|bosch|id:744000128475159,2492,Bosch,Electronics technician / safety technician in the branch customer business for supra-regional use (f/m/div.),2201,smartrecruiters|bosch|id:744000140685509,near,0.9911
+smartrecruiters|bosch|id:744000151560889,5000,Bosch,Customer Service Technician in the Kempten area (f/m/div.),2227,smartrecruiters|bosch|id:744000140151929,near,0.9901
+smartrecruiters|bosch|id:744000151561279,4999,Bosch,Customer Service Technician Area Berlin/Brandenburg (f/m/div.),2228,smartrecruiters|bosch|id:744000140151499,near,0.9906
+smartrecruiters|bosch|id:744000148955546,4307,Bosch,PhD - Lab-on-a-Chip Sample Preparation for Next-Generation Molecular Diagnostics,2272,smartrecruiters|bosch|id:744000139056170,near,0.9804
+smartrecruiters|bosch|id:744000151560895,4997,Bosch,Customer Service Technician in the Stralsund/Greifswald area (f/m/div.),2288,smartrecruiters|bosch|id:744000138852961,near,0.9907
+smartrecruiters|bosch|id:744000147173899,3188,Bosch,Mandatory Internship Automation Operational Logistics,2293,smartrecruiters|bosch|id:744000138787239,near,0.989
+smartrecruiters|bosch|id:744000148411819,4344,Bosch,Mandatory Internship Automation Operational Logistics,2293,smartrecruiters|bosch|id:744000138787239,near,0.9526
+smartrecruiters|bosch|id:744000148958989,4299,Bosch,PhD – Development of a novel lab-on-a-chip component for the analysis and sorting of individual cells,2297,smartrecruiters|bosch|id:744000138611014,near,0.9858
+smartrecruiters|bosch|id:744000137485139,2326,Bosch,"Internship in the field of change, communication and training management",2325,smartrecruiters|bosch|id:744000137485509,near,0.9925
+smartrecruiters|bosch|id:744000148957943,4301,Bosch,PhD Position – Security Contracts for Physical AI,2338,smartrecruiters|bosch|id:744000137081169,near,0.9772
+smartrecruiters|bosch|id:744000135406429,2385,Bosch,Internship in Sales & Market Intelligence,2384,smartrecruiters|bosch|id:744000135418960,near,0.9888
+smartrecruiters|bosch|id:744000148957999,4305,Bosch,Promotion - Skalierbare und effiziente Reinforcement-Learning-Methoden für Physical AI,2418,smartrecruiters|bosch|id:744000134175220,near,0.9688
+smartrecruiters|bosch|id:744000112412912,2565,Bosch,I&C Technician (f/m/div.) Building Automation,2467,smartrecruiters|bosch|id:744000131044670,near,0.955
+smartrecruiters|bosch|id:744000128727634,2487,Bosch,Junior Sales Manager (f/m/div.) in technical sales,2486,smartrecruiters|bosch|id:744000128731988,near,0.9538
+smartrecruiters|bosch|id:744000151314969,5030,Bosch,Internship in the field of training,2513,smartrecruiters|bosch|id:744000126024649,near,0.9783
+smartrecruiters|bosch|id:744000145569249,2653,Bosch,Inspector I (PM),2603,smartrecruiters|bosch|id:744000146554084,near,0.9771
+smartrecruiters|bosch|id:744000143880538,2696,Bosch,Territory Sales Manager (Pro Channel) - Wisconsin and Upper Peninsula - Diablo Tools,2612,smartrecruiters|bosch|id:744000146544979,near,0.9518
+smartrecruiters|bosch|id:744000131662039,2845,Bosch,Mechanical Design Engineering Intern,2617,smartrecruiters|bosch|id:744000146471610,near,0.9611
+smartrecruiters|bosch|id:744000139517599,2794,Bosch,Wireless Research Scientist,2619,smartrecruiters|bosch|id:744000146296069,near,0.9797
+smartrecruiters|bosch|id:744000144547459,2680,Bosch,Machine Operator - Specialist III:Brazing - 3rd,2624,smartrecruiters|bosch|id:744000146236987,near,0.9715
+smartrecruiters|bosch|id:744000133929747,2840,Bosch,Machine Operator - 2ND SHIFT,2624,smartrecruiters|bosch|id:744000146236987,near,0.9625
+smartrecruiters|bosch|id:744000148509785,4416,Bosch,Electrical Engineer,2628,smartrecruiters|bosch|id:744000146064149,near,0.9922
+smartrecruiters|bosch|id:744000146046677,2631,Bosch,Shipping Material Handler - 1st Shift,2630,smartrecruiters|bosch|id:744000146047489,near,0.9847
+smartrecruiters|bosch|id:744000151647825,5093,Bosch,Maintenance Team Lead,2634,smartrecruiters|bosch|id:744000145999992,near,0.9885
+smartrecruiters|bosch|id:744000150781339,5114,Bosch,Warehouse Production Planner (2nd Shift),2647,smartrecruiters|bosch|id:744000145763799,near,0.9963
+smartrecruiters|bosch|id:744000150439689,4713,Bosch,"Territory Manager (Pro Channel) - Portland, OR - Diablo Tools",2648,smartrecruiters|bosch|id:744000145732724,near,0.9531
+smartrecruiters|bosch|id:744000145589689,2650,Bosch,AI Research Scientist- Multimodal Foundational Models,2649,smartrecruiters|bosch|id:744000145603254,near,0.9726
+smartrecruiters|bosch|id:744000148843109,4398,Bosch,HR Service Intern (Year Round),2660,smartrecruiters|bosch|id:744000145355009,near,0.9762
+smartrecruiters|bosch|id:744000150215539,4726,Bosch,Sr. System Engineer - Power Electronics,2667,smartrecruiters|bosch|id:744000144814189,near,0.981
+smartrecruiters|bosch|id:744000128594409,2859,Bosch,Senior AI Research Scientist- World Model,2669,smartrecruiters|bosch|id:744000144627757,near,0.9983
+smartrecruiters|bosch|id:744000144539529,2683,Bosch,Die Rebuild Associate - PA4 - 2nd shift,2682,smartrecruiters|bosch|id:744000144536104,near,0.9876
+smartrecruiters|bosch|id:744000144401969,2685,Bosch,Senior Research Scientist- Robotics AI,2684,smartrecruiters|bosch|id:744000144402069,near,0.9824
+smartrecruiters|bosch|id:744000144401864,2686,Bosch,Research Scientist- Vision-Language-Action (VLA) Models,2684,smartrecruiters|bosch|id:744000144402069,near,0.9521
+smartrecruiters|bosch|id:744000141742329,2750,Bosch,Maintenance Technician 2nd/3rd Shift,2692,smartrecruiters|bosch|id:744000144325499,near,0.9755
+smartrecruiters|bosch|id:744000134025994,2836,Bosch,Warehouse Team Lead (1st Shift),2694,smartrecruiters|bosch|id:744000144177611,near,0.9756
+smartrecruiters|bosch|id:744000151119109,5102,Bosch,Warehouse Team Lead (2nd Shift),2694,smartrecruiters|bosch|id:744000144177611,near,0.9915
+smartrecruiters|bosch|id:744000143847939,2700,Bosch,Global Quality Assurance Leader (Contact Center),2697,smartrecruiters|bosch|id:744000143854754,near,0.9658
+smartrecruiters|bosch|id:744000143853484,2699,Bosch,Global Workforce Management Leader (Contact Center),2698,smartrecruiters|bosch|id:744000143854179,near,0.9799
+smartrecruiters|bosch|id:744000149959639,4741,Bosch,Warehouse Associate II (1st Shift),2701,smartrecruiters|bosch|id:744000143610639,near,0.9881
+smartrecruiters|bosch|id:744000148253729,4432,Bosch,"Powertrain Solutions, Customer Innovation Engineer",2703,smartrecruiters|bosch|id:744000143599169,near,0.9631
+smartrecruiters|bosch|id:744000149922334,4743,Bosch,Customer Solutions Engineer - Manufacturing Diagnostics,2706,smartrecruiters|bosch|id:744000143584564,near,0.9932
+smartrecruiters|bosch|id:744000143148529,2723,Bosch,Sr Product Marketing Manager,2721,smartrecruiters|bosch|id:744000143148535,near,0.9688
+smartrecruiters|bosch|id:744000141810539,2747,Bosch,Research Scientist – Molecular Diagnostics,2746,smartrecruiters|bosch|id:744000141810639,near,0.9896
+smartrecruiters|bosch|id:744000139684009,2789,Bosch,Senior Sales Manager - Semiconductors,2770,smartrecruiters|bosch|id:744000140993029,near,0.9852
+smartrecruiters|bosch|id:744000147253329,3216,Bosch,Applied Solutions Engineer,2782,smartrecruiters|bosch|id:744000140075789,near,0.9703
+smartrecruiters|bosch|id:744000150444089,4712,Bosch,National Key Account Channel Manager – Linear Technologies,2791,smartrecruiters|bosch|id:744000139662606,near,0.968
+smartrecruiters|bosch|id:744000134928949,2830,Bosch,Indirect Tax Accountant,2801,smartrecruiters|bosch|id:744000137981129,near,0.9818
+smartrecruiters|bosch|id:744000136863482,2811,Bosch,Technical Lead- AI Cockpit,2810,smartrecruiters|bosch|id:744000136863450,near,0.9917
+smartrecruiters|bosch|id:744000136549769,2816,Bosch,"Engineering Specialist I-II (depending on exp) D shift, Wednesday - Friday, every other Saturday 6pm-6am",2815,smartrecruiters|bosch|id:744000136550049,near,0.9819
+smartrecruiters|bosch|id:744000134463998,2835,Bosch,Rotational Development Program – Finance – Mobility Company,2834,smartrecruiters|bosch|id:744000134464079,near,0.9831
+smartrecruiters|bosch|id:744000134024380,2838,Bosch,Warehouse Clerk (1st Shift),2837,smartrecruiters|bosch|id:744000134026009,near,0.9889
+smartrecruiters|bosch|id:744000129052860,2855,Bosch,Senior Principal Engineer- End-to-End AI Training Framework,2843,smartrecruiters|bosch|id:744000132989075,near,0.9742
+smartrecruiters|bosch|id:744000105708545,2889,Bosch,"Equipment Maintenance Technician Supervisor D Shift (Wednesday-Friday, every other Saturday 6pm-6am)",2853,smartrecruiters|bosch|id:744000129268829,near,0.9764
+smartrecruiters|bosch|id:744000148306050,4429,Bosch,Senior Controls Engineer - TPM,2875,smartrecruiters|bosch|id:744000121431098,near,0.9711
+smartrecruiters|bosch|id:744000105709029,2888,Bosch,"Equipment Maintenance Technician Level open: I-IV (depending on exp) A shift, Monday-Wednesday, every other Sunday 6am-6pm",2887,smartrecruiters|bosch|id:744000105708750,near,0.9527
+smartrecruiters|bosch|id:744000150025548,4645,Bosch,Lead Engineer Analog ASIC Design (f/m/div.),3202,smartrecruiters|bosch|id:744000146914218,near,0.9836
+smartrecruiters|bosch|id:744000148923429,4312,Bosch,Internship in international production coordination in the field of Bosch brake systems,4079,smartrecruiters|bosch|id:744000147510467,near,1.0
+smartrecruiters|bosch|id:744000151295609,5038,Bosch,Mandatory internship in commercial purchasing,4343,smartrecruiters|bosch|id:744000148414119,near,0.9878
+smartrecruiters|bosch|id:744000149511589,4696,Bosch,PhD - Predictive Occupancy World Models for End-to-End Autonomous Driving,4380,smartrecruiters|bosch|id:744000147844939,near,0.9921
+smartrecruiters|bosch|id:744000150779830,5115,Bosch,Warehouse Supervisor,4400,smartrecruiters|bosch|id:744000148827290,near,0.9754
+smartrecruiters|bosch|id:744000148250710,4438,Bosch,Design Engineer Intern,4433,smartrecruiters|bosch|id:744000148252267,near,0.9852
+smartrecruiters|bosch|id:744000151297029,5036,Bosch,Master Thesis Data-Driven Identification and Forecasting of Thermal Flexibility in Residential Heat Pump Systems,4656,smartrecruiters|bosch|id:744000149876229,near,0.9911
+smartrecruiters|bosch|id:744000151117694,5101,Bosch,Warehouse Associate II (2nd Shift),4749,smartrecruiters|bosch|id:744000149673920,near,0.9744
+smartrecruiters|bosch|id:744000150737489,5117,Bosch,Key Account Manager - Central US,4756,smartrecruiters|bosch|id:744000149402799,near,0.9836
+jobylon|einride|id:375221,2908,Einride,Transportation Manager,2907,jobylon|einride|id:375207,near,0.9684
+jobylon|einride|id:382858,4763,Einride,Regional Planner,4762,jobylon|einride|id:382860,near,0.9722
+lever|plus ai|id:4aab103f-545f-4600-bf99-8211f229ee60,3227,Plus AI,"Senior/Staff Software Engineer, Motion Planning",2948,lever|plus ai|id:81d9b66d-bbc1-4ae8-b1f2-8846e9e95a45,near,0.9797
+greenhouse|wayve|id:8761847002,2972,Wayve,Controls Engineer,2971,greenhouse|wayve|id:8761759002,near,0.9732
+greenhouse|wayve|id:8804208002,4766,Wayve,"Data Engineer, Application Software",2974,greenhouse|wayve|id:8644800002,near,0.9883
+greenhouse|wayve|id:8727973002,3056,Wayve,"Senior Embedded Software Test Engineer, Onboard Test Automation",2985,greenhouse|wayve|id:8594608002,near,0.9635
+greenhouse|wayve|id:8551387002,2993,Wayve,"Feature Owner, ADAS",2992,greenhouse|wayve|id:8648407002,near,0.9945
+greenhouse|wayve|id:8648406002,2995,Wayve,"Feature Owner, ADAS",2992,greenhouse|wayve|id:8648407002,near,0.9957
+greenhouse|wayve|id:8815458002,4771,Wayve,Fleet Service and Maintenance Technician,2998,greenhouse|wayve|id:8747268002,near,0.9713
+greenhouse|wayve|id:8782351002,4112,Wayve,Forensics Engineer,3001,greenhouse|wayve|id:8725953002,near,0.9825
+greenhouse|wayve|id:8817423002,4772,Wayve,Global Head of Training,3004,greenhouse|wayve|id:8737235002,near,0.9926
+greenhouse|wayve|id:8568694002,3014,Wayve,"Machine Learning Engineer, App SW",3011,greenhouse|wayve|id:8431120002,near,0.9529
+greenhouse|wayve|id:8761943002,3036,Wayve,Principal Safety Case Architect,3035,greenhouse|wayve|id:8761832002,near,0.9712
+greenhouse|wayve|id:8743474002,3042,Wayve,Product Marketing Manager,3041,greenhouse|wayve|id:8743556002,near,0.9872
+greenhouse|wayve|id:8552547002,3047,Wayve,"Research Scientist, Wayve Labs",3046,greenhouse|wayve|id:8552515002,near,0.9958
+greenhouse|wayve|id:8552567002,3048,Wayve,"Research Scientist, Wayve Labs",3046,greenhouse|wayve|id:8552515002,near,0.9806
+greenhouse|wayve|id:8760631002,5130,Wayve,"Staff Research Scientist, Reinforce Learning",3046,greenhouse|wayve|id:8552515002,near,0.987
+greenhouse|wayve|id:8728411002,3054,Wayve,Senior Data Scientist,3053,greenhouse|wayve|id:8487888002,near,0.976
+greenhouse|wayve|id:8487813002,3080,Wayve,Staff Data Scientist,3053,greenhouse|wayve|id:8487888002,near,0.9817
+greenhouse|wayve|id:8810531002,4768,Wayve,"Data Scientist, Data Quality & Provenance",3055,greenhouse|wayve|id:8738575002,near,0.9634
+greenhouse|wayve|id:8537458002,3092,Wayve,"Staff SRE, AI Infrastructure",3068,greenhouse|wayve|id:8458272002,near,0.9689
+greenhouse|wayve|id:8554444002,3079,Wayve,Solutions Architect,3078,greenhouse|wayve|id:8624759002,near,0.9959
+greenhouse|wayve|id:8545642002,3098,Wayve,Supply Chain Program Manager,3097,greenhouse|wayve|id:8627776002,near,0.9524
+greenhouse|wayve|id:8602921002,3112,Wayve,Technical Program Manager,3111,greenhouse|wayve|id:8739398002,near,0.9751
+greenhouse|wayve|id:8815521002,4793,Wayve,Trainer,3114,greenhouse|wayve|id:8601206002,near,0.9705
+greenhouse|wayve|id:8781849002,3229,Wayve,Technical Program Manager,3228,greenhouse|wayve|id:8782031002,near,0.989
+greenhouse|wayve|id:8802868002,4790,Wayve,"Staff Software Engineer - OS, Robot Software",4454,greenhouse|wayve|id:8731884002,near,0.9756
+hotjob|horizon|id:698735c6be908548be108261,3415,Horizon,PD Engineer,3337,hotjob|horizon|id:6a3cfed41d4c30777af08c42,near,0.9739
+hotjob|horizon|id:68ff170ec30dea2edc0b3af8,3450,Horizon,[Saturn PDU] Perception algorithm expert,3382,hotjob|horizon|id:69f076c91f17c372511dfc93,near,0.9804
+hotjob|horizon|id:69a8e2d7be908548be2ac166,4124,Horizon,Perception Algorithm Engineer (End-to-End Direction),4122,hotjob|horizon|id:6a59c28953b4650cd32309d9,near,0.9981
+gm|gm|id:JR-202605220,3830,GM,Staff ML Infrastructure Engineer - Embodied AI Scaling Foundations,3808,gm|gm|id:JR-202602491,near,0.9569
+moka|inceptio.ai|id:7082909d-68e7-4143-a85e-1d5cffb7f10e,3901,Inceptio.ai,Decision planning algorithm engineering,3867,moka|inceptio.ai|id:0720a49d-8b4c-4bfe-87ea-a1f3312d0a43,near,0.9726

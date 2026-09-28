@@ -1,6 +1,10 @@
 -- AV Job Profiles relational database foundation
 -- Target: MySQL 8.0.16+
 -- All timestamps are UTC. Application connections should also use UTC.
+-- This is the project's single schema: run_pipeline_v2.py writes here.
+-- Identifier and hash columns use binary collations. The database default
+-- (utf8mb4_0900_ai_ci) ignores case and accents, so it would treat IDs that
+-- differ only in case as duplicates.
 
 CREATE DATABASE IF NOT EXISTS av_job_profiles
   CHARACTER SET utf8mb4
@@ -38,7 +42,7 @@ CREATE TABLE import_rejections (
   import_rejection_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   import_batch_id BIGINT UNSIGNED NOT NULL,
   source_row_number INT UNSIGNED NULL,
-  source_key VARCHAR(191) NULL,
+  source_key VARCHAR(191) COLLATE utf8mb4_bin NULL,
   error_code VARCHAR(64) NOT NULL,
   error_message TEXT NOT NULL,
   raw_record JSON NULL,
@@ -90,7 +94,7 @@ CREATE TABLE job_sources (
 
 CREATE TABLE collection_runs (
   collection_run_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  run_key VARCHAR(96) NOT NULL,
+  run_key VARCHAR(96) COLLATE utf8mb4_bin NOT NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'pending',
   pipeline_version VARCHAR(64) NULL,
   git_commit_sha CHAR(40) NULL,
@@ -128,9 +132,9 @@ CREATE TABLE source_run_results (
 
 CREATE TABLE jobs (
   job_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  source_key VARCHAR(191) NOT NULL,
+  source_key VARCHAR(191) COLLATE utf8mb4_bin NOT NULL,
   source_id VARCHAR(64) NOT NULL,
-  source_job_id VARCHAR(255) NULL,
+  source_job_id VARCHAR(255) COLLATE utf8mb4_bin NULL,
   advertised_job_title VARCHAR(512) NULL,
   job_description LONGTEXT NULL,
   job_url VARCHAR(2048) NULL,
@@ -150,7 +154,13 @@ CREATE TABLE jobs (
   latest_collected_at DATETIME(6) NOT NULL,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   is_new_in_latest_run BOOLEAN NOT NULL DEFAULT FALSE,
-  content_hash CHAR(64) NULL,
+  -- SHA-1 of the whitespace-normalised description (clean._content_hash).
+  content_hash CHAR(40) CHARACTER SET ascii COLLATE ascii_bin NULL,
+  -- Set when dedupe folds this posting into an earlier one: an exact hash match,
+  -- or near-identical text from the same company. Duplicates are not analysed.
+  duplicate_of_job_id BIGINT UNSIGNED NULL,
+  duplicate_type VARCHAR(8) NULL,
+  duplicate_similarity DECIMAL(5,4) NULL,
   import_batch_id BIGINT UNSIGNED NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
@@ -163,18 +173,27 @@ CREATE TABLE jobs (
   KEY idx_jobs_last_seen (last_seen_date),
   KEY idx_jobs_country (country_code),
   KEY idx_jobs_import_batch (import_batch_id),
+  KEY idx_jobs_duplicate_of (duplicate_of_job_id),
   CONSTRAINT fk_jobs_source
     FOREIGN KEY (source_id) REFERENCES job_sources (source_id)
     ON DELETE RESTRICT,
   CONSTRAINT fk_jobs_import_batch
     FOREIGN KEY (import_batch_id) REFERENCES import_batches (import_batch_id)
     ON DELETE SET NULL,
+  CONSTRAINT fk_jobs_duplicate_of
+    FOREIGN KEY (duplicate_of_job_id) REFERENCES jobs (job_id)
+    ON DELETE SET NULL,
   CONSTRAINT chk_jobs_seen_dates
     CHECK (last_seen_date >= first_seen_date),
   CONSTRAINT chk_jobs_salary_range
     CHECK (salary_min IS NULL OR salary_max IS NULL OR salary_max >= salary_min),
   CONSTRAINT chk_jobs_remote_type
-    CHECK (remote_type IS NULL OR remote_type IN ('onsite', 'hybrid', 'remote', 'unknown'))
+    CHECK (remote_type IS NULL OR remote_type IN ('onsite', 'hybrid', 'remote', 'unknown')),
+  CONSTRAINT chk_jobs_duplicate
+    CHECK (
+      (duplicate_type IS NULL OR duplicate_type IN ('exact', 'near'))
+      AND (duplicate_similarity IS NULL OR duplicate_similarity BETWEEN 0 AND 1)
+    )
 ) ENGINE=InnoDB;
 
 -- Immutable snapshots preserve what was seen in each collection. The jobs table
@@ -191,7 +210,7 @@ CREATE TABLE job_observations (
   date_posted DATETIME(6) NULL,
   collected_at DATETIME(6) NOT NULL,
   is_active_at_run BOOLEAN NOT NULL DEFAULT TRUE,
-  content_hash CHAR(64) NULL,
+  content_hash CHAR(40) CHARACTER SET ascii COLLATE ascii_bin NULL,
   raw_payload_json JSON NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (job_observation_id),
@@ -209,10 +228,13 @@ CREATE TABLE job_observations (
 -- ---------------------------------------------------------------------------
 -- Classification and skill layer
 -- ---------------------------------------------------------------------------
+-- The reference answers and any human annotations are stored as analysis runs of
+-- their own (result_origin 'imported' / 'manual'), so agreement between a method
+-- and the references is a join between two runs on job_id.
 
 CREATE TABLE analysis_runs (
   analysis_run_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  run_key VARCHAR(96) NOT NULL,
+  run_key VARCHAR(96) COLLATE utf8mb4_bin NOT NULL,
   method VARCHAR(32) NOT NULL,
   provider VARCHAR(64) NULL,
   model_name VARCHAR(128) NULL,
@@ -222,6 +244,10 @@ CREATE TABLE analysis_runs (
   code_version VARCHAR(64) NULL,
   source_dataset_version VARCHAR(128) NULL,
   parameters_json JSON NULL,
+  -- Totals for paid model calls, from the billed usage the API reports.
+  prompt_tokens BIGINT UNSIGNED NULL,
+  output_tokens BIGINT UNSIGNED NULL,
+  cost_usd DECIMAL(12,6) NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'pending',
   notes TEXT NULL,
   started_at DATETIME(6) NOT NULL,
@@ -248,18 +274,31 @@ CREATE TABLE job_analyses (
   relevance_confidence DECIMAL(5,4) NULL,
   relevance_confidence_label VARCHAR(24) NULL,
   relevance_reason TEXT NULL,
-  technical_responsibilities TEXT NULL,
+  technical_responsibilities TEXT NULL,   -- the reference answers' summary field
+  role_summary TEXT NULL,                 -- v2's summary field
+  responsibilities_json JSON NULL,
+  requirements_json JSON NULL,
+  language_of_posting VARCHAR(64) NULL,
   generic_job_title VARCHAR(255) NULL,
   seniority_code VARCHAR(32) NULL,
   seniority_raw VARCHAR(128) NULL,
   seniority_source VARCHAR(32) NULL,
   seniority_evidence TEXT NULL,
-  seniority_conflict BOOLEAN NOT NULL DEFAULT FALSE,
+  seniority_conflict BOOLEAN NULL,        -- NULL = not checked by this method, not "no conflict"
   experience_min_years DECIMAL(5,1) NULL,
   experience_max_years DECIMAL(5,1) NULL,
   experience_evidence VARCHAR(1024) NULL,
   key_evidence_json JSON NULL,
   raw_response_json JSON NULL,
+  -- SHA-1 of the description the method read (clean._content_hash). A stored record
+  -- is reused only while the job's text still hashes the same.
+  input_content_hash CHAR(40) CHARACTER SET ascii COLLATE ascii_bin NULL,
+  -- Per-call provenance for model output: the host OpenRouter routed the call to,
+  -- and the billed usage.
+  served_by VARCHAR(64) NULL,
+  prompt_tokens INT UNSIGNED NULL,
+  output_tokens INT UNSIGNED NULL,
+  cost_usd DECIMAL(10,6) NULL,
   import_batch_id BIGINT UNSIGNED NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (job_analysis_id),
@@ -362,8 +401,11 @@ CREATE TABLE job_skills (
 
 CREATE TABLE cluster_runs (
   cluster_run_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  run_key VARCHAR(96) NOT NULL,
+  run_key VARCHAR(96) COLLATE utf8mb4_bin NOT NULL,
   analysis_run_id BIGINT UNSIGNED NOT NULL,
+  -- The postings this clustering covers. v2 clusters AV-relevant and other
+  -- postings separately: one analysis run, one cluster run per group.
+  population VARCHAR(24) NOT NULL DEFAULT 'all',
   algorithm VARCHAR(64) NOT NULL,
   algorithm_version VARCHAR(64) NULL,
   requested_cluster_count INT NULL,
@@ -378,12 +420,14 @@ CREATE TABLE cluster_runs (
   PRIMARY KEY (cluster_run_id),
   UNIQUE KEY uq_cluster_runs_key (run_key),
   UNIQUE KEY uq_cluster_runs_pk_analysis (cluster_run_id, analysis_run_id),
-  KEY idx_cluster_runs_analysis (analysis_run_id),
+  KEY idx_cluster_runs_analysis (analysis_run_id, population),
   CONSTRAINT fk_cluster_runs_analysis
     FOREIGN KEY (analysis_run_id) REFERENCES analysis_runs (analysis_run_id)
     ON DELETE RESTRICT,
   CONSTRAINT chk_cluster_run_status
-    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial'))
+    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial')),
+  CONSTRAINT chk_cluster_run_population
+    CHECK (population IN ('all', 'av_relevant', 'not_av_relevant'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE clusters (
@@ -439,8 +483,6 @@ CREATE TABLE cluster_label_revisions (
   reviewed_at DATETIME(6) NULL,
   PRIMARY KEY (cluster_label_revision_id),
   UNIQUE KEY uq_cluster_label_revision (cluster_pk, revision_number),
-  UNIQUE KEY uq_cluster_label_revision_cluster
-    (cluster_label_revision_id, cluster_pk),
   KEY idx_cluster_label_status (cluster_pk, label_status),
   CONSTRAINT fk_cluster_label_revision_cluster
     FOREIGN KEY (cluster_pk) REFERENCES clusters (cluster_pk)
@@ -461,11 +503,14 @@ CREATE TABLE cluster_label_revisions (
     )
 ) ENGINE=InnoDB;
 
+-- SET NULL, not RESTRICT: revisions are deleted with their cluster, and a RESTRICT
+-- pointer back to them blocked deleting any labelled cluster or cluster run. The
+-- application must point only at one of the cluster's own revisions.
 ALTER TABLE clusters
   ADD CONSTRAINT fk_clusters_current_label
-  FOREIGN KEY (current_label_revision_id, cluster_pk)
-  REFERENCES cluster_label_revisions (cluster_label_revision_id, cluster_pk)
-  ON DELETE RESTRICT;
+  FOREIGN KEY (current_label_revision_id)
+  REFERENCES cluster_label_revisions (cluster_label_revision_id)
+  ON DELETE SET NULL;
 
 CREATE TABLE job_cluster_assignments (
   job_analysis_id BIGINT UNSIGNED NOT NULL,
