@@ -14,6 +14,7 @@ SELECT
   js.region AS source_region,
   j.advertised_job_title,
   ja.generic_job_title,
+  COALESCE(NULLIF(TRIM(ja.generic_job_title), ''), j.advertised_job_title) AS display_title,
   j.job_url,
   j.location_raw,
   j.city,

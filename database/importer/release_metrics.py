@@ -114,6 +114,7 @@ def summarize_outcomes(
     analysis_count = len(analysis_ids)
     partition_sum = len(duplicate_ids) + analysis_count + len(unaccounted_ids)
     checks = {
+        "source_snapshot_not_empty": source_count > 0,
         "source_partition_balanced": partition_sum == source_count and not overlap_ids,
         "classification_partition_balanced": len(success_rows) == av_count + non_av_count + unknown_count,
         "no_duplicate_analysis_overlap": not overlap_ids,
@@ -216,10 +217,12 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
         assignment_rows = list(cursor.fetchall())
 
         cursor.execute(
-            "SELECT c.cluster_pk,c.population,c.size_cached,COUNT(jca.job_analysis_id) AS member_count "
+            "SELECT c.cluster_pk,c.population,c.size_cached,c.is_noise,c.cluster_name,clr.label_status,"
+            "COUNT(jca.job_analysis_id) AS member_count "
             "FROM clusters c LEFT JOIN job_cluster_assignments jca "
             "ON jca.cluster_pk=c.cluster_pk AND jca.cluster_run_id=c.cluster_run_id "
-            "WHERE c.cluster_run_id=%s GROUP BY c.cluster_pk,c.population,c.size_cached",
+            "LEFT JOIN cluster_label_revisions clr ON clr.cluster_label_revision_id=c.current_label_revision_id "
+            "WHERE c.cluster_run_id=%s GROUP BY c.cluster_pk,c.population,c.size_cached,c.is_noise,c.cluster_name,clr.label_status",
             (release["cluster_run_id"],),
         )
         cluster_rows = list(cursor.fetchall())
@@ -240,7 +243,7 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
         skillless_row = cursor.fetchone()
 
         cursor.execute(
-            "SELECT COUNT(DISTINCT job_id) AS visible_job_count,"
+            "SELECT COUNT(*) AS visible_job_rows,COUNT(DISTINCT job_id) AS visible_job_count,"
             "COUNT(DISTINCT company_id) AS visible_company_count "
             "FROM v_dashboard_jobs WHERE dashboard_release_id=%s",
             (release["dashboard_release_id"],),
@@ -292,7 +295,6 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
     for row in assignment_rows:
         job_analysis_id = int(row["job_analysis_id"])
         assignment_count_by_analysis[job_analysis_id] += 1
-        cluster_pk = int(row["cluster_pk"])
         relevance = _relevance(row.get("av_relevant"))
         expected_population = "av_relevant" if relevance is True else (
             "not_av_relevant" if relevance is False else None
@@ -321,6 +323,25 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
     visible_cluster_count = int((public_cluster_leaks or {}).get("visible_cluster_count") or 0)
     visible_non_av_cluster_count = int((public_cluster_leaks or {}).get("visible_non_av_cluster_count") or 0)
     expected_public_jobs = metrics["av_postings"] if release["status"] == "published" else 0
+    expected_public_companies = metrics["companies_with_av_postings"] if release["status"] == "published" else 0
+    expected_public_skilled = metrics["av_postings"] - visible_skillless if release["status"] == "published" else 0
+    visible_skilled = int((public_skills or {}).get("visible_skilled_job_count") or 0)
+    unnamed_av_clusters = sum(
+        row.get("population") == "av_relevant" and int(row["member_count"]) > 0
+        and not bool(row.get("is_noise"))
+        and (not row.get("cluster_name") or row.get("label_status") != "approved")
+        for row in cluster_rows
+    )
+    av_noise_clusters = sum(
+        row.get("population") == "av_relevant" and int(row["member_count"]) > 0
+        and bool(row.get("is_noise"))
+        for row in cluster_rows
+    )
+    av_noise_postings = sum(
+        int(row["member_count"])
+        for row in cluster_rows
+        if row.get("population") == "av_relevant" and bool(row.get("is_noise"))
+    )
     expected_av_cluster_count = sum(
         row.get("population") == "av_relevant" and int(row["member_count"]) > 0
         for row in cluster_rows
@@ -337,6 +358,9 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
         "analysis_run_completed": release["analysis_run_status"] == "completed",
         "cluster_run_completed": release["cluster_run_status"] == "completed",
         "published_view_job_count_matches_av_count": visible_job_count == expected_public_jobs,
+        "public_job_rows_are_unique": int(public_jobs["visible_job_rows"]) == visible_job_count,
+        "published_company_count_matches_av_companies": visible_company_count == expected_public_companies,
+        "published_skilled_job_count_matches_av_skills": visible_skilled == expected_public_skilled,
         "public_job_view_is_av_only_and_release_scoped": public_job_violation_count == 0,
         "public_skill_view_is_av_only_and_release_scoped": public_skill_violation_count == 0,
         "published_cluster_view_matches_av_population": visible_cluster_count == expected_public_clusters,
@@ -348,6 +372,9 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
         "duplicate_cluster_assignments": duplicate_cluster_assignments,
         "cluster_size_mismatches": cluster_size_mismatches,
         "av_postings_without_skills": visible_skillless,
+        "av_clusters_without_approved_names": unnamed_av_clusters,
+        "av_noise_clusters": av_noise_clusters,
+        "av_noise_postings": av_noise_postings,
         "public_visible_av_postings": visible_job_count,
         "public_visible_companies": visible_company_count,
         "public_visible_skilled_postings": int((public_skills or {}).get("visible_skilled_job_count") or 0),
@@ -359,6 +386,11 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
     warnings = []
     if visible_skillless:
         warnings.append(f"{visible_skillless} AV-relevant posting(s) have no extracted skills")
+    if unnamed_av_clusters:
+        warnings.append(
+            f"{unnamed_av_clusters} regular AV cluster(s) have no approved name; "
+            "display an unlabelled state, not an invented occupation name"
+        )
     return {
         "status": "passed" if not errors else "failed",
         "release": {

@@ -62,7 +62,9 @@ The public views in `views.mysql.sql` apply the same release and population
 filter:
 
 - `v_dashboard_jobs`: AV-relevant, successful, non-duplicate job rows in the
-  release's collection snapshot.
+  release's collection snapshot. `display_title` uses a non-empty
+  `generic_job_title` when available, otherwise the collected
+  `advertised_job_title`; it does not create or persist a generic title.
 - `v_dashboard_job_skills`: skills linked to those same AV jobs.
 - `v_dashboard_skill_demand`: skill and company counts derived only from the
   AV-only skill view. Job counts use distinct `job_id`; company counts use
@@ -86,9 +88,29 @@ python database/weekly_import.py qa-release --release-key <release-key>
 The JSON report identifies the release and three linked runs, reports the
 internal partition counts, checks duplicate chains and cluster membership,
 counts AV jobs without skills, and compares the public view to the AV count.
+A non-empty source snapshot is required. For published releases it also checks
+unique job rows, company coverage and the number of AV jobs represented in the
+skill view. Missing approved names for **regular** AV clusters are reported as
+warnings; AV noise clusters and their postings are counted separately. A noise
+bucket is not a job family and should display as `Unclustered`. Unapproved
+regular clusters should display as `Unlabelled` until a reviewer approves a
+name; a cluster number or top keyword is not an approved occupation name.
+This permits a technical data release without falsely claiming role labels have
+been reviewed. It does not constitute client approval of classification quality.
 A non-passing QA result exits with a non-zero status and is written to the
 existing per-operation local report and append-only log.
 
 The report shows `public_visible_av_postings = 0` for an unpublished draft.
 For a published release, that count must equal `av_postings`. Publication
 remains a separate reviewed operation; running QA does not publish a release.
+
+## Deployment check after restoring a database
+
+A restored MySQL database may temporarily have stale cardinality estimates
+(for example, estimating a populated table as one row). Before measuring or
+publishing, refresh optimizer statistics on the populated base tables with
+`ANALYZE TABLE`, outside the publication transaction because it can implicitly
+commit. Then test the public views inside a rolled-back publication transaction
+on an isolated restored copy, including skill aggregates. Preserve the backup
+and local QA reports. Do not infer publication readiness solely from empty
+draft views.
