@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_cors import CORS
 
@@ -9,7 +8,6 @@ from app.routes.jobs import bp as jobs_bp
 
 
 def create_app(config_overrides=None, job_repository=None):
-    load_dotenv()
 
     app = Flask(__name__)
     app.config.from_object(Config)
