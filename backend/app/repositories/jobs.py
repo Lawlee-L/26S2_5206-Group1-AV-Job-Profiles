@@ -106,6 +106,30 @@ class JobRepository:
             },
         }
 
+    def list_companies(self):
+        rows = fetch_all(
+            """
+            SELECT
+                j.company_name,
+                COUNT(*) AS job_count
+            FROM v_dashboard_jobs AS j
+            WHERE j.is_active = TRUE
+              AND j.av_relevant = TRUE
+              AND j.company_name IS NOT NULL
+              AND TRIM(j.company_name) <> ''
+            GROUP BY j.company_name
+            ORDER BY job_count DESC, j.company_name ASC
+            """
+        )
+
+        return [
+            {
+                "name": row["company_name"],
+                "jobCount": int(row["job_count"]),
+            }
+            for row in rows
+        ]
+
     def get_job(self, source_key):
         row = fetch_one(
             f"""

@@ -20,6 +20,18 @@ class FakeJobRepository:
             "pagination": {"page": 1, "pageSize": 20, "total": 1, "totalPages": 1},
         }
 
+    def list_companies(self):
+        return [
+            {
+                "name": "Example AV",
+                "jobCount": 3,
+            },
+            {
+                "name": "Another AV Company",
+                "jobCount": 1,
+            },
+        ]
+
     def get_job(self, source_key):
         if source_key == "greenhouse|example|id:123":
             return {
