@@ -3,7 +3,7 @@
 **Week:** 10  
 **Date:** 28 September – 4 October 2026  
 **Team Lead / PM:** Nyx Chen  
-**Status:** Working plan. Proposed internal dates and minutes roles should be confirmed with the team.
+**Status:** Working plan. Internal dates and meeting availability should be confirmed with the team.
 
 The project is entering integration, not another planning-only week. The team should have a **video-ready Minimum Viable Product (MVP) by 4 October** as an **internal target**, leaving time to record individual videos. This is not an LMS submission date or a claim that every final feature is complete.
 
@@ -35,7 +35,7 @@ The project is entering integration, not another planning-only week. The team sh
   - [ ] Ask for advice on the smallest demonstrable end-to-end workflow, how to report unlabelled clusters and limited historical trend data, and whether the 13 October group report also requires a completed runnable MVP.
   - [ ] Check the plan for a client demonstration and feedback before the final group report.
   - [ ] Confirm action items, owners and dates; upload the minutes to `Meeting Minutes/Facilitator Meeting/`.  
-    **Proposed minutes owner:** Leon Nel Nel (rotation; confirm availability before the meeting).<br>
+    **Minutes owner:** Leon Nel Nel (assigned by rotation; please confirm availability or arrange a swap).<br>
     **Internal target:** 1 October.
 
 - Group Meeting — **Saturday, 3 October 2026, 12:00 PM (proposed regular slot)**
@@ -44,7 +44,7 @@ The project is entering integration, not another planning-only week. The team sh
   - [ ] Identify individual feature ownership and contribution evidence; each member chooses their own video content using the LMS instructions.
   - [ ] Review blockers and update owners/dates for the following week.
   - [ ] Upload minutes to `Meeting Minutes/Team Meeting/`.  
-    **Proposed minutes owner:** Thushamini Chathusika Hewa Pathegamage (rotation; confirm availability before the meeting).<br>
+    **Minutes owner:** Thushamini Chathusika Hewa Pathegamage (assigned by rotation; please confirm the meeting and your availability or arrange a swap).<br>
     **Internal target:** 4 October.
 
 - Weekly Team Accountability Document — **Sunday, 4 October 2026**
@@ -175,11 +175,10 @@ To complete after the Saturday group meeting: record what actually ran end to en
 
 | Week | Meeting | Minutes Owner | Status |
 | --- | --- | --- | --- |
-| Week 10 | Facilitator Meeting, 30 September | Leon Nel Nel | Proposed assignment; confirm availability |
-| Week 10 | Group Meeting, 3 October (proposed) | Thushamini Chathusika Hewa Pathegamage | Proposed assignment; confirm meeting and availability |
+| Week 10 | Facilitator Meeting, 30 September | Leon Nel Nel | Assigned; confirm availability |
+| Week 10 | Group Meeting, 3 October (proposed) | Thushamini Chathusika Hewa Pathegamage | Assigned; confirm meeting and availability |
 
-These suggestions balance the recorded rotation through Week 9: Leon has taken
-one set of minutes, and Thushamini is among the members with only two.
-Once both members confirm, update the central
-`Meeting Minutes/CITS5206 Meeting Minutes Rotation.md` record; arrange and
-record a swap there if either is unavailable.
+These assignments balance the actual `Recorded by` entries through Week 9:
+Leon has taken one set of minutes and Thushamini two. The central
+`Meeting Minutes/CITS5206 Meeting Minutes Rotation.md` records these assignments;
+update it if either member needs a swap.
