@@ -1,0 +1,148 @@
+# Week 10 Weekly Project Plan
+
+**Week:** 10  
+**Date:** 28 September – 4 October 2026  
+**Team Lead / PM:** Nyx Chen  
+**Status:** Working plan. Proposed internal dates and unassigned minutes roles should be confirmed with the team.
+
+---
+
+## 1. School Deliverables and Meetings
+
+- Individual assessments — **Tuesday, 29 September 2026, 11:59 PM (UTC+8)**
+  - [ ] Submit the Software Feature Report (Individual) through the Learning Management System (LMS).
+  - [ ] Submit the Professional Reflection (Individual) through LMS.
+    **Owner:** Each student for their own submissions.  
+    **Note:** Check the assessment pages for submission instructions and any individually approved adjustment; these are not group submissions.
+
+- Facilitator Meeting — **Wednesday, 30 September 2026, 11:30 AM–12:00 PM (UTC+8)**
+  - [ ] Confirm that Dr Sumayyah has the invitation, online meeting link and agenda.  
+    **Owner:** Li Luo (Facilitator Liaison), with agenda points coordinated by Nyx.  
+    **Internal target:** 29 September.
+  - [ ] Present a short, accurate progress update: collected and classified data, database import, frontend/backend integration and remaining gaps.
+  - [ ] Ask for advice on the smallest demonstrable end-to-end workflow and how to report unlabelled clusters and limited historical trend data.
+  - [ ] Confirm action items, owners and dates; upload the minutes to `Meeting Minutes/Facilitator Meeting/`.  
+    **Minutes owner:** To be confirmed in the rotation table before the meeting.  
+    **Internal target:** 1 October.
+
+- Group Meeting — **Saturday, 3 October 2026, 12:00 PM (proposed regular slot)**
+  - [ ] Check a live demonstration of the data-to-website path and identify anything still using mock data.
+  - [ ] Agree on the smallest stable project version and setup instructions each member can use for their own pitch video.
+  - [ ] Identify individual feature ownership and contribution evidence; each member chooses their own video content using the LMS instructions.
+  - [ ] Review blockers and update owners/dates for the following week.
+  - [ ] Upload minutes to `Meeting Minutes/Team Meeting/`.  
+    **Minutes owner:** To be confirmed in the rotation table.  
+    **Internal target:** 4 October.
+
+- Weekly Team Accountability Document — **Sunday, 4 October 2026**
+  - [ ] Put the blank Week 10 document in Microsoft Teams `Team – Shared` and remind each member to describe work actually completed.  
+    **Owner:** Nyx.
+  - [ ] Check that each member has filled in their own section; compile and upload the completed document to the CITS5206 Teams channel.  
+    **Owner:** Nyx.  
+    **Internal target:** 7:00 PM. The course document states a Sunday 8:00 PM upload deadline.
+
+- Project Pitch Video (Individual) — **Tuesday, 6 October 2026, 11:59 PM (UTC+8)**
+  - [ ] Each member checks the LMS brief and prepares, records and submits their own video.  
+    **Owner:** Each student.
+  - [ ] Provide a stable, runnable shared project version and setup notes by **Sunday, 4 October**. This leaves Monday, 5 October for individual recording and troubleshooting.  
+    **Owner:** Relevant module owners, coordinated by Nyx.
+
+---
+
+## 2. Weekly Project Goals
+
+- [ ] Agree on the minimum runnable project path: trace a real collected posting through classification, database, backend response and website display.
+- [ ] Bring the importer, database, backend and frontend together in one documented local setup; identify and remove demo-path mock data.
+- [ ] Show only validated autonomous-vehicle (AV) relevant jobs in public views, with counts reconciled to the published data release.
+- [ ] Prepare the client's three priority dashboard areas: job-count changes, skill demand and country-level locations. Mark any chart that lacks enough dated observations as a prototype rather than a measured trend.
+- [ ] Review classification limitations: one AV job has no extracted skills, 596 AV jobs are in the noise/unassigned cluster, and cluster names have not been approved.
+- [ ] Keep decisions, blockers, meeting minutes and progress visible in GitHub Issues or pull requests (PRs).
+- [ ] Let every member test the shared project early enough to prepare their own pitch video and describe their actual contribution.
+
+---
+
+## 3. Internal Task Allocation
+
+### Data collection and translation — Li Luo
+
+- [ ] Provide the latest dated collection/translation output and source-health summary, including new, changed, removed and failed-source counts.  
+  **Internal target:** 2 October.
+- [ ] Verify whether the WeRide/Moka posting with only a title has a retrievable detail description; record the result without inventing missing skills.  
+  **Internal target:** 3 October.
+- [ ] Explain which dated snapshots can support job-count changes. Do not equate cumulative history with a series of verified weekly classification results.
+
+### Classification and client liaison — Sunjol Singh Paul
+
+- [ ] Share a concise classification quality summary, including AV relevance, extracted skills, the noise group and reproducible run instructions.  
+  **Internal target:** 1 October.
+- [ ] Prepare a reviewable shortlist of the largest meaningful AV clusters with top terms and example titles; separate the noise group. Ask the team/client for label suggestions rather than treating proposed names as approved.  
+  **Internal target:** 2 October.
+- [ ] Follow up with Adrian on project progress, cluster-label review, the intended dashboard demonstration and any outstanding requirements. Copy or summarise the outcome for the team.  
+  **Internal target:** 2 October; client liaison remains with Sunjol.
+
+### Database and integration — Nyx Chen
+
+- [ ] Share the published local AV-only release counts and the database connection/read-view contract with Leon and Seonjeong; explain the current limitations.  
+  **Internal target:** 30 September.
+- [ ] Finish review of importer and AV-only dashboard PRs, include the latest quality-check fixes, and coordinate their review/integration in dependency order.  
+  **Internal target:** 2 October.
+- [ ] Pair with Leon and Sunjol on one repeatable integration check: a known `source_key` appears in the imported analysis, backend response and website with matching skills and relevance.  
+  **Internal target:** 3 October.
+- [ ] Record the setup commands, required environment variables, test result and known gaps so every member can run the project; do not include credentials.  
+  **Internal target:** 4 October.
+
+### Backend — Leon Nel Nel
+
+- [ ] Continue [backend Issue #42](https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles/issues/42): connect the backend to the published AV-only database views and expose the fields required by the website.  
+  **Internal target:** first working endpoint by 2 October.
+- [ ] Agree with Thushamini on response shapes and error handling; test a real job detail and a skills/company aggregate.  
+  **Internal target:** 3 October.
+- [ ] Document how to start the backend locally and report connection or schema blockers promptly.
+
+### Frontend — Thushamini Chathusika Hewa Pathegamage
+
+- [ ] Meet Leon to agree on the API contract and connect a real jobs list and detail page to the backend.  
+  **Internal target:** 2 October.
+- [ ] Mark any remaining mock or placeholder content and remove it from the shared working path that members may show in their individual videos.  
+  **Internal target:** 3 October.
+- [ ] Prepare a short user journey that members can explore in their own videos, and test loading, empty states and basic layout on a narrow screen.  
+  **Internal target:** 4 October.
+
+### Dashboard and analysis — Seonjeong Jeong
+
+- [ ] Confirm the dashboard fields and query/API needs with Leon and Nyx; use the published AV-only population for current counts and skill demand.  
+  **Internal target:** 1 October.
+- [ ] Prepare usable job-count, skills and country views for the demonstration. Where a genuine time series is unavailable, show the current snapshot and describe the missing historical data.  
+  **Internal target:** 3 October.
+- [ ] Help check whether proposed cluster labels are understandable from their top terms and example postings; keep proposals distinct from approved names.
+
+### All members
+
+- [ ] Complete individual assessments by the LMS deadline or the date in each person's approved adjustment.
+- [ ] Run the shared project by 4 October; report incorrect data, missing provenance or broken user flows before making an individual recording.
+- [ ] Prepare and submit the Project Pitch Video individually by 6 October, following the LMS brief.
+- [ ] Update personal GitHub task status and the Week 10 accountability entry with work actually done.
+
+---
+
+## 4. Integration Checkpoints and Risks
+
+| Checkpoint / risk | Practical response | Owner / target |
+| --- | --- | --- |
+| The individual Project Pitch Videos are due 6 October, shortly after Week 10 | Finish a stable shared project and setup notes by 4 October so each member has time to record their own video | Module owners, coordinated by Nyx / 4 October |
+| Frontend, backend and database still run separately | Agree on one `source_key` test case and run all three together | Nyx, Leon, Thushamini / 3 October |
+| Only one classified database run is available for some analyses | Do not present synthetic skill or cluster trends; document the snapshots required for real trend charts | Seonjeong, Nyx, Li / 3 October |
+| 115 AV cluster rows have no approved label, including one 596-job noise group | Request proposed names for meaningful clusters and a reviewer; keep noise visibly unassigned | Sunjol, Seonjeong / 3 October |
+| Client feedback or two difficult company sources may not arrive in time | Demonstrate the reliable in-scope data; report the limits and follow up separately | Sunjol, Li / 2 October |
+| Individual reports are due early in the week | Keep 28–29 September meetings and internal requests short; schedule integration work after those submissions | Nyx / 29 September |
+
+## 5. Week 10 Summary
+
+To complete after the Saturday group meeting: record what actually ran end to end, which tasks remain open, whether every member has the setup needed for an individual video, and the next owners/dates. Do not mark a task complete solely because code or sample data was uploaded.
+
+### Meeting Minutes Rotation
+
+| Week | Meeting | Minutes Owner | Status |
+| --- | --- | --- | --- |
+| Week 10 | Facilitator Meeting, 30 September | To be confirmed by 29 September | Upcoming |
+| Week 10 | Group Meeting, 3 October (proposed) | To be confirmed by 29 September | Proposed |
