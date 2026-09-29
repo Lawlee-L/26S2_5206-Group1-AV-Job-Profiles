@@ -1,7 +1,7 @@
 """Input contracts shared by CLI, GUI, and future importer adapters."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 
@@ -12,6 +12,8 @@ class CollectionFiles:
     snapshot: Path
     previous_snapshot: Path | None = None
     snapshot_generated_at: datetime | None = None
+    week_date: date | None = None
+    historical: bool = False
 
 
 @dataclass(frozen=True)
@@ -25,3 +27,4 @@ class AnalysisFiles:
     other_cluster_summary: Path
     duplicates: Path
     failures: Path
+    week_date: date | None = None

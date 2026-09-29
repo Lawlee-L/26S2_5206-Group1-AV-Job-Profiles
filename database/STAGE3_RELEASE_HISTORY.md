@@ -32,7 +32,7 @@ the team has no deployed shared database requiring migration yet.
 
 | Field | Meaning for a cumulative export |
 | --- | --- |
-| `collection_runs.snapshot_as_of_date` | Date of the newest source observation in the supplied cumulative file; date-level state only. |
+| `collection_runs.snapshot_as_of_date` | Explicit week label for the selected cumulative file (normally its dated deliverable folder), not the newest source observation or exact crawl time. |
 | `collection_runs.snapshot_generated_at` | Actual UTC export completion time, only when supplied. Never inferred. |
 | `collection_runs.started_at/completed_at` | Local importer operation time, not crawl time. |
 | `job_observations.collected_at` | NULL: the cumulative file does not prove this job was crawled in this run. |
@@ -47,15 +47,10 @@ times and per-source results. Failed or unexpected zero-result sources need
 investigation before a run is called complete.
 
 Two different files on one date have distinct file digests, but per-job
-timestamps do not order whole exports. A second same-date import requires
-the actual UTC export completion time:
-
-```powershell
-python database/weekly_import.py import-collection --input <file> `
-  --snapshot-generated-at 2026-09-29T11:42:00Z
-```
-
-If this time is unknown, do not invent one to force an import. The analysis
+timestamps do not order whole exports. Only one file may be selected as the
+official weekly version. The importer rejects a second file for that date;
+an actual UTC export time does not override this rule. Do not invent a time
+or date to force an import. The analysis
 run points to the exact `collection_run_id` and source file SHA-256 digest.
 Classifier hashes are compared with that run's `job_observations`, not the
 newest mutable `jobs` row. Thus later imports do not invalidate an earlier

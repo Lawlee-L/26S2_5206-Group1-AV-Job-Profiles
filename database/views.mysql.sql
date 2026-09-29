@@ -258,3 +258,94 @@ JOIN JSON_TABLE(r.payload_json, '$' COLUMNS (
   notes VARCHAR(1024) PATH '$.notes'
 )) AS snap
 WHERE dr.status='published' AND dr.snapshot_frozen_at IS NOT NULL;
+
+-- A weekly collection can be official before classification exists. These
+-- read-only views are the backend's version catalogue and historical inputs;
+-- draft analysis and non-AV classifier rows are never exposed here.
+CREATE OR REPLACE VIEW v_weekly_versions AS
+SELECT
+  wv.week_date,
+  wv.collection_run_id,
+  cr.run_key AS collection_run_key,
+  JSON_UNQUOTE(JSON_EXTRACT(cr.source_scope_json, '$.input_sha256')) AS collection_sha256,
+  cr.status AS collection_run_status,
+  cr.run_kind,
+  cr.time_quality,
+  cr.source_report_available,
+  wv.selected_analysis_run_id AS analysis_run_id,
+  ar.run_key AS analysis_run_key,
+  ar.status AS analysis_run_status,
+  dr.dashboard_release_id,
+  dr.release_key,
+  dr.status AS release_status,
+  CASE
+    WHEN wv.selected_analysis_run_id IS NULL THEN 'pending'
+    WHEN dr.snapshot_frozen_at IS NOT NULL AND dr.status IN ('published','retired') THEN 'ready'
+    ELSE 'imported_pending_release'
+  END AS classification_status
+FROM weekly_versions AS wv
+JOIN collection_runs AS cr ON cr.collection_run_id=wv.collection_run_id
+LEFT JOIN analysis_runs AS ar ON ar.analysis_run_id=wv.selected_analysis_run_id
+LEFT JOIN dashboard_releases AS dr
+  ON dr.analysis_run_id=wv.selected_analysis_run_id
+ AND dr.collection_run_id=wv.collection_run_id;
+
+CREATE OR REPLACE VIEW v_weekly_jobs AS
+SELECT
+  wv.week_date, wv.collection_run_id, j.job_id, j.source_key, j.source_id,
+  c.company_id, c.company_name,
+  jo.advertised_job_title, jo.job_url, jo.location_raw, jo.date_posted,
+  jo.first_seen_date, jo.last_seen_date, jo.state_as_of_date,
+  jo.source_last_collected_at, jo.is_active_at_run AS is_active,
+  jo.is_new_at_run AS is_new_in_run
+FROM weekly_versions AS wv
+JOIN job_observations AS jo ON jo.collection_run_id=wv.collection_run_id
+JOIN jobs AS j ON j.job_id=jo.job_id
+JOIN job_sources AS src ON src.source_id=j.source_id
+JOIN companies AS c ON c.company_id=src.company_id;
+
+CREATE OR REPLACE VIEW v_weekly_av_jobs AS
+SELECT
+  wv.week_date, dr.dashboard_release_id, dr.release_key,
+  snap.job_id, snap.source_key, snap.company_id, snap.company_name,
+  snap.advertised_job_title, snap.display_title, snap.job_url,
+  snap.location_raw, snap.date_posted, snap.is_active, snap.seniority_code,
+  snap.cluster_number, snap.cluster_name, snap.is_noise
+FROM weekly_versions AS wv
+JOIN dashboard_releases AS dr
+  ON dr.collection_run_id=wv.collection_run_id
+ AND dr.analysis_run_id=wv.selected_analysis_run_id
+JOIN dashboard_release_snapshot_rows AS r
+  ON r.dashboard_release_id=dr.dashboard_release_id AND r.row_kind='job'
+JOIN JSON_TABLE(r.payload_json, '$' COLUMNS (
+  job_id BIGINT PATH '$.job_id', source_key VARCHAR(191) PATH '$.source_key',
+  company_id BIGINT PATH '$.company_id', company_name VARCHAR(191) PATH '$.company_name',
+  advertised_job_title VARCHAR(512) PATH '$.advertised_job_title',
+  display_title VARCHAR(512) PATH '$.display_title',
+  job_url VARCHAR(2048) PATH '$.job_url', location_raw VARCHAR(1024) PATH '$.location_raw',
+  date_posted VARCHAR(40) PATH '$.date_posted', is_active TINYINT PATH '$.is_active',
+  seniority_code VARCHAR(32) PATH '$.seniority_code',
+  cluster_number INT PATH '$.cluster_number', cluster_name VARCHAR(255) PATH '$.cluster_name',
+  is_noise TINYINT PATH '$.is_noise'
+)) AS snap
+WHERE dr.status IN ('published','retired') AND dr.snapshot_frozen_at IS NOT NULL;
+
+CREATE OR REPLACE VIEW v_weekly_av_job_skills AS
+SELECT
+  wv.week_date, dr.dashboard_release_id, dr.release_key,
+  snap.job_id, snap.source_key, snap.company_id, snap.company_name,
+  snap.skill_id, snap.skill_name, snap.skill_type, snap.confidence
+FROM weekly_versions AS wv
+JOIN dashboard_releases AS dr
+  ON dr.collection_run_id=wv.collection_run_id
+ AND dr.analysis_run_id=wv.selected_analysis_run_id
+JOIN dashboard_release_snapshot_rows AS r
+  ON r.dashboard_release_id=dr.dashboard_release_id AND r.row_kind='job_skill'
+JOIN JSON_TABLE(r.payload_json, '$' COLUMNS (
+  job_id BIGINT PATH '$.job_id', source_key VARCHAR(191) PATH '$.source_key',
+  company_id BIGINT PATH '$.company_id', company_name VARCHAR(191) PATH '$.company_name',
+  skill_id BIGINT PATH '$.skill_id', skill_name VARCHAR(191) PATH '$.skill_name',
+  skill_type VARCHAR(32) PATH '$.skill_type',
+  confidence DECIMAL(5,4) PATH '$.confidence'
+)) AS snap
+WHERE dr.status IN ('published','retired') AND dr.snapshot_frozen_at IS NOT NULL;

@@ -31,6 +31,7 @@ if __package__:
         canonical_record_sha256,
         classifier_description_sha1,
     )
+    from .importer.weekly_versions import ensure_unselected_week, file_week_date, selected_collection
 else:  # Support the documented ``python database/weekly_import.py`` entry point.
     from importer import ImportErrorSafe
     from importer.hashing import (
@@ -38,6 +39,7 @@ else:  # Support the documented ``python database/weekly_import.py`` entry point
         canonical_record_sha256,
         classifier_description_sha1,
     )
+    from importer.weekly_versions import ensure_unselected_week, file_week_date, selected_collection
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -210,7 +212,9 @@ def load_collection(path: Path) -> tuple[list[dict[str, Any]], str]:
 
 
 def collection_plan(rows: list[dict[str, Any]], digest: str,
-                    previous_path: Path | None = None) -> dict[str, Any]:
+                    previous_path: Path | None = None,
+                    snapshot_path: Path | None = None) -> dict[str, Any]:
+    latest_source_date = max(r["latest_collected_at"] for r in rows).date()
     report: dict[str, Any] = {
         "file": "collection snapshot", "sha256": digest, "rows": len(rows),
         "hash_contract_version": HASH_CONTRACT_VERSION,
@@ -220,7 +224,9 @@ def collection_plan(rows: list[dict[str, Any]], digest: str,
         "active": sum(r["is_active"] for r in rows),
         "inactive": sum(not r["is_active"] for r in rows),
         "missing_description": sum(not r["job_description"] for r in rows),
-        "snapshot_date": max(r["latest_collected_at"] for r in rows).date().isoformat(),
+        "snapshot_date": file_week_date(snapshot_path, latest_source_date, None).isoformat()
+        if snapshot_path else latest_source_date.isoformat(),
+        "latest_source_collection_date": latest_source_date.isoformat(),
     }
     if previous_path:
         old, _ = load_collection(previous_path)
@@ -383,12 +389,14 @@ def release_import_lock(conn) -> None:
 
 def verify_schema(conn) -> None:
     required = {"import_batches", "import_job_undo", "companies", "job_sources", "collection_runs",
+                "weekly_versions",
                 "jobs", "job_observations", "analysis_runs", "job_analyses", "skills", "job_skills",
                 "job_deduplication_links", "cluster_runs", "clusters", "cluster_label_revisions", "job_cluster_assignments",
                 "cluster_skills", "dashboard_releases", "dashboard_release_snapshot_rows"}
     required_views = {"v_candidate_dashboard_jobs", "v_candidate_dashboard_job_skills",
                       "v_candidate_dashboard_clusters", "v_dashboard_jobs",
-                      "v_dashboard_job_skills", "v_dashboard_skill_demand", "v_dashboard_clusters"}
+                      "v_dashboard_job_skills", "v_dashboard_skill_demand", "v_dashboard_clusters",
+                      "v_weekly_versions", "v_weekly_jobs", "v_weekly_av_jobs", "v_weekly_av_job_skills"}
     with conn.cursor() as cur:
         cur.execute("SELECT VERSION() AS version")
         version = cur.fetchone()["version"]
@@ -543,7 +551,8 @@ def insert_job_undo(cur, batch_id: int, key: str, kind: str,
 
 
 def apply_collection(path: Path, backup_dir: Path,
-                     snapshot_generated_at: datetime | None = None) -> dict[str, Any]:
+                     snapshot_generated_at: datetime | None = None, *,
+                     week_date: date | None = None, historical: bool = False) -> dict[str, Any]:
     rows, digest = load_collection(path)
     conn = db_connect()
     try:
@@ -555,12 +564,20 @@ def apply_collection(path: Path, backup_dir: Path,
             if cur.fetchone():
                 raise ImportErrorSafe("This exact collection file has already been imported; refusing to duplicate it")
             latest_collected = max(r["latest_collected_at"] for r in rows)
-            run_date = latest_collected.date()
+            run_date = file_week_date(path, latest_collected.date(), week_date)
+            if historical and week_date is None:
+                raise ImportErrorSafe("Historical backfill requires an explicit --week-date")
+            ensure_unselected_week(cur, run_date)
             if snapshot_generated_at is not None and snapshot_generated_at < latest_collected:
                 raise ImportErrorSafe("Snapshot generation time predates a job's latest collection timestamp")
             cur.execute("SELECT metadata_json FROM import_batches WHERE batch_type='collection' "
-                        "AND status IN ('completed','partial') ORDER BY import_batch_id DESC LIMIT 1")
+                        "AND status IN ('completed','partial') "
+                        "AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(metadata_json, "
+                        "'$.historical_backfill')), 'false') <> 'true' "
+                        "ORDER BY import_batch_id DESC LIMIT 1")
             prior = cur.fetchone()
+            if historical and not prior:
+                raise ImportErrorSafe("Historical backfill needs existing canonical jobs; import the newest file first")
             if prior:
                 prior_meta = as_object(prior["metadata_json"])
                 prior_date = parse_date(prior_meta.get("snapshot_date"), "prior batch snapshot_date")
@@ -568,9 +585,12 @@ def apply_collection(path: Path, backup_dir: Path,
                                                  "prior batch latest_collected_at")
                 prior_generated = parse_datetime(prior_meta.get("snapshot_generated_at"),
                                                  "prior batch snapshot_generated_at")
-                if prior_date and run_date < prior_date:
+                if historical:
+                    if prior_date and run_date >= prior_date:
+                        raise ImportErrorSafe("--historical requires a date older than the latest normal import")
+                elif prior_date and run_date < prior_date:
                     raise ImportErrorSafe(f"This snapshot is older than the latest imported date {prior_date}")
-                if prior_date == run_date:
+                if not historical and prior_date == run_date:
                     if snapshot_generated_at is None:
                         raise ImportErrorSafe(
                             "Same-day cumulative rerun requires --snapshot-generated-at; "
@@ -579,7 +599,7 @@ def apply_collection(path: Path, backup_dir: Path,
                         raise ImportErrorSafe("Snapshot generation time is not newer than prior same-day export")
                     if not prior_generated and prior_collected and snapshot_generated_at <= prior_collected:
                         raise ImportErrorSafe("Snapshot generation time must follow prior known source collection")
-                elif prior_generated and snapshot_generated_at and snapshot_generated_at <= prior_generated:
+                elif not historical and prior_generated and snapshot_generated_at and snapshot_generated_at <= prior_generated:
                     raise ImportErrorSafe("Snapshot generation time is not newer than prior export")
             backup_path = backup_database(backup_dir)
             backup_digest = sha256_file(backup_path)
@@ -589,11 +609,12 @@ def apply_collection(path: Path, backup_dir: Path,
                 "INSERT INTO import_batches (batch_type,source_filename,file_sha256,status,total_rows,metadata_json) "
                 "VALUES ('collection',%s,%s,'running',%s,%s)",
                 (path.name, digest, len(rows), stable_json({"backup_file": str(backup_path),
-                 "backup_sha256": backup_digest, "run_key": run_key,
-                 "snapshot_date": run_date.isoformat(), "snapshot_sha256": digest,
-                 "snapshot_generated_at": snapshot_generated_at.isoformat() if snapshot_generated_at else None,
-                 "latest_collected_at": latest_collected.isoformat(),
-                 "source_ids": source_ids, "synthetic_snapshot": True})),
+                    "backup_sha256": backup_digest, "run_key": run_key,
+                    "snapshot_date": run_date.isoformat(), "snapshot_sha256": digest,
+                    "snapshot_generated_at": snapshot_generated_at.isoformat() if snapshot_generated_at else None,
+                    "historical_backfill": historical,
+                    "latest_collected_at": latest_collected.isoformat(),
+                    "source_ids": source_ids, "synthetic_snapshot": True})),
             )
             batch_id = cur.lastrowid
             cur.execute(
@@ -608,14 +629,26 @@ def apply_collection(path: Path, backup_dir: Path,
                  snapshot_generated_at, "exact_utc" if snapshot_generated_at else "date_only"),
             )
             collection_run_id = cur.lastrowid
+            cur.execute(
+                "INSERT INTO weekly_versions (week_date,collection_run_id) VALUES (%s,%s)",
+                (run_date, collection_run_id),
+            )
             created_company_ids: list[int] = []
             created_source_ids: list[str] = []
-            for source_id in source_ids:
-                record = next(r for r in rows if r["source_id"] == source_id)
-                ensure_source(cur, record["company"], source_id, record["platform"], record["region"],
-                              created_company_ids, created_source_ids)
+            if not historical:
+                for source_id in source_ids:
+                    record = next(r for r in rows if r["source_id"] == source_id)
+                    ensure_source(cur, record["company"], source_id, record["platform"], record["region"],
+                                  created_company_ids, created_source_ids)
 
             current = fetch_jobs_by_keys(cur, [r["source_key"] for r in rows])
+            if historical:
+                missing = sorted({r["source_key"] for r in rows} - set(current))
+                if missing:
+                    raise ImportErrorSafe(
+                        f"Historical file contains {len(missing)} jobs absent from current jobs "
+                        f"(first: {missing[0]}); rebuild a new database chronologically instead"
+                    )
             stats = Counter()
             job_ids: dict[str, int] = {}
             columns = list(JOB_VALUE_COLUMNS)
@@ -645,7 +678,10 @@ def apply_collection(path: Path, backup_dir: Path,
                 old = current.get(key)
                 if old is not None and old["source_id"] != record["source_id"]:
                     raise ImportErrorSafe(f"source_key {key!r} already belongs to another source_id")
-                if old is None:
+                if historical:
+                    job_id = old["job_id"]
+                    stats["historical_existing"] += 1
+                elif old is None:
                     cur.execute(insert_sql, values + (batch_id,))
                     job_id = cur.lastrowid
                     cur.execute("SELECT * FROM jobs WHERE job_id=%s", (job_id,))
@@ -678,6 +714,7 @@ def apply_collection(path: Path, backup_dir: Path,
                         "collection_run_id": collection_run_id, "snapshot_date": run_date.isoformat(),
                         "latest_collected_at": latest_collected.isoformat(),
                         "snapshot_generated_at": snapshot_generated_at.isoformat() if snapshot_generated_at else None,
+                        "historical_backfill": historical,
                         "hash_contract_version": HASH_CONTRACT_VERSION,
                         "snapshot_sha256": digest, "source_ids": source_ids,
                         "created_company_ids": created_company_ids, "created_source_ids": created_source_ids,
@@ -688,7 +725,8 @@ def apply_collection(path: Path, backup_dir: Path,
                         (len(rows), stable_json(metadata), batch_id))
         conn.commit()
         return {"status": "completed", "import_batch_id": batch_id, "collection_run_id": collection_run_id,
-                "run_key": run_key, "rows": len(rows), **dict(stats), "backup": str(backup_path),
+                "run_key": run_key, "week_date": run_date.isoformat(), "rows": len(rows), **dict(stats),
+                "backup": str(backup_path),
                 "backup_sha256": backup_digest}
     except Exception:
         conn.rollback()
@@ -982,11 +1020,16 @@ def get_or_create_skill(cur, name: str, skill_type: str,
 def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
                    av_summary_path: Path, other_summary_path: Path,
                    duplicates_path: Path, failures_path: Path, backup_dir: Path,
-                   git_commit: str | None = None) -> dict[str, Any]:
+                   git_commit: str | None = None, *, week_date: date | None = None) -> dict[str, Any]:
     if not git_commit or not re.fullmatch(r"[0-9a-fA-F]{7,64}", git_commit):
         raise ImportErrorSafe("Provide the classification pipeline Git commit with --git-commit (7–64 hex characters)")
     report = load_analysis(postings_path, metadata_path, source_path, av_summary_path, other_summary_path,
                            duplicates_path, failures_path)
+    if week_date is None:
+        raise ImportErrorSafe("Specify the official Li snapshot with --week-date")
+    file_week_date(source_path,
+                   max(row["last_seen_date"] for row in report["source_by_key"].values()),
+                   week_date)
     digest = report["analysis_sha256"]
     metadata = report["metadata"]
     conn = db_connect()
@@ -1017,6 +1060,7 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
             collection_run_id = source_meta.get("collection_run_id")
             if not collection_run_id:
                 raise ImportErrorSafe("The matching collection batch has no collection_run_id")
+            selected_collection(cur, week_date, collection_run_id)
             cur.execute(
                 "SELECT j.source_key,j.source_id,jo.content_hash,jo.record_hash_sha256 "
                 "FROM job_observations jo JOIN jobs j ON j.job_id=jo.job_id "
@@ -1188,17 +1232,26 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
                                 (cluster_pk, skill_id, rank, Decimal(count) / max(cluster_size, 1), count))
 
             release_key = f"draft-{digest[:24]}"
-            cutoff = max(r["last_seen_date"] for r in report["source_by_key"].values())
+            cutoff = week_date
             cur.execute("INSERT INTO dashboard_releases (release_key,collection_run_id,analysis_run_id,cluster_run_id,"
                         "data_cutoff_date,status,notes) VALUES (%s,%s,%s,%s,%s,'draft',%s)",
                         (release_key, collection_run_id, analysis_run_id, cluster_run_id, cutoff,
                          "Candidate release from imported Sunjol analysis. It requires QA and approval before publication."))
             release_id = cur.lastrowid
+            if not report["llm_failures"]:
+                cur.execute(
+                    "UPDATE weekly_versions SET selected_analysis_run_id=%s "
+                    "WHERE week_date=%s AND collection_run_id=%s AND selected_analysis_run_id IS NULL",
+                    (analysis_run_id, week_date, collection_run_id),
+                )
+                if cur.rowcount != 1:
+                    raise ImportErrorSafe("Official weekly analysis selection changed during import")
             batch_metadata = {"backup_file": str(backup_path), "backup_sha256": backup_digest,
                               "analysis_run_id": analysis_run_id,
                               "cluster_run_id": cluster_run_id, "dashboard_release_id": release_id,
                               "collection_run_id": collection_run_id, "source_input_sha256": digest_source,
-                              "analysis_sha256": digest, "created_skill_ids": skill_ids_created,
+                              "analysis_sha256": digest, "week_date": week_date.isoformat(),
+                              "created_skill_ids": skill_ids_created,
                               "analysis_key_count": report["postings"], "release_key": release_key}
             cur.execute("UPDATE import_batches SET status=%s,accepted_rows=%s,rejected_rows=%s,completed_at=UTC_TIMESTAMP(6),"
                         "metadata_json=%s WHERE import_batch_id=%s",
@@ -1305,6 +1358,7 @@ def rollback_latest(batch_id: int | None, backup_dir: Path) -> dict[str, Any]:
                 for company_id in metadata.get("created_company_ids", []):
                     cur.execute("DELETE FROM companies WHERE company_id=%s AND NOT EXISTS "
                                 "(SELECT 1 FROM job_sources WHERE company_id=%s)", (company_id, company_id))
+                cur.execute("DELETE FROM weekly_versions WHERE collection_run_id=%s ", (collection_run_id,))
                 cur.execute("DELETE FROM collection_runs WHERE collection_run_id=%s", (collection_run_id,))
             elif latest["batch_type"] == "analysis":
                 analysis_run_id = metadata.get("analysis_run_id")
@@ -1312,15 +1366,18 @@ def rollback_latest(batch_id: int | None, backup_dir: Path) -> dict[str, Any]:
                 release_id = metadata.get("dashboard_release_id")
                 if not all((analysis_run_id, cluster_run_id, release_id)):
                     raise ImportErrorSafe("Analysis batch audit metadata is incomplete; cannot undo safely")
-                cur.execute("SELECT status FROM dashboard_releases WHERE dashboard_release_id=%s", (release_id,))
+                cur.execute("SELECT status,snapshot_frozen_at FROM dashboard_releases "
+                            "WHERE dashboard_release_id=%s", (release_id,))
                 release = cur.fetchone()
-                if release and release["status"] == "published":
-                    raise ImportErrorSafe("This candidate release has been published; create a new corrective release instead")
+                if release and (release["status"] != "draft" or release["snapshot_frozen_at"] is not None):
+                    raise ImportErrorSafe("This release is frozen or published; create a new corrective release instead")
                 cur.execute("SELECT COUNT(*) AS n FROM clusters c JOIN cluster_label_revisions l USING (cluster_pk) "
                             "WHERE c.cluster_run_id=%s AND (l.label_status='approved' OR c.current_label_revision_id=l.cluster_label_revision_id)",
                             (cluster_run_id,))
                 if cur.fetchone()["n"]:
                     raise ImportErrorSafe("A cluster label from this run has been approved; preserve it and create a new run")
+                cur.execute("UPDATE weekly_versions SET selected_analysis_run_id=NULL "
+                            "WHERE selected_analysis_run_id=%s", (analysis_run_id,))
                 cur.execute("DELETE FROM dashboard_releases WHERE dashboard_release_id=%s", (release_id,))
                 cur.execute("DELETE FROM job_deduplication_links WHERE analysis_run_id=%s", (analysis_run_id,))
                 cur.execute("DELETE FROM job_cluster_assignments WHERE cluster_run_id=%s", (cluster_run_id,))

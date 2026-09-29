@@ -78,6 +78,7 @@ def _analysis_files_from_args(args: argparse.Namespace) -> AnalysisFiles:
         other_cluster_summary=args.other_summary,
         duplicates=args.duplicates,
         failures=args.failures,
+        week_date=getattr(args, "week_date", None),
     )
 
 
@@ -104,9 +105,13 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
     collection = subs.add_parser("import-collection", help="back up and import one cumulative Li snapshot")
     add_audit_dir(collection)
     collection.add_argument("--input", required=True, type=Path)
+    collection.add_argument("--week-date", type=date.fromisoformat,
+                            help="official weekly version date (YYYY-MM-DD); checked against file contents")
+    collection.add_argument("--historical", action="store_true",
+                            help="backfill an older week without changing latest jobs")
     collection.add_argument(
         "--snapshot-generated-at", type=str,
-        help="actual export completion time in ISO-8601 UTC; required for a second snapshot on one date",
+        help="actual export completion time in ISO-8601 UTC, if known; cannot override one official file per week",
     )
     collection.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
     analysis = subs.add_parser("import-analysis", help="back up and import validated Sunjol pipeline outputs")
@@ -115,6 +120,8 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
         analysis.add_argument("--" + name, required=True, type=Path)
     analysis.add_argument("--duplicates", required=True, type=Path)
     analysis.add_argument("--failures", required=True, type=Path)
+    analysis.add_argument("--week-date", required=True, type=date.fromisoformat,
+                          help="week of the official Li collection file used by this classification")
     analysis.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
     analysis.add_argument("--git-commit", required=True,
                           help="classification pipeline Git commit SHA (7–64 hex characters)")
@@ -135,6 +142,8 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
     publish = subs.add_parser("publish-release", help="freeze and publish a QA-checked draft")
     add_audit_dir(publish)
     publish.add_argument("--release-key", required=True)
+    publish.add_argument("--historical", action="store_true",
+                         help="freeze an older week's approved analysis without changing the current release")
     publish.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
     freeze = subs.add_parser("freeze-release", help="freeze an already-published legacy release")
     add_audit_dir(freeze)
@@ -173,7 +182,9 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
                 if raw_time.tzinfo is None or raw_time.utcoffset().total_seconds() != 0:
                     raise ImportErrorSafe("--snapshot-generated-at must include UTC (Z or +00:00)")
                 generated_at = raw_time.astimezone(timezone.utc).replace(tzinfo=None)
-            result = service.import_collection(CollectionFiles(args.input, snapshot_generated_at=generated_at),
+            result = service.import_collection(CollectionFiles(
+                args.input, snapshot_generated_at=generated_at,
+                week_date=args.week_date, historical=args.historical),
                                                args.backup_dir)
         elif args.command == "import-analysis":
             result = service.import_analysis(_analysis_files_from_args(args), args.backup_dir, args.git_commit)
@@ -191,7 +202,8 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
         elif args.command in {"publish-release", "freeze-release"}:
             result = service.publish_release(
                 args.release_key, args.backup_dir,
-                freeze_existing=args.command == "freeze-release")
+                freeze_existing=args.command == "freeze-release",
+                historical=getattr(args, "historical", False))
         elif args.command == "trend-readiness":
             result = service.trend_readiness()
         else:

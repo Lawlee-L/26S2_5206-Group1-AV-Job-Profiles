@@ -1,7 +1,8 @@
 -- AV Job Profiles relational database foundation
 -- Target: MySQL 8.0.16+
 -- All timestamps are UTC. Application connections should also use UTC.
--- This is the project's single schema: run_pipeline_v2.py writes here.
+-- This is the project's relational schema. The importer loads Li and Sunjol
+-- artifacts here; the classifier does not write directly to this database.
 -- Identifier and hash columns use binary collations. The database default
 -- (utf8mb4_0900_ai_ci) ignores case and accents, so it would treat IDs that
 -- differ only in case as duplicates.
@@ -304,6 +305,7 @@ CREATE TABLE analysis_runs (
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (analysis_run_id),
   UNIQUE KEY uq_analysis_runs_key (run_key),
+  UNIQUE KEY uq_analysis_collection_pair (analysis_run_id, collection_run_id),
   KEY idx_analysis_collection (collection_run_id),
   KEY idx_analysis_runs_completed (completed_at),
   CONSTRAINT fk_analysis_collection
@@ -313,6 +315,29 @@ CREATE TABLE analysis_runs (
     CHECK (method IN ('llm', 'dictionary', 'hybrid', 'manual')),
   CONSTRAINT chk_analysis_run_status
     CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial'))
+) ENGINE=InnoDB;
+
+-- A human-readable weekly version selects exactly one collection file. Analysis
+-- is optional and may be attached later; internal run IDs and file hashes still
+-- distinguish technical reruns from the selected weekly version.
+CREATE TABLE weekly_versions (
+  week_date DATE NOT NULL,
+  collection_run_id BIGINT UNSIGNED NOT NULL,
+  selected_analysis_run_id BIGINT UNSIGNED NULL,
+  created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+    ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (week_date),
+  UNIQUE KEY uq_weekly_collection (collection_run_id),
+  UNIQUE KEY uq_weekly_analysis (selected_analysis_run_id),
+  KEY idx_weekly_analysis_pair (selected_analysis_run_id, collection_run_id),
+  CONSTRAINT fk_weekly_collection
+    FOREIGN KEY (collection_run_id) REFERENCES collection_runs (collection_run_id)
+    ON DELETE RESTRICT,
+  CONSTRAINT fk_weekly_analysis_pair
+    FOREIGN KEY (selected_analysis_run_id, collection_run_id)
+    REFERENCES analysis_runs (analysis_run_id, collection_run_id)
+    ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 CREATE TABLE job_analyses (

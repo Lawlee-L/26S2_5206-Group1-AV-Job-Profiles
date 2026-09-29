@@ -75,8 +75,10 @@ def _materialize(engine: Any, connection: Any, release_id: int) -> dict[str, int
 
 
 def publish_release(engine: Any, release_key: str, backup_dir: Path,
-                    *, freeze_existing: bool = False) -> dict[str, Any]:
-    """Freeze a draft and publish it, or freeze one already-published legacy release."""
+                    *, freeze_existing: bool = False, historical: bool = False) -> dict[str, Any]:
+    """Freeze a draft for current or historical display without rewriting old snapshots."""
+    if freeze_existing and historical:
+        raise ImportErrorSafe("An existing published release cannot be frozen as a historical draft")
     connection = engine.db_connect()
     try:
         engine.acquire_import_lock(connection)
@@ -94,21 +96,34 @@ def publish_release(engine: Any, release_key: str, backup_dir: Path,
             if release["snapshot_frozen_at"] is not None:
                 raise ImportErrorSafe("Release is already frozen; refusing to change its snapshot")
             if not freeze_existing:
+                cursor.execute(
+                    "SELECT 1 FROM weekly_versions wv JOIN dashboard_releases dr "
+                    "ON dr.collection_run_id=wv.collection_run_id "
+                    "AND dr.analysis_run_id=wv.selected_analysis_run_id "
+                    "WHERE dr.release_key=%s",
+                    (release_key,),
+                )
+                if cursor.fetchone() is None:
+                    raise ImportErrorSafe("Release is not the selected classification for an official week")
                 qa = release_qa_report(connection, release_key)
                 if qa["status"] != "passed":
                     raise ImportErrorSafe("Draft release failed QA: " + ", ".join(qa["errors"]))
-                cursor.execute("SELECT release_key,snapshot_frozen_at FROM dashboard_releases "
-                               "WHERE status='published' FOR UPDATE")
-                current = cursor.fetchone()
-                if current and current["snapshot_frozen_at"] is None:
-                    raise ImportErrorSafe(
-                        "Existing published release is not frozen; run freeze-release on it first")
+                if not historical:
+                    cursor.execute("SELECT release_key,snapshot_frozen_at FROM dashboard_releases "
+                                   "WHERE status='published' FOR UPDATE")
+                    current = cursor.fetchone()
+                    if current and current["snapshot_frozen_at"] is None:
+                        raise ImportErrorSafe(
+                            "Existing published release is not frozen; run freeze-release on it first")
             # The backup is a recovery point, not a substitute for the transaction.
             backup = engine.backup_database(backup_dir)
             backup_hash = engine.sha256_file(backup)
             release_id = int(release["dashboard_release_id"])
             counts = _materialize(engine, connection, release_id)
-            if not freeze_existing:
+            if historical:
+                cursor.execute("UPDATE dashboard_releases SET status='retired' "
+                               "WHERE dashboard_release_id=%s", (release_id,))
+            elif not freeze_existing:
                 cursor.execute("UPDATE dashboard_releases SET status='retired' WHERE status='published'")
                 cursor.execute(
                     "UPDATE dashboard_releases SET status='published',published_at=UTC_TIMESTAMP(6) "
@@ -123,7 +138,8 @@ def publish_release(engine: Any, release_key: str, backup_dir: Path,
         return {"release_key": release_key, "snapshot_rows": counts,
                 "qa_status": final_qa["status"], "backup": str(backup),
                 "backup_sha256": backup_hash,
-                "action": "freeze_existing" if freeze_existing else "publish"}
+                "action": "freeze_existing" if freeze_existing else (
+                    "freeze_historical" if historical else "publish")}
     except Exception:
         connection.rollback()
         raise

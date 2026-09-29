@@ -32,7 +32,7 @@ class MySQLImporterBackend:
     def plan_collection(self, files: CollectionFiles) -> dict[str, Any]:
         engine = self._engine()
         rows, digest = engine.load_collection(files.snapshot)
-        return engine.collection_plan(rows, digest, files.previous_snapshot)
+        return engine.collection_plan(rows, digest, files.previous_snapshot, files.snapshot)
 
     def plan_analysis(self, files: AnalysisFiles) -> dict[str, Any]:
         engine = self._engine()
@@ -45,7 +45,10 @@ class MySQLImporterBackend:
         return {key: value for key, value in report.items() if key not in hidden}
 
     def import_collection(self, files: CollectionFiles, backup_dir: Path) -> dict[str, Any]:
-        return self._engine().apply_collection(files.snapshot, backup_dir, files.snapshot_generated_at)
+        return self._engine().apply_collection(
+            files.snapshot, backup_dir, files.snapshot_generated_at,
+            week_date=files.week_date, historical=files.historical,
+        )
 
     def import_analysis(
         self, files: AnalysisFiles, backup_dir: Path, git_commit: str
@@ -54,6 +57,7 @@ class MySQLImporterBackend:
             files.postings, files.metadata, files.source_snapshot,
             files.av_cluster_summary, files.other_cluster_summary,
             files.duplicates, files.failures, backup_dir, git_commit,
+            week_date=files.week_date,
         )
 
     def backup(self, backup_dir: Path) -> dict[str, Any]:
@@ -87,9 +91,9 @@ class MySQLImporterBackend:
             connection.close()
 
     def publish_release(self, release_key: str, backup_dir: Path,
-                        freeze_existing: bool = False) -> dict[str, Any]:
+                        freeze_existing: bool = False, historical: bool = False) -> dict[str, Any]:
         return publish_release(self._engine(), release_key, backup_dir,
-                               freeze_existing=freeze_existing)
+                               freeze_existing=freeze_existing, historical=historical)
 
     def trend_readiness(self) -> dict[str, Any]:
         engine = self._engine()
