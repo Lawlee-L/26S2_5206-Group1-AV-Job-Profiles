@@ -175,7 +175,7 @@ export default function Jobs() {
 
               {/* RIGHT */}
               <div className="jobs-list-right">
-                <span>{job.postedDate}</span>
+                <span>{job.date}</span>
 
                 <button
                   type="button"
