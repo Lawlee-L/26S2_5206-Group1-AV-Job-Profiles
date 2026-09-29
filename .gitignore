@@ -10,3 +10,4 @@ data-collection/data/run_reports/
 data-collection/data/translation/
 *.egg-info/
 data-collection/data/history/
+node_modules/
