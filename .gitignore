@@ -12,3 +12,4 @@ data-collection/data/translation/
 data-collection/data/history/
 /database/backups/
 /database/operation_logs/
+node_modules/
