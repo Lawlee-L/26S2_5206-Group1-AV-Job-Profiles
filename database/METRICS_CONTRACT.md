@@ -58,8 +58,11 @@ they must never use `2,902` as a hard-coded total.
 
 ## Public database views
 
-The public views in `views.mysql.sql` apply the same release and population
-filter:
+The internal `v_candidate_dashboard_*` views build rows from the release's
+linked collection observation, not the latest mutable `jobs` fields. At
+publication these rows are frozen in `dashboard_release_snapshot_rows`.
+The public views in `views.mysql.sql` read only the frozen published release
+and apply the same AV-only population filter:
 
 - `v_dashboard_jobs`: AV-relevant, successful, non-duplicate job rows in the
   release's collection snapshot. `display_title` uses a non-empty

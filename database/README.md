@@ -280,13 +280,14 @@ from disappearing silently.
 | --- | --- | --- | --- |
 | `companies` | Provide one canonical company identity instead of repeating inconsistent company names in every job. | Numeric `company_id`, canonical name, slug, optional website and headquarters country. | One company has many `job_sources`. Maintained by Li's source configuration/import process. |
 | `job_sources` | Describe each configured careers source from which jobs are collected. | Stable `source_id`, `company_id`, platform/ATS, region, endpoint, enabled flag and source configuration JSON. | One source belongs to one company and publishes many `jobs`; it also has one result per collection run. Written from the checked source configuration. |
-| `collection_runs` | Version one complete or partial execution of the collection pipeline. | Run ID/key, status, pipeline version, Git commit, source scope, notes, start/end timestamps. | Parent of `source_run_results` and `job_observations`. Written once per collection execution. |
-| `source_run_results` | Distinguish a genuinely removed job from a source that simply failed during collection. | Composite run/source key, success/failure/skipped status, job count, error message, snapshot path and completion time. | Joins `collection_runs` to `job_sources`. Written by Li's collection pipeline. |
+| `collection_runs` | Version a cumulative export or a verified crawl without confusing the two. | Run ID/key, kind, date/exact-time quality, source-report availability, operation times. | Parent of `source_run_results` and `job_observations`. The current importer records cumulative exports as partial, not complete crawls. |
+| `source_run_results` | Distinguish a genuinely removed job from a source that failed during collection. | Composite run/source key, success/failure/skipped status, job count, error message, snapshot path and completion time. | A future verified-crawl integration must write these; the current cumulative export has no such evidence and leaves this table empty. |
 | `jobs` | Store the latest canonical state of every known source advertisement for fast backend access. | Internal `job_id`, unique `source_key`, source job ID, title, description, URL, raw/normalised location, raw/normalised salary, posting/seen/collection dates, active/new flags, classifier `content_hash` (SHA-1), and change-detection `record_hash_sha256`. | One job belongs to one source and has many observations and analysis versions. Upserted by the collection importer; classification must not overwrite it. |
-| `job_observations` | Preserve what one job looked like in each collection run for history, change detection and trend charts. | Observation ID, job/run IDs, title, description, URL, raw location/salary, posting and collection dates, active-at-run flag, both hashes and optional raw payload. | Unique per `(job_id, collection_run_id)`. Appended by the collection importer and never edited as current state. |
+| `job_observations` | Preserve the full job state in each supplied export, including inactive jobs. | Job/run IDs, all dashboard source fields, state date, nullable actual observation time, last source collection time, active/new flags, hashes and raw payload. | Unique per `(job_id, collection_run_id)`. Appended by the importer. Cumulative-state rows are **not** real crawl observations for trend charts. |
 
-`jobs` is optimised for current Dashboard reads. `job_observations` preserves
-history for trend charts, auditing, and detecting changed/removed jobs.
+`jobs` holds the latest internal state; public Dashboard reads are release
+snapshots. `job_observations` supports auditing and change detection, but
+cumulative exports alone do not prove comparable trend points.
 
 ### 4.3 Classification and skill tables
 
@@ -323,6 +324,7 @@ overlap; cluster `29` in a later run may also represent a different group.
 | Table | Purpose | Main contents | Relationship and writer |
 | --- | --- | --- | --- |
 | `dashboard_releases` | Select one mutually consistent collection, analysis and clustering version for public Dashboard reads. | Release ID/key, collection/analysis/cluster run IDs, data cutoff date, draft/published/retired status, publication time and notes. | References the three versioned stages. Nyx creates drafts and changes status only after QA/owner approval; backend views read the single published row. |
+| `dashboard_release_snapshot_rows` | Freeze the exact rows displayed in a release. | Release ID, row kind (`job`, `job_skill`, `cluster`), entity key, JSON payload and SHA-256 row fingerprint. | Built transactionally at publication; public views read these rows, not mutable source tables. |
 
 Only one release can be `published`. Incomplete runs can remain stored without
 becoming visible to Dashboard users.
@@ -663,52 +665,20 @@ python -m pip install -r database/requirements-import.txt
 ```
 
 Set `AVDB_HOST`, `AVDB_PORT`, `AVDB_USER`, `AVDB_PASSWORD`, and `AVDB_NAME` in
-the local environment or secret manager. Never commit credentials. Choose one
-schema setup path:
+the local environment or secret manager. Never commit credentials. The team
+has **no shared deployed database** yet. For Stage 3 development, create a
+new empty MySQL database and apply `schema.mysql.sql`, then `views.mysql.sql`.
+Reimport the saved matching Li/Sunjol files. Do not overwrite a populated
+database, and do not replay old migration scripts on a fresh schema.
 
-- **New, empty database:** apply `schema.mysql.sql`, then `views.mysql.sql`.
-  The current schema already includes the results of migrations 001–005. Do
-  not replay those migrations: 001 and 002 create tables that already exist.
-- **Existing database with tables or data:** do not run `schema.mysql.sql` over
-  the existing tables. Take a full backup, restore it into an isolated MySQL
-  instance, inspect the existing table/column definitions, and apply only the
-  missing migrations in numeric order. Validate row counts, keys, hash
-  columns, and importer schema checks on that restored copy before applying
-  the same changes to the target database. After a successful upgrade, apply
-  `views.mysql.sql` to refresh the dashboard views. Migrations 001 and 002 are
-  one-time scripts and are not safe to replay blindly.
+The previous migration scripts 001–005 document older schema changes; they do
+**not** upgrade an arbitrary populated database to the Stage 3 contract. If
+the team later deploys a shared database, review its real schema, take a
+backup, and write/test a dedicated versioned migration then. For now, the
+local test database can be rebuilt from source artifacts.
 
-Migration files use `USE av_job_profiles`; an isolated test instance must use
-that database name unless the scripts are deliberately adapted and reviewed.
-The repository currently has no migration-version ledger, so an existing
-database's migration state must be established from its actual schema before
-recording any migration as applied. Do not infer it from a successful command
-on another database. Migration 004 preserves the previous 64-character record
-hash by renaming it to `record_hash_sha256`, then establishes the 40-character
-classifier `content_hash` and adds structured result/provenance fields. The
-importer checks expected lengths and case-sensitive collations before writing;
-it refuses a mismatched schema rather than truncate hashes or case-fold IDs.
-
-Migration 005 backfills `clusters.population` only when every cluster has
-successful, consistently AV or non-AV members. It stops if a cluster is empty,
-mixed, or has unknown/failed members. It then changes cluster-number uniqueness
-to `(cluster_run_id, population, cluster_number)`. Apply it after a backup and
-test restore, then apply `views.mysql.sql` so every public Dashboard view uses
-the AV-only rule. The new-database schema already includes this column and key.
-
-Migration 004 uses MySQL client `DELIMITER` directives for guarded, schema-aware
-changes; apply it with the MySQL command-line client, not by sending the whole
-file as one prepared SQL statement through a Python connector:
-
-```text
-mysql -u USER -p < database/migrations/004_unified_hash_and_analysis_contract.sql
-mysql -u USER -p < database/migrations/005_av_only_dashboard_population.sql
-```
-
-For old rows, migration 004 does not invent a classifier hash: new SHA-1 values
-and `input_content_hash` are populated on the next source/analysis import.
-Existing record SHA-256 values are preserved where their old meaning matches
-the six-field contract.
+The importer checks key collations and hash lengths before writing; it refuses
+an incompatible schema instead of truncating identifiers or hash values.
 
 ### Stable importer boundary
 
@@ -851,6 +821,8 @@ python database/weekly_import.py rollback
 python database/weekly_import.py backup
 python database/weekly_import.py restore --file path/to/av_job_profiles_TIMESTAMP.sql.gz --target-db av_job_profiles_restore
 python database/weekly_import.py qa-release --release-key <release-key>
+python database/weekly_import.py publish-release --release-key <draft-key>
+python database/weekly_import.py trend-readiness
 ```
 
 ## 15. Files and deployment
@@ -863,6 +835,7 @@ python database/weekly_import.py qa-release --release-key <release-key>
 - `views.mysql.sql`: stable read contract for the backend.
 - `SOURCE_MAPPING.md`: collection and classification field mapping and import contract.
 - `METRICS_CONTRACT.md`: release counts, QA checks, and the AV-only public display rule.
+- `STAGE3_RELEASE_HISTORY.md`: immutable release publication and time/trend semantics.
 
 For a **new, empty database only**:
 
@@ -871,9 +844,9 @@ mysql -u USER -p < database/schema.mysql.sql
 mysql -u USER -p < database/views.mysql.sql
 ```
 
-For an **existing database**, follow the backup, test-restore, schema-inspection,
-and selective-migration procedure in Section 14. Apply `views.mysql.sql` only
-after the necessary table migrations have succeeded.
+Do not run the fresh schema against an existing populated database. The
+development database can be rebuilt from the saved source files; any future
+deployed database would need its own reviewed migration plan.
 
 Database credentials must come from environment variables or the deployment
 platform's secret manager. They must not be committed to GitHub.

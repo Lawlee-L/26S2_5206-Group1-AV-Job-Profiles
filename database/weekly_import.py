@@ -413,7 +413,9 @@ def verify_schema(conn) -> None:
                     "FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND "
                     "((TABLE_NAME='jobs' AND COLUMN_NAME IN "
                     "('source_key','source_job_id','content_hash','record_hash_sha256')) OR "
-                    "(TABLE_NAME='job_observations' AND COLUMN_NAME IN ('content_hash','record_hash_sha256')) OR "
+                    "(TABLE_NAME='job_observations' AND COLUMN_NAME IN "
+                    "('content_hash','record_hash_sha256','advertised_job_title','first_seen_date',"
+                    "'last_seen_date','is_new_at_run','state_as_of_date')) OR "
                     "(TABLE_NAME='job_observations' AND COLUMN_NAME IN "
                     "('state_as_of_date','source_last_collected_at')) OR "
                     "(TABLE_NAME='collection_runs' AND COLUMN_NAME IN "
@@ -433,6 +435,8 @@ def verify_schema(conn) -> None:
         ("jobs", "content_hash"), ("jobs", "record_hash_sha256"),
         ("job_observations", "content_hash"), ("job_observations", "record_hash_sha256"),
         ("job_observations", "state_as_of_date"),
+        ("job_observations", "first_seen_date"), ("job_observations", "last_seen_date"),
+        ("job_observations", "is_new_at_run"),
         ("job_observations", "source_last_collected_at"),
         ("collection_runs", "run_kind"), ("collection_runs", "snapshot_as_of_date"),
         ("collection_runs", "snapshot_generated_at"), ("collection_runs", "time_quality"),
@@ -620,6 +624,21 @@ def apply_collection(path: Path, backup_dir: Path,
                           f"({','.join(['%s'] * len(insert_columns))})")
             update_columns = [c for c in columns if c != "source_key"] + ["import_batch_id"]
             update_sql = "UPDATE jobs SET " + ",".join(f"{c}=%s" for c in update_columns) + " WHERE job_id=%s"
+            observation_fields = (
+                "advertised_job_title", "job_description", "job_url", "location_raw",
+                "city", "state_region", "country_code", "remote_type", "salary_raw",
+                "salary_min", "salary_max", "salary_currency", "salary_period",
+                "date_posted", "first_seen_date", "last_seen_date",
+            )
+            observation_columns = (
+                "job_id", "collection_run_id", *observation_fields, "collected_at",
+                "state_as_of_date", "source_last_collected_at", "is_active_at_run",
+                "is_new_at_run", "content_hash", "record_hash_sha256", "raw_payload_json",
+            )
+            observation_sql = (
+                f"INSERT INTO job_observations ({','.join(observation_columns)}) VALUES "
+                f"({','.join(['%s'] * len(observation_columns))})"
+            )
             for record in rows:
                 key = record["source_key"]
                 values = tuple(record[c] for c in columns)
@@ -648,17 +667,13 @@ def apply_collection(path: Path, backup_dir: Path,
                     else:
                         stats["unchanged"] += 1
                 job_ids[key] = job_id
-                cur.execute(
-                    "INSERT INTO job_observations (job_id,collection_run_id,advertised_job_title,job_description,job_url,"
-                    "location_raw,salary_raw,date_posted,collected_at,state_as_of_date,"
-                    "source_last_collected_at,is_active_at_run,content_hash,record_hash_sha256,raw_payload_json) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                    (job_id, collection_run_id, record["advertised_job_title"], record["job_description"],
-                     record["job_url"], record["location_raw"], record["salary_raw"], record["date_posted"],
-                     None, run_date, record["latest_collected_at"], record["is_active"],
-                     record["content_hash"], record["record_hash_sha256"],
-                     stable_json(record["raw_record"])),
-                )
+                cur.execute(observation_sql, (
+                    job_id, collection_run_id,
+                    *(record[field] for field in observation_fields),
+                    None, run_date, record["latest_collected_at"], record["is_active"],
+                    record["is_new_in_latest_run"], record["content_hash"],
+                    record["record_hash_sha256"], stable_json(record["raw_record"]),
+                ))
             metadata = {"backup_file": str(backup_path), "backup_sha256": backup_digest, "run_key": run_key,
                         "collection_run_id": collection_run_id, "snapshot_date": run_date.isoformat(),
                         "latest_collected_at": latest_collected.isoformat(),

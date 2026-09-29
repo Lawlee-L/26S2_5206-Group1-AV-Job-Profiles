@@ -9,28 +9,28 @@ SELECT
   j.job_id,
   j.source_key,
   c.company_id,
-  c.company_name,
-  js.platform,
-  js.region AS source_region,
-  j.advertised_job_title,
+  JSON_UNQUOTE(JSON_EXTRACT(jo.raw_payload_json, '$.metadata.company')) AS company_name,
+  JSON_UNQUOTE(JSON_EXTRACT(jo.raw_payload_json, '$.metadata.platform')) AS platform,
+  JSON_UNQUOTE(JSON_EXTRACT(jo.raw_payload_json, '$.metadata.region')) AS source_region,
+  jo.advertised_job_title,
   ja.generic_job_title,
-  COALESCE(NULLIF(TRIM(ja.generic_job_title), ''), j.advertised_job_title) AS display_title,
-  j.job_url,
-  j.location_raw,
-  j.city,
-  j.state_region,
-  j.country_code,
-  j.remote_type,
-  j.salary_raw,
-  j.salary_min,
-  j.salary_max,
-  j.salary_currency,
-  j.salary_period,
-  j.date_posted,
-  j.first_seen_date,
-  j.last_seen_date,
-  j.is_active,
-  j.is_new_in_latest_run,
+  COALESCE(NULLIF(TRIM(ja.generic_job_title), ''), jo.advertised_job_title) AS display_title,
+  jo.job_url,
+  jo.location_raw,
+  jo.city,
+  jo.state_region,
+  jo.country_code,
+  jo.remote_type,
+  jo.salary_raw,
+  jo.salary_min,
+  jo.salary_max,
+  jo.salary_currency,
+  jo.salary_period,
+  jo.date_posted,
+  jo.first_seen_date,
+  jo.last_seen_date,
+  jo.is_active_at_run AS is_active,
+  jo.is_new_at_run AS is_new_in_latest_run,
   ja.av_relevant,
   ja.result_origin AS analysis_result_origin,
   ja.relevance_confidence,
@@ -53,6 +53,8 @@ JOIN job_analyses AS ja
   ON ja.analysis_run_id = dr.analysis_run_id
 JOIN jobs AS j
   ON j.job_id = ja.job_id
+JOIN job_observations AS jo
+  ON jo.job_id = j.job_id AND jo.collection_run_id = dr.collection_run_id
 JOIN job_sources AS js
   ON js.source_id = j.source_id
 JOIN companies AS c
@@ -68,12 +70,6 @@ WHERE dr.status IN ('draft', 'published')
   AND dr.collection_run_id IS NOT NULL
   AND ja.analysis_status = 'success'
   AND ja.av_relevant = TRUE
-  AND EXISTS (
-    SELECT 1
-    FROM job_observations AS jo
-    WHERE jo.job_id = j.job_id
-      AND jo.collection_run_id = dr.collection_run_id
-  )
   AND NOT EXISTS (
     SELECT 1
     FROM job_deduplication_links AS jdl
@@ -88,7 +84,7 @@ SELECT
   j.job_id,
   j.source_key,
   c.company_id,
-  c.company_name,
+  JSON_UNQUOTE(JSON_EXTRACT(jo.raw_payload_json, '$.metadata.company')) AS company_name,
   s.skill_id,
   s.canonical_name AS skill_name,
   s.skill_type,
@@ -99,6 +95,8 @@ JOIN job_analyses AS ja
   ON ja.analysis_run_id = dr.analysis_run_id
 JOIN jobs AS j
   ON j.job_id = ja.job_id
+JOIN job_observations AS jo
+  ON jo.job_id = j.job_id AND jo.collection_run_id = dr.collection_run_id
 JOIN job_sources AS src
   ON src.source_id = j.source_id
 JOIN companies AS c
@@ -111,12 +109,6 @@ WHERE dr.status IN ('draft', 'published')
   AND dr.collection_run_id IS NOT NULL
   AND ja.analysis_status = 'success'
   AND ja.av_relevant = TRUE
-  AND EXISTS (
-    SELECT 1
-    FROM job_observations AS jo
-    WHERE jo.job_id = j.job_id
-      AND jo.collection_run_id = dr.collection_run_id
-  )
   AND NOT EXISTS (
     SELECT 1
     FROM job_deduplication_links AS jdl
