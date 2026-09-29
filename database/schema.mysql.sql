@@ -114,6 +114,12 @@ CREATE TABLE collection_runs (
   pipeline_version VARCHAR(64) NULL,
   git_commit_sha CHAR(40) NULL,
   source_scope_json JSON NULL,
+  -- A cumulative export is not evidence that every source was crawled at this time.
+  run_kind VARCHAR(32) NOT NULL DEFAULT 'cumulative_state_export',
+  snapshot_as_of_date DATE NULL,
+  snapshot_generated_at DATETIME(6) NULL,
+  time_quality VARCHAR(24) NOT NULL DEFAULT 'date_only',
+  source_report_available BOOLEAN NOT NULL DEFAULT FALSE,
   notes TEXT NULL,
   started_at DATETIME(6) NOT NULL,
   completed_at DATETIME(6) NULL,
@@ -122,7 +128,11 @@ CREATE TABLE collection_runs (
   UNIQUE KEY uq_collection_runs_key (run_key),
   KEY idx_collection_runs_completed (completed_at),
   CONSTRAINT chk_collection_run_status
-    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial'))
+    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial')),
+  CONSTRAINT chk_collection_run_kind
+    CHECK (run_kind IN ('cumulative_state_export', 'verified_crawl')),
+  CONSTRAINT chk_collection_time_quality
+    CHECK (time_quality IN ('date_only', 'exact_utc'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE source_run_results (
@@ -212,7 +222,10 @@ CREATE TABLE job_observations (
   location_raw VARCHAR(1024) NULL,
   salary_raw VARCHAR(1024) NULL,
   date_posted DATETIME(6) NULL,
-  collected_at DATETIME(6) NOT NULL,
+  -- NULL for cumulative exports: no per-row crawl observation was supplied.
+  collected_at DATETIME(6) NULL,
+  state_as_of_date DATE NOT NULL,
+  source_last_collected_at DATETIME(6) NULL,
   is_active_at_run BOOLEAN NOT NULL DEFAULT TRUE,
   content_hash CHAR(40) CHARACTER SET ascii COLLATE ascii_bin NULL,
   record_hash_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
@@ -245,6 +258,8 @@ CREATE TABLE analysis_runs (
   taxonomy_version VARCHAR(64) NULL,
   code_version VARCHAR(64) NULL,
   source_dataset_version VARCHAR(128) NULL,
+  collection_run_id BIGINT UNSIGNED NULL,
+  source_snapshot_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
   parameters_json JSON NULL,
   -- Aggregate billed usage for paid model calls in this run, when supplied.
   prompt_tokens BIGINT UNSIGNED NULL,
@@ -257,7 +272,11 @@ CREATE TABLE analysis_runs (
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (analysis_run_id),
   UNIQUE KEY uq_analysis_runs_key (run_key),
+  KEY idx_analysis_collection (collection_run_id),
   KEY idx_analysis_runs_completed (completed_at),
+  CONSTRAINT fk_analysis_collection
+    FOREIGN KEY (collection_run_id) REFERENCES collection_runs (collection_run_id)
+    ON DELETE RESTRICT,
   CONSTRAINT chk_analysis_method
     CHECK (method IN ('llm', 'dictionary', 'hybrid', 'manual')),
   CONSTRAINT chk_analysis_run_status
@@ -593,6 +612,8 @@ CREATE TABLE dashboard_releases (
   data_cutoff_date DATE NOT NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'draft',
   published_at DATETIME(6) NULL,
+  snapshot_frozen_at DATETIME(6) NULL,
+  snapshot_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
   notes TEXT NULL,
   published_guard TINYINT
     GENERATED ALWAYS AS (CASE WHEN status = 'published' THEN 1 ELSE NULL END) STORED,
@@ -617,4 +638,21 @@ CREATE TABLE dashboard_releases (
     CHECK (status IN ('draft', 'published', 'retired')),
   CONSTRAINT chk_dashboard_release_published_at
     CHECK (status <> 'published' OR published_at IS NOT NULL)
+) ENGINE=InnoDB;
+
+-- Immutable, release-scoped copies of the exact rows exposed to the backend.
+-- They deliberately do not join mutable jobs, skills or current cluster labels.
+CREATE TABLE dashboard_release_snapshot_rows (
+  dashboard_release_id BIGINT UNSIGNED NOT NULL,
+  row_kind VARCHAR(16) NOT NULL,
+  entity_key VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  payload_json JSON NOT NULL,
+  row_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  PRIMARY KEY (dashboard_release_id, row_kind, entity_key),
+  KEY idx_release_snapshot_kind (row_kind),
+  CONSTRAINT fk_snapshot_release
+    FOREIGN KEY (dashboard_release_id) REFERENCES dashboard_releases (dashboard_release_id)
+    ON DELETE RESTRICT,
+  CONSTRAINT chk_release_snapshot_kind
+    CHECK (row_kind IN ('job', 'job_skill', 'cluster'))
 ) ENGINE=InnoDB;

@@ -52,10 +52,12 @@ truncate, compare, or reuse one hash as the other.
 The current history file is cumulative rather than a complete set of weekly
 snapshots. Each file import creates a synthetic collection run; its run key
 includes the snapshot date and file digest so distinct files from one day do
-not collide. The current `collected_at` written to observations is a synthetic
-end-of-day timestamp, not proof of the actual scrape time. A later history
-phase must separate actual observation, snapshot-generation, and import times
-before the team relies on fine-grained trend charts.
+not collide. For cumulative exports, `job_observations.collected_at` is NULL:
+no exact per-run crawl observation was supplied. `state_as_of_date` records
+date-level state and `source_last_collected_at` preserves each job's latest
+source timestamp. `collection_runs.snapshot_generated_at` is set only when
+the actual export time is supplied. `trend-readiness` rejects cumulative
+exports even if a generation timestamp is known.
 
 ## 2. Sunjol v2 pipeline output contract
 

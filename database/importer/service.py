@@ -39,3 +39,10 @@ class ImporterService:
     def qa_release(self, release_key: str) -> dict[str, Any]:
         """Read and validate release metrics without mutating the database."""
         return self._backend.qa_release(release_key)
+
+    def publish_release(self, release_key: str, backup_dir: Path,
+                        *, freeze_existing: bool = False) -> dict[str, Any]:
+        return self._backend.publish_release(release_key, backup_dir, freeze_existing)
+
+    def trend_readiness(self) -> dict[str, Any]:
+        return self._backend.trend_readiness()

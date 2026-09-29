@@ -14,6 +14,8 @@ from typing import Any
 
 from .contracts import AnalysisFiles, CollectionFiles
 from .release_metrics import release_qa_report
+from .publication import publish_release
+from .trends import trend_readiness_report
 
 
 class MySQLImporterBackend:
@@ -43,7 +45,7 @@ class MySQLImporterBackend:
         return {key: value for key, value in report.items() if key not in hidden}
 
     def import_collection(self, files: CollectionFiles, backup_dir: Path) -> dict[str, Any]:
-        return self._engine().apply_collection(files.snapshot, backup_dir)
+        return self._engine().apply_collection(files.snapshot, backup_dir, files.snapshot_generated_at)
 
     def import_analysis(
         self, files: AnalysisFiles, backup_dir: Path, git_commit: str
@@ -81,5 +83,19 @@ class MySQLImporterBackend:
         try:
             engine.verify_schema(connection)
             return release_qa_report(connection, release_key)
+        finally:
+            connection.close()
+
+    def publish_release(self, release_key: str, backup_dir: Path,
+                        freeze_existing: bool = False) -> dict[str, Any]:
+        return publish_release(self._engine(), release_key, backup_dir,
+                               freeze_existing=freeze_existing)
+
+    def trend_readiness(self) -> dict[str, Any]:
+        engine = self._engine()
+        connection = engine.db_connect()
+        try:
+            engine.verify_schema(connection)
+            return trend_readiness_report(connection)
         finally:
             connection.close()

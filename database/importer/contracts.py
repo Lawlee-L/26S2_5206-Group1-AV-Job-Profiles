@@ -1,6 +1,7 @@
 """Input contracts shared by CLI, GUI, and future importer adapters."""
 
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 
@@ -10,6 +11,7 @@ class CollectionFiles:
 
     snapshot: Path
     previous_snapshot: Path | None = None
+    snapshot_generated_at: datetime | None = None
 
 
 @dataclass(frozen=True)

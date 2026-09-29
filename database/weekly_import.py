@@ -385,7 +385,10 @@ def verify_schema(conn) -> None:
     required = {"import_batches", "import_job_undo", "companies", "job_sources", "collection_runs",
                 "jobs", "job_observations", "analysis_runs", "job_analyses", "skills", "job_skills",
                 "job_deduplication_links", "cluster_runs", "clusters", "cluster_label_revisions", "job_cluster_assignments",
-                "cluster_skills", "dashboard_releases"}
+                "cluster_skills", "dashboard_releases", "dashboard_release_snapshot_rows"}
+    required_views = {"v_candidate_dashboard_jobs", "v_candidate_dashboard_job_skills",
+                      "v_candidate_dashboard_clusters", "v_dashboard_jobs",
+                      "v_dashboard_job_skills", "v_dashboard_skill_demand", "v_dashboard_clusters"}
     with conn.cursor() as cur:
         cur.execute("SELECT VERSION() AS version")
         version = cur.fetchone()["version"]
@@ -395,11 +398,11 @@ def verify_schema(conn) -> None:
         cur.execute("SELECT TABLE_NAME,ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=DATABASE()")
         table_rows = cur.fetchall()
         present = {row["TABLE_NAME"] for row in table_rows}
-        missing = sorted(required - present)
+        missing = sorted((required | required_views) - present)
         if missing:
             raise ImportErrorSafe(
-                "Database schema is incomplete. For a new empty database, apply schema.mysql.sql; "
-                "for an existing database, back up and apply only the missing migrations. "
+                "Database schema is incomplete. Create a fresh development database with "
+                "schema.mysql.sql and views.mysql.sql; do not overwrite an existing database. "
                 "Missing: " + ", ".join(missing)
             )
         non_transactional = sorted(row["TABLE_NAME"] for row in table_rows
@@ -411,24 +414,38 @@ def verify_schema(conn) -> None:
                     "((TABLE_NAME='jobs' AND COLUMN_NAME IN "
                     "('source_key','source_job_id','content_hash','record_hash_sha256')) OR "
                     "(TABLE_NAME='job_observations' AND COLUMN_NAME IN ('content_hash','record_hash_sha256')) OR "
+                    "(TABLE_NAME='job_observations' AND COLUMN_NAME IN "
+                    "('state_as_of_date','source_last_collected_at')) OR "
+                    "(TABLE_NAME='collection_runs' AND COLUMN_NAME IN "
+                    "('run_kind','snapshot_as_of_date','snapshot_generated_at','time_quality','source_report_available')) OR "
+                    "(TABLE_NAME='dashboard_releases' AND COLUMN_NAME IN "
+                    "('snapshot_frozen_at','snapshot_sha256')) OR "
                     "(TABLE_NAME='job_analyses' AND COLUMN_NAME IN "
                     "('input_content_hash','role_summary','responsibilities_json','requirements_json',"
                     "'language_of_posting','served_by','prompt_tokens','output_tokens','cost_usd')) OR "
                     "(TABLE_NAME='clusters' AND COLUMN_NAME IN ('population')) OR "
                     "(TABLE_NAME='analysis_runs' AND COLUMN_NAME IN "
-                    "('run_key','prompt_tokens','output_tokens','cost_usd'))) ")
+                    "('run_key','prompt_tokens','output_tokens','cost_usd',"
+                    "'collection_run_id','source_snapshot_sha256'))) ")
         columns = {(row["TABLE_NAME"], row["COLUMN_NAME"]): row for row in cur.fetchall()}
     required_columns = (
         ("jobs", "source_key"), ("jobs", "source_job_id"),
         ("jobs", "content_hash"), ("jobs", "record_hash_sha256"),
         ("job_observations", "content_hash"), ("job_observations", "record_hash_sha256"),
+        ("job_observations", "state_as_of_date"),
+        ("job_observations", "source_last_collected_at"),
+        ("collection_runs", "run_kind"), ("collection_runs", "snapshot_as_of_date"),
+        ("collection_runs", "snapshot_generated_at"), ("collection_runs", "time_quality"),
+        ("collection_runs", "source_report_available"),
+        ("dashboard_releases", "snapshot_frozen_at"), ("dashboard_releases", "snapshot_sha256"),
         ("job_analyses", "input_content_hash"), ("job_analyses", "role_summary"),
         ("job_analyses", "responsibilities_json"), ("job_analyses", "requirements_json"),
         ("job_analyses", "language_of_posting"), ("job_analyses", "served_by"),
         ("job_analyses", "prompt_tokens"), ("job_analyses", "output_tokens"),
         ("job_analyses", "cost_usd"), ("analysis_runs", "run_key"),
         ("analysis_runs", "prompt_tokens"), ("analysis_runs", "output_tokens"),
-        ("analysis_runs", "cost_usd"), ("clusters", "population"),
+        ("analysis_runs", "cost_usd"), ("analysis_runs", "collection_run_id"),
+        ("analysis_runs", "source_snapshot_sha256"), ("clusters", "population"),
     )
     for key in required_columns:
         if key not in columns:
@@ -521,7 +538,8 @@ def insert_job_undo(cur, batch_id: int, key: str, kind: str,
     )
 
 
-def apply_collection(path: Path, backup_dir: Path) -> dict[str, Any]:
+def apply_collection(path: Path, backup_dir: Path,
+                     snapshot_generated_at: datetime | None = None) -> dict[str, Any]:
     rows, digest = load_collection(path)
     conn = db_connect()
     try:
@@ -534,6 +552,8 @@ def apply_collection(path: Path, backup_dir: Path) -> dict[str, Any]:
                 raise ImportErrorSafe("This exact collection file has already been imported; refusing to duplicate it")
             latest_collected = max(r["latest_collected_at"] for r in rows)
             run_date = latest_collected.date()
+            if snapshot_generated_at is not None and snapshot_generated_at < latest_collected:
+                raise ImportErrorSafe("Snapshot generation time predates a job's latest collection timestamp")
             cur.execute("SELECT metadata_json FROM import_batches WHERE batch_type='collection' "
                         "AND status IN ('completed','partial') ORDER BY import_batch_id DESC LIMIT 1")
             prior = cur.fetchone()
@@ -542,13 +562,23 @@ def apply_collection(path: Path, backup_dir: Path) -> dict[str, Any]:
                 prior_date = parse_date(prior_meta.get("snapshot_date"), "prior batch snapshot_date")
                 prior_collected = parse_datetime(prior_meta.get("latest_collected_at"),
                                                  "prior batch latest_collected_at")
+                prior_generated = parse_datetime(prior_meta.get("snapshot_generated_at"),
+                                                 "prior batch snapshot_generated_at")
                 if prior_date and run_date < prior_date:
                     raise ImportErrorSafe(f"This snapshot is older than the latest imported date {prior_date}")
-                if prior_collected and latest_collected <= prior_collected:
-                    raise ImportErrorSafe("This snapshot is not newer than the latest imported collection")
+                if prior_date == run_date:
+                    if snapshot_generated_at is None:
+                        raise ImportErrorSafe(
+                            "Same-day cumulative rerun requires --snapshot-generated-at; "
+                            "per-job collection times do not order whole exports")
+                    if prior_generated and snapshot_generated_at <= prior_generated:
+                        raise ImportErrorSafe("Snapshot generation time is not newer than prior same-day export")
+                    if not prior_generated and prior_collected and snapshot_generated_at <= prior_collected:
+                        raise ImportErrorSafe("Snapshot generation time must follow prior known source collection")
+                elif prior_generated and snapshot_generated_at and snapshot_generated_at <= prior_generated:
+                    raise ImportErrorSafe("Snapshot generation time is not newer than prior export")
             backup_path = backup_database(backup_dir)
             backup_digest = sha256_file(backup_path)
-            as_of = datetime.combine(run_date, time(23, 59, 59))
             run_key = f"history-{run_date:%Y%m%d}-{digest[:12]}"
             source_ids = sorted({r["source_id"] for r in rows})
             cur.execute(
@@ -557,16 +587,21 @@ def apply_collection(path: Path, backup_dir: Path) -> dict[str, Any]:
                 (path.name, digest, len(rows), stable_json({"backup_file": str(backup_path),
                  "backup_sha256": backup_digest, "run_key": run_key,
                  "snapshot_date": run_date.isoformat(), "snapshot_sha256": digest,
+                 "snapshot_generated_at": snapshot_generated_at.isoformat() if snapshot_generated_at else None,
                  "latest_collected_at": latest_collected.isoformat(),
                  "source_ids": source_ids, "synthetic_snapshot": True})),
             )
             batch_id = cur.lastrowid
             cur.execute(
-                "INSERT INTO collection_runs (run_key,status,pipeline_version,source_scope_json,notes,started_at,completed_at) "
-                "VALUES (%s,'partial','importer-v1',%s,%s,%s,%s)",
+                "INSERT INTO collection_runs (run_key,status,pipeline_version,source_scope_json,notes,"
+                "run_kind,snapshot_as_of_date,snapshot_generated_at,time_quality,source_report_available,"
+                "started_at,completed_at) "
+                "VALUES (%s,'partial','importer-v1',%s,%s,'cumulative_state_export',%s,%s,%s,FALSE,"
+                "UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))",
                 (run_key, stable_json({"source_ids": source_ids, "input_sha256": digest}),
                  "Synthetic state snapshot from cumulative translated job history. Per-source crawl success records "
-                 "were not supplied; absent keys are never treated as removals.", as_of, as_of),
+                 "were not supplied; absent keys are never treated as removals.", run_date,
+                 snapshot_generated_at, "exact_utc" if snapshot_generated_at else "date_only"),
             )
             collection_run_id = cur.lastrowid
             created_company_ids: list[int] = []
@@ -615,17 +650,19 @@ def apply_collection(path: Path, backup_dir: Path) -> dict[str, Any]:
                 job_ids[key] = job_id
                 cur.execute(
                     "INSERT INTO job_observations (job_id,collection_run_id,advertised_job_title,job_description,job_url,"
-                    "location_raw,salary_raw,date_posted,collected_at,is_active_at_run,content_hash,"
-                    "record_hash_sha256,raw_payload_json) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    "location_raw,salary_raw,date_posted,collected_at,state_as_of_date,"
+                    "source_last_collected_at,is_active_at_run,content_hash,record_hash_sha256,raw_payload_json) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                     (job_id, collection_run_id, record["advertised_job_title"], record["job_description"],
                      record["job_url"], record["location_raw"], record["salary_raw"], record["date_posted"],
-                     as_of, record["is_active"], record["content_hash"], record["record_hash_sha256"],
+                     None, run_date, record["latest_collected_at"], record["is_active"],
+                     record["content_hash"], record["record_hash_sha256"],
                      stable_json(record["raw_record"])),
                 )
             metadata = {"backup_file": str(backup_path), "backup_sha256": backup_digest, "run_key": run_key,
                         "collection_run_id": collection_run_id, "snapshot_date": run_date.isoformat(),
                         "latest_collected_at": latest_collected.isoformat(),
+                        "snapshot_generated_at": snapshot_generated_at.isoformat() if snapshot_generated_at else None,
                         "hash_contract_version": HASH_CONTRACT_VERSION,
                         "snapshot_sha256": digest, "source_ids": source_ids,
                         "created_company_ids": created_company_ids, "created_source_ids": created_source_ids,
@@ -953,14 +990,6 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
             missing = sorted(set(report["source_by_key"]) - set(current_jobs))
             if missing:
                 raise ImportErrorSafe(f"{len(missing)} Li input keys are not in canonical jobs; first: {missing[0]}")
-            for key, source in report["source_by_key"].items():
-                current = current_jobs[key]
-                if current["record_hash_sha256"] != source["record_hash_sha256"]:
-                    raise ImportErrorSafe(f"Li source record {key!r} differs from current database state; re-collect/reclassify")
-                if current["content_hash"] != source["content_hash"]:
-                    raise ImportErrorSafe(f"Classifier description hash for {key!r} differs from current database state; reclassify")
-                if current["source_id"] != source["source_id"]:
-                    raise ImportErrorSafe(f"Li source_id for {key!r} differs from current database state")
             cur.execute("SELECT metadata_json FROM import_batches "
                         "WHERE batch_type='collection' AND JSON_UNQUOTE(JSON_EXTRACT(metadata_json,'$.snapshot_sha256'))=%s "
                         "AND status='completed' ORDER BY import_batch_id DESC LIMIT 1", (digest_source,))
@@ -973,6 +1002,21 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
             collection_run_id = source_meta.get("collection_run_id")
             if not collection_run_id:
                 raise ImportErrorSafe("The matching collection batch has no collection_run_id")
+            cur.execute(
+                "SELECT j.source_key,j.source_id,jo.content_hash,jo.record_hash_sha256 "
+                "FROM job_observations jo JOIN jobs j ON j.job_id=jo.job_id "
+                "WHERE jo.collection_run_id=%s", (collection_run_id,))
+            observed = {row["source_key"]: row for row in cur.fetchall()}
+            if set(observed) != set(report["source_by_key"]):
+                raise ImportErrorSafe("Classification source keys do not equal the linked collection snapshot")
+            for key, source in report["source_by_key"].items():
+                row = observed[key]
+                if row["record_hash_sha256"] != source["record_hash_sha256"]:
+                    raise ImportErrorSafe(f"Li source record {key!r} differs from linked collection snapshot")
+                if row["content_hash"] != source["content_hash"]:
+                    raise ImportErrorSafe(f"Classifier description for {key!r} differs from linked collection snapshot")
+                if row["source_id"] != source["source_id"]:
+                    raise ImportErrorSafe(f"Li source_id for {key!r} differs from linked collection snapshot")
             run_key = f"sunjol-{digest[:20]}"
             analysis_method = str(metadata.get("method") or "hybrid").strip().lower()
             provider = str(metadata.get("provider") or "openrouter").strip()
@@ -996,13 +1040,15 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
             parameters["hash_contract_version"] = HASH_CONTRACT_VERSION
             cur.execute(
                 "INSERT INTO analysis_runs (run_key,method,provider,model_name,model_version,prompt_version,"
-                "taxonomy_version,code_version,source_dataset_version,parameters_json,prompt_tokens,output_tokens,"
+                "taxonomy_version,code_version,source_dataset_version,collection_run_id,source_snapshot_sha256,"
+                "parameters_json,prompt_tokens,output_tokens,"
                 "cost_usd,status,notes,"
                 "started_at,completed_at) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (run_key, analysis_method, provider, metadata.get("model"), metadata.get("model_version"),
                  metadata.get("prompt_version"), metadata.get("taxonomy_version"), git_commit,
-                 Path(str(metadata.get("input") or source_path.name)).name, stable_json(parameters),
+                 Path(str(metadata.get("input") or source_path.name)).name,
+                 collection_run_id, digest_source, stable_json(parameters),
                  token_count_or_none(metadata.get("prompt_tokens"), "run_metadata.prompt_tokens",
                                      maximum=18_446_744_073_709_551_615),
                  token_count_or_none(metadata.get("output_tokens"), "run_metadata.output_tokens",

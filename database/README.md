@@ -185,7 +185,10 @@ Before publishing, Nyx reports these Quality Assurance (QA) counts:
 
 After the responsible owners approve their outputs, the old release changes
 from `published` to `retired`, and the validated draft becomes `published`.
-The backend views automatically expose only the published release.
+`publish-release` first copies the exact job, skill and cluster display rows
+into an immutable release snapshot, then changes statuses in one transaction.
+The backend views read only the published snapshot, not mutable `jobs` or
+current cluster labels. See [Stage 3 release/history contract](STAGE3_RELEASE_HISTORY.md).
 
 ## 3. How one job is split and linked
 
@@ -527,7 +530,7 @@ Suggested API mapping:
 | `GET /skills` | `v_dashboard_skill_demand` |
 | `GET /clusters` | `v_dashboard_clusters` |
 | `GET /companies` | distinct companies from `v_dashboard_jobs` |
-| `GET /trends` | `job_observations` grouped by collection run/date |
+| `GET /trends` | Not enabled until `trend-readiness` reports two comparable verified crawls; cumulative exports are not valid trend points. |
 
 ## 11. Extending for Dashboard and new business requirements
 
@@ -733,9 +736,11 @@ preview = service.plan_collection(CollectionFiles(snapshot=Path("jobs.json")))
 The API does not require a weekly cadence: the same operations can be called
 for manual tests, frequent runs, scheduled jobs, or GUI actions. The current
 cumulative-file importer can distinguish different snapshots by file digest,
-but it synthesizes each observation time as 23:59:59 on the snapshot date; do
-not use that timestamp for intra-day trends. Separating actual collection,
-snapshot, import, and publication times remains a later history/publishing task.
+and same-day reruns require an explicit UTC `--snapshot-generated-at` time.
+For cumulative exports, `job_observations.collected_at` is NULL; the separate
+`state_as_of_date` and per-job `source_last_collected_at` must not be mistaken
+for a complete crawl's exact timestamp. See
+[Stage 3 release/history contract](STAGE3_RELEASE_HISTORY.md).
 
 ### Hash contract
 

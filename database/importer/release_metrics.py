@@ -159,8 +159,10 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
         cursor.execute(
             "SELECT dr.dashboard_release_id,dr.release_key,dr.status,dr.collection_run_id,"
             "dr.analysis_run_id,dr.cluster_run_id,dr.data_cutoff_date,cr.run_key AS collection_run_key,"
+            "dr.snapshot_frozen_at,dr.snapshot_sha256,"
             "cr.status AS collection_run_status,"
             "ar.run_key AS analysis_run_key,ar.status AS analysis_run_status,"
+            "ar.collection_run_id AS analysis_collection_run_id,"
             "clr.run_key AS cluster_run_key,clr.status AS cluster_run_status "
             "FROM dashboard_releases dr "
             "LEFT JOIN collection_runs cr ON cr.collection_run_id=dr.collection_run_id "
@@ -184,6 +186,15 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
             (release["collection_run_id"],),
         )
         source_rows = list(cursor.fetchall())
+
+        cursor.execute(
+            "SELECT COUNT(*) AS mismatches FROM job_analyses ja "
+            "JOIN job_observations jo ON jo.job_id=ja.job_id AND jo.collection_run_id=%s "
+            "WHERE ja.analysis_run_id=%s AND ja.analysis_status='success' "
+            "AND NOT (ja.input_content_hash <=> jo.content_hash)",
+            (release["collection_run_id"], release["analysis_run_id"]),
+        )
+        analysis_hash_mismatches = int(cursor.fetchone()["mismatches"])
 
         cursor.execute(
             "SELECT job_id,job_analysis_id,analysis_status,av_relevant "
@@ -351,6 +362,11 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
     public_skill_violation_count = int((public_skill_violations or {}).get("violations") or 0)
     checks = dict(outcomes["checks"])
     checks.update({
+        "analysis_uses_release_collection":
+            release["analysis_collection_run_id"] == release["collection_run_id"],
+        "analysis_input_hashes_match_collection": analysis_hash_mismatches == 0,
+        "published_release_is_frozen":
+            release["status"] != "published" or bool(release["snapshot_frozen_at"] and release["snapshot_sha256"]),
         "cluster_assignments_match_population": assignment_population_mismatches == 0,
         "no_duplicate_has_cluster_assignment": duplicate_cluster_assignments == 0,
         "cluster_cached_sizes_match_memberships": cluster_size_mismatches == 0,
@@ -381,6 +397,7 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
         "public_job_view_violations": public_job_violation_count,
         "public_skill_view_violations": public_skill_violation_count,
         "public_visible_non_av_clusters": visible_non_av_cluster_count,
+        "analysis_input_hash_mismatches": analysis_hash_mismatches,
     })
     errors = [name for name, passed in checks.items() if not passed]
     warnings = []
@@ -397,6 +414,8 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
             "dashboard_release_id": int(release["dashboard_release_id"]),
             "release_key": release["release_key"],
             "status": release["status"],
+            "snapshot_frozen_at": str(release["snapshot_frozen_at"]) if release["snapshot_frozen_at"] else None,
+            "snapshot_sha256": release["snapshot_sha256"],
             "data_cutoff_date": str(release["data_cutoff_date"]),
             "collection_run_id": int(release["collection_run_id"]),
             "collection_run_key": release["collection_run_key"],

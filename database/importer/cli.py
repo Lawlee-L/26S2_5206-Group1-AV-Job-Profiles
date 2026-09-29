@@ -104,6 +104,10 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
     collection = subs.add_parser("import-collection", help="back up and import one cumulative Li snapshot")
     add_audit_dir(collection)
     collection.add_argument("--input", required=True, type=Path)
+    collection.add_argument(
+        "--snapshot-generated-at", type=str,
+        help="actual export completion time in ISO-8601 UTC; required for a second snapshot on one date",
+    )
     collection.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
     analysis = subs.add_parser("import-analysis", help="back up and import validated Sunjol pipeline outputs")
     add_audit_dir(analysis)
@@ -128,6 +132,16 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
     release_qa = subs.add_parser("qa-release", help="read-only QA counts for one dashboard release")
     add_audit_dir(release_qa)
     release_qa.add_argument("--release-key", required=True)
+    publish = subs.add_parser("publish-release", help="freeze and publish a QA-checked draft")
+    add_audit_dir(publish)
+    publish.add_argument("--release-key", required=True)
+    publish.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
+    freeze = subs.add_parser("freeze-release", help="freeze an already-published legacy release")
+    add_audit_dir(freeze)
+    freeze.add_argument("--release-key", required=True)
+    freeze.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
+    trends = subs.add_parser("trend-readiness", help="check whether historical trends have comparable real crawls")
+    add_audit_dir(trends)
     return parser
 
 
@@ -150,7 +164,17 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
         elif args.command == "plan-analysis":
             result = service.plan_analysis(_analysis_files_from_args(args))
         elif args.command == "import-collection":
-            result = service.import_collection(CollectionFiles(args.input), args.backup_dir)
+            generated_at = None
+            if args.snapshot_generated_at:
+                try:
+                    raw_time = datetime.fromisoformat(args.snapshot_generated_at.replace("Z", "+00:00"))
+                except ValueError as exc:
+                    raise ImportErrorSafe("Invalid --snapshot-generated-at ISO-8601 timestamp") from exc
+                if raw_time.tzinfo is None or raw_time.utcoffset().total_seconds() != 0:
+                    raise ImportErrorSafe("--snapshot-generated-at must include UTC (Z or +00:00)")
+                generated_at = raw_time.astimezone(timezone.utc).replace(tzinfo=None)
+            result = service.import_collection(CollectionFiles(args.input, snapshot_generated_at=generated_at),
+                                               args.backup_dir)
         elif args.command == "import-analysis":
             result = service.import_analysis(_analysis_files_from_args(args), args.backup_dir, args.git_commit)
         elif args.command == "backup":
@@ -164,6 +188,12 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
             if result.get("status") != "passed":
                 exit_code = 4
                 error = "Release QA checks failed: " + ", ".join(result.get("errors", []))
+        elif args.command in {"publish-release", "freeze-release"}:
+            result = service.publish_release(
+                args.release_key, args.backup_dir,
+                freeze_existing=args.command == "freeze-release")
+        elif args.command == "trend-readiness":
+            result = service.trend_readiness()
         else:
             raise ImportErrorSafe("Unknown command")
     except ImportErrorSafe as exc:
