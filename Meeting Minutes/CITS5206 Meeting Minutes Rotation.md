@@ -21,6 +21,10 @@ This table is used to manage the rotation of meeting minutes responsibilities wi
 | Week 7 | Group Meeting | 12/09/2026 | Sunjol Singh Paul | Completed |
 | Week 8 | Client Meeting | 18/09/2026 | Nyx Chen | Completed |
 | Week 8 | Group Meeting | 19/09/2026 | Li Luo | Completed |
+| Week 9 | Group Meeting | 26/09/2026 | Seonjeong Jeong | Completed |
+| Week 10 | Facilitator Meeting | 30/09/2026 | Leon Nel Nel | Upcoming; please confirm availability |
+| Week 10 | Group Meeting (proposed) | 03/10/2026 | Thushamini Chathusika Hewa Pathegamage | Upcoming; please confirm meeting and availability |
+
 TBC
 ## Status
 
