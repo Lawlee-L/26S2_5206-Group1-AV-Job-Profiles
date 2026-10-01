@@ -161,7 +161,7 @@ def save_run(conn: sqlite3.Connection, df: pd.DataFrame, failed: pd.DataFrame,
     # Microseconds keep keys unique even for two runs within the same second.
     run_key = f"v2-{meta['model']}-{meta['prompt_version']}-" \
               f"{datetime.now(timezone.utc).isoformat(timespec='microseconds')}"
-    cluster_params = {k: meta[k] for k in ("embedding_model", "min_cluster_size", "min_samples")}
+    embedding = {k: meta[k] for k in ("embedding_model", "chunk_words")}
     with conn:
         run_id = conn.execute("""
             INSERT INTO analysis_runs (run_key, method, provider, model_name, prompt_version,
@@ -170,7 +170,7 @@ def save_run(conn: sqlite3.Connection, df: pd.DataFrame, failed: pd.DataFrame,
             VALUES (?, 'llm', 'openrouter', ?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?)""",
             (run_key, meta["model"], meta["prompt_version"], Path(meta["input"]).name,
              _json({k: meta[k] for k in ("limit", "temperature", "n_records", "n_llm_failures")}
-                   | cluster_params),
+                   | embedding | {"cluster_params": meta["cluster_params"]}),
              meta["prompt_tokens"], meta["output_tokens"], meta["cost_usd"],
              meta["started_at"], now)).lastrowid
 
@@ -228,7 +228,8 @@ def save_run(conn: sqlite3.Connection, df: pd.DataFrame, failed: pd.DataFrame,
                 VALUES (?, ?, ?, 'umap+hdbscan', ?, ?, ?, 'completed', ?, ?)""",
                 (f"{run_key}-{population}", run_id, population,
                  int((~summary["is_noise"]).sum()), bool(summary["is_noise"].any()),
-                 _json(cluster_params), meta["started_at"], now)).lastrowid
+                 _json(embedding | meta["cluster_params"][population]),
+                 meta["started_at"], now)).lastrowid
             cluster_pk = {}
             for c in summary.to_dict("records"):
                 # Names, job families and specialisations are left for a human to fill.

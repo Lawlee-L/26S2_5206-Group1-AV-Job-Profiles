@@ -37,11 +37,14 @@ LLM_EST_OUTPUT_TOKENS = 750
 # --------------------------------------------------------------------------
 # Embedding
 # --------------------------------------------------------------------------
-EMBED_MODEL = "all-MiniLM-L6-v2"
+# Chosen in notebooks/clustering_decisions.ipynb (section 3): tied with bge-large-en-v1.5
+# on the title check and about 4x faster; MiniLM, mpnet and e5 scored lower.
+EMBED_MODEL = "thenlper/gte-base"
 
-# MiniLM truncates at 256 word-pieces (~180 words), so longer texts are
-# chunked and the chunk vectors mean-pooled instead of silently truncated.
-CHUNK_WORDS = 160
+# gte-base reads 512 word-pieces (~350 words), so all but a handful of postings are
+# embedded in one pass (notebook section 4); longer texts are still chunked and the
+# chunk vectors mean-pooled instead of silently truncated.
+CHUNK_WORDS = 350
 CHUNK_OVERLAP_WORDS = 32
 MAX_CHUNKS_PER_DOC = 12
 EMBED_BATCH_SIZE = 64
@@ -51,22 +54,29 @@ EMBED_BATCH_SIZE = 64
 # --------------------------------------------------------------------------
 RANDOM_SEED = 42
 
-# UMAP before HDBSCAN: on the raw 384-d vectors HDBSCAN degenerates on this
+# UMAP before HDBSCAN: on the raw embedding vectors HDBSCAN degenerates on this
 # dataset (one giant cluster, or >90% noise). See cluster.py.
-UMAP_COMPONENTS = 5
-UMAP_N_NEIGHBORS = 15
+# Settings per group, chosen in notebooks/clustering_decisions.ipynb (section 5) from a
+# 126-setting grid (metrics averaged over three UMAP seeds): at most 20% noise, no
+# cluster over 10% of the group, seed agreement >= 0.6, a labellable number of
+# clusters, then the best combined rank on title coherence, self-containment, seed
+# agreement and noise. The old single setting
+# (15 / 5 / 8 / 2) gave 184 overlapping clusters that half-changed under tiny
+# numerical differences. min_samples stays below min_cluster_size on purpose:
+# HDBSCAN's default (equal to min_cluster_size) pushes most postings to noise.
+CLUSTER_PARAMS = {
+    "av_relevant":     {"umap_n_neighbors": 15, "umap_components": 10,
+                        "min_cluster_size": 30, "min_samples": 1},
+    "not_av_relevant": {"umap_n_neighbors": 50, "umap_components": 5,
+                        "min_cluster_size": 20, "min_samples": 1},
+}
 UMAP_MIN_DIST = 0.0         # 0.0 packs points tightly, which suits density clustering
-
-MIN_CLUSTER_SIZE = 8
-# Lower than min_cluster_size on purpose. HDBSCAN's default (min_samples ==
-# min_cluster_size) is very conservative and pushes most postings to noise.
-MIN_SAMPLES = 2
 CLUSTER_SELECTION_METHOD = "eom"   # "eom" (fewer, larger) or "leaf" (more, finer)
 CLUSTER_SELECTION_EPSILON = 0.0
 
-# Grid tried by `--sweep` so you can see the size distribution before committing.
-SWEEP_MIN_CLUSTER_SIZES = [5, 8, 10, 12, 15, 20]
-SWEEP_MIN_SAMPLES = [2, 5]
+# Grid tried by `--sweep` (per group, on that group's UMAP settings).
+SWEEP_MIN_CLUSTER_SIZES = [8, 10, 15, 20, 25, 30, 40]
+SWEEP_MIN_SAMPLES = [1, 2, 5]
 
 TOP_TFIDF_TERMS = 15
 EXAMPLE_TITLES_PER_CLUSTER = 5

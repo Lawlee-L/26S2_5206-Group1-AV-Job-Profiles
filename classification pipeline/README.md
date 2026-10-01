@@ -12,7 +12,7 @@ One LLM call per posting does the reading, in any language. Everything after tha
 postings JSON
   → [1] load + deduplicate           exact copies and ≥95%-similar reposts within a company
   → [2] one LLM call per posting     strict JSON record, validated; 10 calls in flight
-  → [3] embed the record             MiniLM on role summary + responsibilities + skills
+  → [3] embed the record             gte-base on role summary + responsibilities + skills
   → [4] cluster each group apart     AV-relevant and other postings: UMAP → HDBSCAN
   → [5] write outputs                CSV / JSON / Markdown, optionally a SQLite database
 ```
@@ -44,8 +44,8 @@ cp .env.example .env        # then paste your OpenRouter key into .env
 ```
 
 Model calls go through [OpenRouter](https://openrouter.ai); the key is read from
-`.env` and never printed. The embedding model (`all-MiniLM-L6-v2`) downloads once on
-first use.
+`.env` and never printed. The embedding model (`thenlper/gte-base`) downloads once on
+first use and runs locally.
 
 ## Input data
 
@@ -80,9 +80,9 @@ python run_pipeline_v2.py --input postings.json --limit 50 --output-dir output_s
 # Full run, written to files and to SQLite
 python run_pipeline_v2.py --input postings.json --db
 
-# Try cluster settings on cached records (free), then re-run with the chosen size
+# Try cluster settings on cached records (free), then override both groups' settings
 python run_pipeline_v2.py --input postings.json --sweep
-python run_pipeline_v2.py --input postings.json --min-cluster-size 12 --db
+python run_pipeline_v2.py --input postings.json --min-cluster-size 20 --db
 ```
 
 | Option | What it does |
@@ -91,7 +91,7 @@ python run_pipeline_v2.py --input postings.json --min-cluster-size 12 --db
 | `--output-dir` | where results go (default `output_v3/`) |
 | `--model` | any OpenRouter model id (default `openai/gpt-6-luna`) |
 | `--limit N` | random sample of N postings |
-| `--min-cluster-size`, `--min-samples` | HDBSCAN settings |
+| `--min-cluster-size`, `--min-samples` | HDBSCAN settings for both groups (overrides `CLUSTER_PARAMS`) |
 | `--sweep` | print a grid of cluster settings per group, then stop |
 | `--db` | also write `<output-dir>/av_job_profiles.sqlite`, reusing stored answers |
 | `--no-cache` | ignore cached answers and call the model again (paid) |
@@ -150,7 +150,8 @@ Settings live in `avjobs/config.py`; the ones most likely to change:
 |---|---|---|
 | `LLM_MODEL` | `openai/gpt-6-luna` | chosen over gpt-4o-mini on the reference postings |
 | `LLM_WORKERS` | `10` | model calls in flight at once |
-| `MIN_CLUSTER_SIZE`, `MIN_SAMPLES` | `8`, `2` | HDBSCAN |
+| `EMBED_MODEL`, `CHUNK_WORDS` | `thenlper/gte-base`, `350` | embedding model and words per chunk |
+| `CLUSTER_PARAMS` | AV: UMAP 15 neighbours / 10 dims, HDBSCAN 30 / 1; other: 50 / 5, 20 / 1 | per-group settings, chosen in the notebook below |
 | `NEAR_DUP_THRESHOLD` | `0.95` | similarity at which two postings of one company are duplicates |
 | `SENIORITY_LABELS` | Intern … Executive, Other | the seniority scale |
 
@@ -163,6 +164,22 @@ pays again.
 Measured on a 50-posting sample with `openai/gpt-6-luna`: about $0.0005 per posting.
 Roughly **$2 and 40 minutes for 4,500 postings** with 10 calls in flight. Run
 `--dry-run` for an estimate on your data.
+
+## Why these clustering settings
+
+[`notebooks/clustering_decisions.ipynb`](notebooks/clustering_decisions.ipynb) documents
+every embedding and clustering choice with the evidence behind it: which text to embed,
+which embedding model (six compared), chunk size, and the UMAP/HDBSCAN settings for each
+group. It uses no labels and makes no LLM calls: postings are read from a `--db` run
+(`output_full/av_job_profiles.sqlite`, analysis run 1) and every check is computed
+locally. The committed copy already shows its outputs; to re-run it:
+
+```bash
+pip install -r requirements-notebook.txt
+python run_pipeline_v2.py --input postings.json --output-dir output_full --db
+```
+
+then open the notebook with the `.venv` kernel. Helpers are in `notebooks/cluster_eval.py`.
 
 ## Tests
 
@@ -185,11 +202,12 @@ avjobs/
   config.py            settings
   clean.py             loading and deduplication
   llm.py               prompt, schema, model calls, cache, cost estimate
-  embed.py             MiniLM embeddings
+  embed.py             local sentence-transformer embeddings
   cluster.py           UMAP, HDBSCAN, cluster summaries, labelling worksheet
   validate.py          reference-posting checks
   store.py, schema.sql SQLite storage in the tables of schema.mysql.sql
 schema.mysql.sql       full database design (MySQL 8)
 docker-compose.yml     optional local MySQL
+notebooks/             evidence for the embedding and clustering choices
 tests/                 offline tests
 ```

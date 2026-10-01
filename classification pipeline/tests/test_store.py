@@ -216,8 +216,8 @@ class StoreTest(unittest.TestCase):
         bad = pd.DataFrame([{"cluster_id": 0, "size": 1, "is_noise": False, "technical_score": 0.5,
                              "lean": "not-a-lean", "top_terms": "", "example_titles": "", "top_companies": ""}])
         meta = {"model": "m", "prompt_version": "p", "input": "x", "limit": None, "temperature": 0,
-                "n_records": 1, "n_llm_failures": 0, "embedding_model": "e", "min_cluster_size": 8,
-                "min_samples": 2, "prompt_tokens": 1, "output_tokens": 1, "cost_usd": 0.0,
+                "n_records": 1, "n_llm_failures": 0, "embedding_model": "e", "chunk_words": 350,
+                "cluster_params": {"av_relevant": {"min_cluster_size": 8}}, "prompt_tokens": 1, "output_tokens": 1, "cost_usd": 0.0,
                 "started_at": "2026-01-01T00:00:00+00:00"}
         with self.assertRaises(sqlite3.IntegrityError):
             store.save_run(conn, df, empty, empty, {"av_relevant": bad}, meta)
