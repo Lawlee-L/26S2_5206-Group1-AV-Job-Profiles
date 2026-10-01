@@ -1,8 +1,8 @@
 """Local sentence-transformer embeddings with chunked mean-pooling.
 
-all-MiniLM-L6-v2 truncates at 256 word-pieces, so a long text embedded in one
-shot loses its tail. Chunking and mean-pooling keeps the whole text in the
-vector at negligible CPU cost.
+Models read a fixed number of word-pieces (gte-base: 512), so a longer text
+embedded in one shot would lose its tail. Chunking and mean-pooling keeps the
+whole text in the vector at negligible cost.
 """
 
 from __future__ import annotations
@@ -56,7 +56,7 @@ def embed_postings(texts, use_cache: bool = True) -> np.ndarray:
 
     from sentence_transformers import SentenceTransformer
 
-    print(f"  [embed] loading {cfg.EMBED_MODEL} (local, CPU)")
+    print(f"  [embed] loading {cfg.EMBED_MODEL} (local)")
     model = SentenceTransformer(cfg.EMBED_MODEL)
 
     chunks, owners = build_chunks(texts)

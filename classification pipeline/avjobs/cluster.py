@@ -15,15 +15,14 @@ import pandas as pd
 from . import config as cfg
 
 
-def reduce_dimensions(embeddings: np.ndarray) -> np.ndarray:
+def reduce_dimensions(embeddings: np.ndarray, n_neighbors: int, n_components: int) -> np.ndarray:
     """UMAP to a few dimensions, preserving the local neighbourhoods HDBSCAN needs."""
     import umap
 
-    print(f"  [cluster] UMAP -> {cfg.UMAP_COMPONENTS}d "
-          f"(n_neighbors={cfg.UMAP_N_NEIGHBORS}, metric=cosine)")
+    print(f"  [cluster] UMAP -> {n_components}d (n_neighbors={n_neighbors}, metric=cosine)")
     reducer = umap.UMAP(
-        n_components=cfg.UMAP_COMPONENTS,
-        n_neighbors=cfg.UMAP_N_NEIGHBORS,
+        n_components=n_components,
+        n_neighbors=n_neighbors,
         min_dist=cfg.UMAP_MIN_DIST,
         metric="cosine",
         random_state=cfg.RANDOM_SEED,   # reproducible runs for the write-up
