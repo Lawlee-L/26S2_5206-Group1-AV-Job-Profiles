@@ -13,12 +13,14 @@ VIEW_SETS = {
         "job_skills": "v_dashboard_job_skills",
         "skills": "v_dashboard_skill_demand",
         "clusters": "v_dashboard_clusters",
+        "job_details": "v_dashboard_job_details",
     },
     "candidate": {
         "jobs": "v_candidate_dashboard_jobs",
         "job_skills": "v_candidate_dashboard_job_skills",
         "skills": None,
         "clusters": "v_candidate_dashboard_clusters",
+        "job_details": None,
     },
 }
 
@@ -286,7 +288,72 @@ class JobRepository:
             return None
 
         skills = self._skills_for_job_ids([row["job_id"]]).get(row["job_id"], [])
-        return self._job_to_api(row, skills)
+        result = self._job_to_api(row, skills)
+
+        details_view = self.views["job_details"]
+
+        if details_view is None:
+            result.update(
+                {
+                    "description": None,
+                    "roleSummary": None,
+                    "responsibilities": [],
+                    "requirements": [],
+                    "detailSnapshotAvailable": False,
+                }
+            )
+            return result
+
+        details = fetch_one(
+
+            f"""
+            SELECT
+                job_description,
+                role_summary,
+                responsibilities_json,
+                requirements_json,
+                detail_snapshot_available
+            FROM {details_view}
+            WHERE dashboard_release_id = %s
+                AND job_id = %s
+            """,
+            (
+                row["dashboard_release_id"],
+                row["job_id"], 
+            ),
+
+        )
+
+        if details is None:
+            result.update(
+                {
+                    "description": None,
+                    "roleSummary": None,
+                    "responsibilities": [],
+                    "requirements": [],
+                    "detailSnapshotAvailable": False,
+                }
+            )
+            return result
+
+        result.update(
+            {
+                "description": details["job_description"],
+                "roleSummary": details["role_summary"],
+                "responsibilities": _detail_array(
+                    details["responsibilities_json"]
+                ),
+                "requirements": _detail_array(
+                    details["requirements_json"]
+                ),
+                "detailSnapshotAvailable": bool(
+                    details["detail_snapshot_available"]
+                ),
+            }
+        )
+
+        return result
+
 
 
     def _build_filters(self, *, search, company, country, remote_type, seniority):
@@ -421,6 +488,24 @@ def _json_value(value):
         return float(value)
     if isinstance(value, (date, datetime)):
         return value.isoformat()
+    return value
+
+def _detail_array(value):
+    if value is None:
+        return []
+
+    if isinstance(value, (bytes, bytearray)):
+        value = value.decode("utf-8")
+
+    if isinstance(value, str):
+        value = json.loads(value)
+
+    if not isinstance(value, list):
+        raise ValueError("Invalid job-detail array")
+
+    if any(not isinstance(item, str) for item in value):
+        raise ValueError("Invalid job-detail array")
+
     return value
 
 def _json_data(value):
