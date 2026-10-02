@@ -104,15 +104,18 @@ SELECT * FROM v_weekly_av_job_details
 WHERE week_date = %s AND release_key = %s AND source_key = %s;
 ```
 
-Select the intended release from `v_weekly_versions`; do not assume only one
-release exists for a date if a replacement was published.
+Select the intended release from `v_weekly_versions`. The weekly detail view
+exposes only that exact selected release; superseded revisions stay stored but
+are not duplicated in the query result.
 
 ## 4. Installing and publishing
 
 For a new local database, follow `TEAM_GUIDE.md` as usual. For an existing
-development database, apply the updated `views.mysql.sql` through the database
-operator's existing SQL runner; **do not rerun the CREATE TABLE schema**.
-The table structure and importer commands have not changed.
+006 development database, install migration 007 first, then apply the updated
+`views.mysql.sql` through the database operator's existing SQL runner;
+**do not rerun the CREATE TABLE schema**. Follow the sequence documented in
+[the revision guide](RELEASE_REVISIONS.md). It adds selection/audit fields,
+not new job-description columns or changed classification output requirements.
 
 The next newly frozen release captures detail text and arrays in each existing
 `row_kind='job'` snapshot row. Both description and classification sections are
@@ -123,13 +126,11 @@ the rest of the snapshot payload. This does not change `jobs.content_hash` or
 Old frozen releases are not rewritten. Applying the views alone makes their
 detail rows readable, but they return `NULL` text, empty arrays, and
 `detail_snapshot_available=0`. A new reviewed draft and publication are needed
-to expose details from existing input data. There is currently no CLI command
-to clone an already frozen release into a new draft: rerunning the same input
-import is idempotent, not a refresh. For this local development stage, the
-simplest supported approach is a **new test database**, followed by the guide's
-imports, QA and publication with this updated code. Keep the previous database
-untouched. A future re-publication command would be separate work. Never fill
-an old snapshot by joining the latest mutable `jobs` record.
+to expose details from existing input data. Use `create-release` to reuse the
+existing analysis in a new draft, QA it, then `activate-release` with the
+expected old selections. This requires no model rerun or whole-database
+rebuild. See [the step-by-step commands](RELEASE_REVISIONS.md). Never fill an
+old snapshot by joining the latest mutable `jobs` record.
 
 Grant the backend account only the additional public views:
 

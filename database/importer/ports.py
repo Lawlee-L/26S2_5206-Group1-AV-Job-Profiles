@@ -1,9 +1,10 @@
 """Adapter interfaces for persistence and external side effects."""
 
 from pathlib import Path
+from datetime import date
 from typing import Any, Protocol
 
-from .contracts import AnalysisFiles, CollectionFiles
+from .contracts import AnalysisFiles, CollectionFiles, ReleaseActivation
 
 
 class ImportBackend(Protocol):
@@ -31,3 +32,10 @@ class ImportBackend(Protocol):
                         freeze_existing: bool = False, historical: bool = False) -> dict[str, Any]: ...
 
     def trend_readiness(self) -> dict[str, Any]: ...
+
+    def create_release(self, source_key: str, reason: str, actor: str,
+                       backup_dir: Path) -> dict[str, Any]: ...
+
+    def activate_release(self, request: ReleaseActivation, backup_dir: Path) -> dict[str, Any]: ...
+
+    def list_releases(self, week_date: date | None = None) -> dict[str, Any]: ...

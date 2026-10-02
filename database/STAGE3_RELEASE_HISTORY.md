@@ -12,9 +12,12 @@ cannot rewrite an old release. Freezing an unapproved label does not approve it.
 
 `v_candidate_dashboard_*` reads mutable tables solely to build/review a
 release. Do **not** grant it to the backend's public read-only account.
-Publication backs up the database, freezes rows and switches release status
-in one transaction; a failed QA check rolls the transaction back. A frozen
-release cannot be materialized again.
+Publication backs up the database and prepares a complete frozen draft without
+exposing it. The exact weekly selection and current release then switch in one
+transaction with operation evidence. Failed activation preserves the previous
+dashboard; a prepared frozen draft may remain for retry. A frozen release
+cannot be materialized again. Same-week upgrades and reversion use
+[the explicit revision workflow](RELEASE_REVISIONS.md), not deletion of old data.
 
 ```powershell
 python database/weekly_import.py qa-release --release-key <draft-key>
@@ -38,7 +41,8 @@ the team has no deployed shared database requiring migration yet.
 | `job_observations.collected_at` | NULL: the cumulative file does not prove this job was crawled in this run. |
 | `job_observations.source_last_collected_at` | Last supplied source collection time for this job; inactive jobs may have older values. |
 | `job_observations.state_as_of_date` | State of this job in the cumulative export. |
-| `dashboard_releases.published_at` | Dashboard publication time, not collection time. |
+| `dashboard_releases.published_at` | First current-Dashboard publication time of this release, not collection time. |
+| `release_operations.created_at` | UTC workflow time for a preparation/switch/reversion; never the collection week label. |
 
 Current Li history imports explicitly use `run_kind='cumulative_state_export'`,
 `time_quality='date_only'`, and `source_report_available=FALSE`; no

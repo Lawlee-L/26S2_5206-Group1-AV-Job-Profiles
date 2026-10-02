@@ -383,6 +383,7 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
         "public_cluster_view_has_no_non_av_population": visible_non_av_cluster_count == 0,
     })
     metrics.update({
+        "av_clusters": expected_av_cluster_count,
         "unclustered_av_postings": unclustered_av,
         "cluster_population_mismatches": assignment_population_mismatches,
         "duplicate_cluster_assignments": duplicate_cluster_assignments,

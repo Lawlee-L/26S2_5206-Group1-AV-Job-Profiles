@@ -17,6 +17,12 @@ analysis importer requires `--week-date`, the exact
 matching per-job hashes. An incomplete classification is retained for audit but
 is not selected as the week's official analysis.
 
+`selected_release_id` additionally pins the **exact** frozen snapshot of the
+selected collection and analysis. A three-column foreign key enforces that
+pairing. Several same-week analyses/releases may be staged or retained, but
+the public weekly views expose only the selected release. See
+[same-week revisions](RELEASE_REVISIONS.md) for staged upgrades and reversion.
+
 ## Current-week import
 
 ```text
@@ -62,14 +68,22 @@ The import produces a draft. Run `qa-release --release-key KEY`, then either
 without replacing the current Dashboard. Only QA-passing, frozen releases
 appear in the AV-specific historical views.
 
+For a replacement rather than a first classification, add `--candidate` to
+the import command. It leaves official selections unchanged. Review the
+returned release with `qa-release`, then use `activate-release` with the
+expected old weekly/current keys. Re-running an identical output is still
+duplicate-protected. Use `create-release` when reusing the same analysis to
+build an updated snapshot without new model output.
+
 ## Read-only backend contract
 
 | View | What it exposes |
 | --- | --- |
 | `v_weekly_versions` | Every official week, even without classification; collection and classification status plus the selected release. |
 | `v_weekly_jobs` | The cumulative raw job state for each week, including active/inactive flags; not AV-filtered. |
-| `v_weekly_av_jobs` | AV-relevant, non-duplicate jobs from frozen published or historical releases only. |
+| `v_weekly_av_jobs` | AV-relevant, non-duplicate jobs from each week's exact selected frozen release only; old revisions are not duplicated. |
 | `v_weekly_av_job_skills` | Job-to-skill links from those same frozen releases. |
+| `v_weekly_av_job_details` | Full descriptions and extracted sections from those same exact frozen releases. |
 | `v_dashboard_*` | Only the one currently published Dashboard release. |
 
 Grant the backend read-only access to these views, not the candidate views or
@@ -82,8 +96,12 @@ coverage limitation stated until Li's run reports are linked.
 ## Existing development database
 
 For an existing Stage 3 database, verify a backup and apply
-`migrations/006_weekly_versions.sql`, then replace the views using
+`migrations/006_weekly_versions.sql` if weekly selection does not exist yet,
+followed by `007_release_revisions.sql`, then replace the views using
 `views.mysql.sql` after reviewing the target database name. The migration
 selects an existing published classification automatically but refuses to
 silently choose between multiple collection files with the same date. A new
 empty database needs only `schema.mysql.sql` and `views.mysql.sql`.
+For an existing database already using 006, apply only 007 once. It does not
+rewrite frozen data; ambiguous historical release choices remain unselected
+until an operator reviews and activates one.

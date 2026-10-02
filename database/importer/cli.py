@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import getpass
 import json
 import os
 import sys
@@ -14,7 +15,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
-from . import AnalysisFiles, CollectionFiles, ImportErrorSafe, ImporterService, MySQLImporterBackend
+from . import AnalysisFiles, CollectionFiles, ImportErrorSafe, ImporterService, MySQLImporterBackend, ReleaseActivation
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -79,6 +80,7 @@ def _analysis_files_from_args(args: argparse.Namespace) -> AnalysisFiles:
         duplicates=args.duplicates,
         failures=args.failures,
         week_date=getattr(args, "week_date", None),
+        candidate=getattr(args, "candidate", False),
     )
 
 
@@ -125,6 +127,8 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
     analysis.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
     analysis.add_argument("--git-commit", required=True,
                           help="classification pipeline Git commit SHA (7–64 hex characters)")
+    analysis.add_argument("--candidate", action="store_true",
+                          help="stage a same-week revision; do not change the official classification")
     backup = subs.add_parser("backup", help="create a compressed full-database backup")
     add_audit_dir(backup)
     backup.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
@@ -151,6 +155,27 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
     freeze.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
     trends = subs.add_parser("trend-readiness", help="check whether historical trends have comparable real crawls")
     add_audit_dir(trends)
+    releases = subs.add_parser("list-releases", help="list drafts, frozen revisions and official selections")
+    add_audit_dir(releases)
+    releases.add_argument("--week-date", type=date.fromisoformat)
+    clone = subs.add_parser("create-release", help="make a new draft from existing analysis without rerunning AI")
+    add_audit_dir(clone)
+    clone.add_argument("--from-release-key", required=True)
+    clone.add_argument("--reason", required=True)
+    clone.add_argument("--actor", default=getpass.getuser(), help="operator label recorded in database evidence")
+    clone.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
+    activation = subs.add_parser("activate-release", help="publish a candidate or switch back to an intact frozen revision")
+    add_audit_dir(activation)
+    activation.add_argument("--release-key", required=True)
+    activation.add_argument("--expected-week-release", required=True,
+                            help="currently selected release for the target week; 'none' if unselected")
+    activation.add_argument("--expected-current-release", required=True,
+                            help="currently published Dashboard release; 'none' if there is no current release")
+    activation.add_argument("--historical", action="store_true",
+                            help="change an earlier week's selection without changing the current Dashboard")
+    activation.add_argument("--reason", required=True)
+    activation.add_argument("--actor", default=getpass.getuser())
+    activation.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
     return parser
 
 
@@ -206,6 +231,16 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
                 historical=getattr(args, "historical", False))
         elif args.command == "trend-readiness":
             result = service.trend_readiness()
+        elif args.command == "list-releases":
+            result = service.list_releases(args.week_date)
+        elif args.command == "create-release":
+            result = service.create_release(args.from_release_key,args.reason,args.actor,args.backup_dir)
+        elif args.command == "activate-release":
+            result = service.activate_release(ReleaseActivation(
+                release_key=args.release_key,
+                expected_week_release=None if args.expected_week_release.lower() == "none" else args.expected_week_release,
+                expected_current_release=None if args.expected_current_release.lower() == "none" else args.expected_current_release,
+                reason=args.reason,actor=args.actor,historical=args.historical),args.backup_dir)
         else:
             raise ImportErrorSafe("Unknown command")
     except ImportErrorSafe as exc:
@@ -213,7 +248,9 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
         error = f"{type(exc).__name__}: {exc}"
         exit_code = 2
     except Exception as exc:
-        print(f"Import failed; the transaction was rolled back: {type(exc).__name__}: {exc}", file=sys.stderr)
+        message = ("Activation failed; selection changes were rolled back, but a prepared draft may remain"
+                   if args.command == "activate-release" else "Import failed; the transaction was rolled back")
+        print(f"{message}: {type(exc).__name__}: {exc}", file=sys.stderr)
         error = f"{type(exc).__name__}: {exc}"
         password = os.environ.get("AVDB_PASSWORD")
         if password:

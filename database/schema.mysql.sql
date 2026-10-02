@@ -324,6 +324,7 @@ CREATE TABLE weekly_versions (
   week_date DATE NOT NULL,
   collection_run_id BIGINT UNSIGNED NOT NULL,
   selected_analysis_run_id BIGINT UNSIGNED NULL,
+  selected_release_id BIGINT UNSIGNED NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
     ON UPDATE CURRENT_TIMESTAMP(6),
@@ -676,6 +677,7 @@ CREATE TABLE dashboard_releases (
   analysis_run_id BIGINT UNSIGNED NOT NULL,
   cluster_run_id BIGINT UNSIGNED NOT NULL,
   data_cutoff_date DATE NOT NULL,
+  parent_release_id BIGINT UNSIGNED NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'draft',
   published_at DATETIME(6) NULL,
   snapshot_frozen_at DATETIME(6) NULL,
@@ -688,6 +690,7 @@ CREATE TABLE dashboard_releases (
     ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (dashboard_release_id),
   UNIQUE KEY uq_dashboard_release_key (release_key),
+  UNIQUE KEY uq_release_week_pair (dashboard_release_id, collection_run_id, analysis_run_id),
   UNIQUE KEY uq_single_published_release (published_guard),
   KEY idx_dashboard_release_runs (analysis_run_id, cluster_run_id),
   CONSTRAINT fk_dashboard_release_collection
@@ -695,6 +698,9 @@ CREATE TABLE dashboard_releases (
     ON DELETE RESTRICT,
   CONSTRAINT fk_dashboard_release_analysis
     FOREIGN KEY (analysis_run_id) REFERENCES analysis_runs (analysis_run_id)
+    ON DELETE RESTRICT,
+  CONSTRAINT fk_release_parent
+    FOREIGN KEY (parent_release_id) REFERENCES dashboard_releases (dashboard_release_id)
     ON DELETE RESTRICT,
   CONSTRAINT fk_dashboard_release_cluster
     FOREIGN KEY (cluster_run_id, analysis_run_id)
@@ -704,6 +710,47 @@ CREATE TABLE dashboard_releases (
     CHECK (status IN ('draft', 'published', 'retired')),
   CONSTRAINT chk_dashboard_release_published_at
     CHECK (status <> 'published' OR published_at IS NOT NULL)
+) ENGINE=InnoDB;
+
+-- Pin the exact frozen release, not every release using the same analysis.
+-- Added here because dashboard_releases is created after weekly_versions.
+ALTER TABLE weekly_versions
+  ADD KEY idx_weekly_release_pair (selected_release_id, collection_run_id, selected_analysis_run_id),
+  ADD CONSTRAINT fk_weekly_release_pair
+    FOREIGN KEY (selected_release_id, collection_run_id, selected_analysis_run_id)
+    REFERENCES dashboard_releases (dashboard_release_id, collection_run_id, analysis_run_id)
+    ON DELETE RESTRICT,
+  ADD CONSTRAINT chk_weekly_release_analysis
+    CHECK (selected_release_id IS NULL OR selected_analysis_run_id IS NOT NULL);
+
+-- Append-only workflow evidence. Failed attempts also have local CLI reports;
+-- successful state changes and their evidence commit in the same transaction.
+CREATE TABLE release_operations (
+  operation_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  action VARCHAR(24) NOT NULL,
+  week_date DATE NOT NULL,
+  target_release_id BIGINT UNSIGNED NOT NULL,
+  previous_week_release_id BIGINT UNSIGNED NULL,
+  previous_current_release_id BIGINT UNSIGNED NULL,
+  next_current_release_id BIGINT UNSIGNED NULL,
+  reason TEXT NOT NULL,
+  actor VARCHAR(128) NOT NULL,
+  backup_file VARCHAR(1024) NOT NULL,
+  backup_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  details_json JSON NOT NULL,
+  created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (operation_id),
+  KEY idx_release_operations_week (week_date, created_at),
+  CONSTRAINT fk_operation_target FOREIGN KEY (target_release_id)
+    REFERENCES dashboard_releases (dashboard_release_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_operation_previous_week FOREIGN KEY (previous_week_release_id)
+    REFERENCES dashboard_releases (dashboard_release_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_operation_previous_current FOREIGN KEY (previous_current_release_id)
+    REFERENCES dashboard_releases (dashboard_release_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_operation_next_current FOREIGN KEY (next_current_release_id)
+    REFERENCES dashboard_releases (dashboard_release_id) ON DELETE RESTRICT,
+  CONSTRAINT chk_release_operation_action
+    CHECK (action IN ('create', 'freeze_candidate', 'activate', 'reactivate', 'publish', 'freeze_legacy'))
 ) ENGINE=InnoDB;
 
 -- Immutable, release-scoped copies of the exact rows exposed to the backend.

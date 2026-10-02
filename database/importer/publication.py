@@ -79,70 +79,74 @@ def _materialize(engine: Any, connection: Any, release_id: int) -> dict[str, int
 
 def publish_release(engine: Any, release_key: str, backup_dir: Path,
                     *, freeze_existing: bool = False, historical: bool = False) -> dict[str, Any]:
-    """Freeze a draft for current or historical display without rewriting old snapshots."""
+    """Compatibility entry point: first publication or explicit legacy freezing.
+
+    Same-week revisions must use the compare-and-switch activation request.
+    Imports are local to avoid coupling snapshot construction to lifecycle SQL.
+    """
+    from .contracts import ReleaseActivation
+    from .release_revisions import activate_release, record_operation
+    from .snapshot_integrity import verify_frozen_snapshot
+
     if freeze_existing and historical:
         raise ImportErrorSafe("An existing published release cannot be frozen as a historical draft")
+    if not freeze_existing:
+        read = engine.db_connect()
+        try:
+            engine.verify_schema(read)
+            with read.cursor() as cursor:
+                cursor.execute("SELECT release_key FROM dashboard_releases WHERE status='published'")
+                current = cursor.fetchone()
+        finally:
+            read.close()
+        return activate_release(engine, ReleaseActivation(
+            release_key=release_key,expected_week_release=None,
+            expected_current_release=current["release_key"] if current else None,
+            reason="First publication after QA",actor="publish-release",historical=historical),
+            backup_dir,first_publication=True)
+
     connection = engine.db_connect()
     try:
         engine.acquire_import_lock(connection)
         engine.verify_schema(connection)
+        backup = engine.backup_database(backup_dir)
+        backup_hash = engine.sha256_file(backup)
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT dashboard_release_id,status,snapshot_frozen_at "
+                "SELECT * "
                 "FROM dashboard_releases WHERE release_key=%s FOR UPDATE", (release_key,))
             release = cursor.fetchone()
             if not release:
                 raise ImportErrorSafe(f"Unknown release key: {release_key}")
-            expected = "published" if freeze_existing else "draft"
-            if release["status"] != expected:
-                raise ImportErrorSafe(f"Release must be {expected}, not {release['status']}")
+            if release["status"] != "published":
+                raise ImportErrorSafe("freeze-release only handles a currently published legacy release")
             if release["snapshot_frozen_at"] is not None:
                 raise ImportErrorSafe("Release is already frozen; refusing to change its snapshot")
-            if not freeze_existing:
-                cursor.execute(
-                    "SELECT 1 FROM weekly_versions wv JOIN dashboard_releases dr "
-                    "ON dr.collection_run_id=wv.collection_run_id "
-                    "AND dr.analysis_run_id=wv.selected_analysis_run_id "
-                    "WHERE dr.release_key=%s",
-                    (release_key,),
-                )
-                if cursor.fetchone() is None:
-                    raise ImportErrorSafe("Release is not the selected classification for an official week")
-                qa = release_qa_report(connection, release_key)
-                if qa["status"] != "passed":
-                    raise ImportErrorSafe("Draft release failed QA: " + ", ".join(qa["errors"]))
-                if not historical:
-                    cursor.execute("SELECT release_key,snapshot_frozen_at FROM dashboard_releases "
-                                   "WHERE status='published' FOR UPDATE")
-                    current = cursor.fetchone()
-                    if current and current["snapshot_frozen_at"] is None:
-                        raise ImportErrorSafe(
-                            "Existing published release is not frozen; run freeze-release on it first")
-            # The backup is a recovery point, not a substitute for the transaction.
-            backup = engine.backup_database(backup_dir)
-            backup_hash = engine.sha256_file(backup)
+            cursor.execute("SELECT * FROM weekly_versions WHERE week_date=%s FOR UPDATE",
+                           (release["data_cutoff_date"],))
+            week = cursor.fetchone()
+            if not week or week["collection_run_id"] != release["collection_run_id"] or \
+                    week["selected_analysis_run_id"] != release["analysis_run_id"] or \
+                    week["selected_release_id"] not in (None, release["dashboard_release_id"]):
+                raise ImportErrorSafe("Legacy release does not match the official weekly selection")
             release_id = int(release["dashboard_release_id"])
-            counts = _materialize(engine, connection, release_id)
-            if historical:
-                cursor.execute("UPDATE dashboard_releases SET status='retired' "
-                               "WHERE dashboard_release_id=%s", (release_id,))
-            elif not freeze_existing:
-                cursor.execute("UPDATE dashboard_releases SET status='retired' WHERE status='published'")
-                cursor.execute(
-                    "UPDATE dashboard_releases SET status='published',published_at=UTC_TIMESTAMP(6) "
-                    "WHERE dashboard_release_id=%s", (release_id,))
+            _materialize(engine, connection, release_id)
+            cursor.execute("UPDATE weekly_versions SET selected_release_id=%s WHERE week_date=%s",
+                           (release_id, release["data_cutoff_date"]))
             final_qa = release_qa_report(connection, release_key)
             if final_qa["status"] != "passed":
                 raise ImportErrorSafe("Frozen release failed QA: " + ", ".join(final_qa["errors"]))
-            expected_jobs = int(final_qa["metrics"]["av_postings"])
-            if counts["job"] != expected_jobs:
-                raise ImportErrorSafe(f"Snapshot has {counts['job']} jobs, QA expects {expected_jobs}")
+            cursor.execute("SELECT * FROM dashboard_releases WHERE dashboard_release_id=%s", (release_id,))
+            frozen = cursor.fetchone()
+            counts = verify_frozen_snapshot(engine, connection, frozen)
+            op = record_operation(engine,cursor,action="freeze_legacy",release=frozen,week=week,
+                                  current=release,next_current_id=release_id,reason="Freeze legacy published release",
+                                  actor="freeze-release",backup=backup,backup_hash=backup_hash,
+                                  details={"snapshot_rows":counts})
         connection.commit()
         return {"release_key": release_key, "snapshot_rows": counts,
                 "qa_status": final_qa["status"], "backup": str(backup),
-                "backup_sha256": backup_hash,
-                "action": "freeze_existing" if freeze_existing else (
-                    "freeze_historical" if historical else "publish")}
+                "backup_sha256": backup_hash,"database_operation_id":op,"action":"freeze_existing"}
     except Exception:
         connection.rollback()
         raise

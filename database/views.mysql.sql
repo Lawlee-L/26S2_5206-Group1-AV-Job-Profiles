@@ -330,7 +330,8 @@ FROM weekly_versions AS wv
 JOIN collection_runs AS cr ON cr.collection_run_id=wv.collection_run_id
 LEFT JOIN analysis_runs AS ar ON ar.analysis_run_id=wv.selected_analysis_run_id
 LEFT JOIN dashboard_releases AS dr
-  ON dr.analysis_run_id=wv.selected_analysis_run_id
+  ON dr.dashboard_release_id=wv.selected_release_id
+ AND dr.analysis_run_id=wv.selected_analysis_run_id
  AND dr.collection_run_id=wv.collection_run_id;
 
 CREATE OR REPLACE VIEW v_weekly_jobs AS
@@ -356,7 +357,8 @@ SELECT
   snap.cluster_number, snap.cluster_name, snap.is_noise
 FROM weekly_versions AS wv
 JOIN dashboard_releases AS dr
-  ON dr.collection_run_id=wv.collection_run_id
+  ON dr.dashboard_release_id=wv.selected_release_id
+ AND dr.collection_run_id=wv.collection_run_id
  AND dr.analysis_run_id=wv.selected_analysis_run_id
 JOIN dashboard_release_snapshot_rows AS r
   ON r.dashboard_release_id=dr.dashboard_release_id AND r.row_kind='job'
@@ -380,7 +382,8 @@ SELECT wv.week_date, details.dashboard_release_id, details.release_key,
   details.detail_snapshot_available
 FROM weekly_versions AS wv
 JOIN v_frozen_av_job_details AS details
-  ON details.collection_run_id=wv.collection_run_id
+  ON details.dashboard_release_id=wv.selected_release_id
+ AND details.collection_run_id=wv.collection_run_id
  AND details.analysis_run_id=wv.selected_analysis_run_id;
 
 CREATE OR REPLACE VIEW v_weekly_av_job_skills AS
@@ -390,7 +393,8 @@ SELECT
   snap.skill_id, snap.skill_name, snap.skill_type, snap.confidence
 FROM weekly_versions AS wv
 JOIN dashboard_releases AS dr
-  ON dr.collection_run_id=wv.collection_run_id
+  ON dr.dashboard_release_id=wv.selected_release_id
+ AND dr.collection_run_id=wv.collection_run_id
  AND dr.analysis_run_id=wv.selected_analysis_run_id
 JOIN dashboard_release_snapshot_rows AS r
   ON r.dashboard_release_id=dr.dashboard_release_id AND r.row_kind='job_skill'
