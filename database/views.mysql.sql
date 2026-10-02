@@ -15,6 +15,12 @@ SELECT
   jo.advertised_job_title,
   ja.generic_job_title,
   COALESCE(NULLIF(TRIM(ja.generic_job_title), ''), jo.advertised_job_title) AS display_title,
+  -- Detail text comes from this release's observation and selected analysis,
+  -- never from the mutable latest jobs row. Publication preserves these fields.
+  jo.job_description,
+  ja.role_summary,
+  ja.responsibilities_json,
+  ja.requirements_json,
   jo.job_url,
   jo.location_raw,
   jo.city,
@@ -259,6 +265,43 @@ JOIN JSON_TABLE(r.payload_json, '$' COLUMNS (
 )) AS snap
 WHERE dr.status='published' AND dr.snapshot_frozen_at IS NOT NULL;
 
+-- Internal shared reader: current and historical detail views below expose
+-- only immutable AV snapshots. Do not grant this helper to application users.
+CREATE OR REPLACE VIEW v_frozen_av_job_details AS
+SELECT
+  dr.dashboard_release_id, dr.release_key, dr.collection_run_id,
+  dr.analysis_run_id, dr.status AS release_status,
+  snap.job_id, snap.source_key, snap.job_description, snap.role_summary,
+  CASE WHEN JSON_TYPE(JSON_EXTRACT(r.payload_json, '$.responsibilities_json'))='ARRAY'
+    THEN JSON_EXTRACT(r.payload_json, '$.responsibilities_json')
+    ELSE JSON_ARRAY() END AS responsibilities_json,
+  CASE WHEN JSON_TYPE(JSON_EXTRACT(r.payload_json, '$.requirements_json'))='ARRAY'
+    THEN JSON_EXTRACT(r.payload_json, '$.requirements_json')
+    ELSE JSON_ARRAY() END AS requirements_json,
+  JSON_CONTAINS_PATH(r.payload_json, 'all', '$.job_description', '$.role_summary',
+    '$.responsibilities_json', '$.requirements_json') AS detail_snapshot_available
+FROM dashboard_releases AS dr
+JOIN dashboard_release_snapshot_rows AS r
+  ON r.dashboard_release_id=dr.dashboard_release_id AND r.row_kind='job'
+JOIN JSON_TABLE(r.payload_json, '$' COLUMNS (
+  job_id BIGINT PATH '$.job_id', source_key VARCHAR(191) PATH '$.source_key',
+  job_description LONGTEXT PATH '$.job_description',
+  role_summary LONGTEXT PATH '$.role_summary',
+  av_relevant TINYINT PATH '$.av_relevant'
+)) AS snap
+WHERE dr.status IN ('published','retired') AND dr.snapshot_frozen_at IS NOT NULL
+  AND snap.av_relevant=TRUE;
+
+-- Additive contract: job lists keep their existing columns; details are fetched
+-- only for a selected job. Old frozen releases return null/empty detail fields
+-- with detail_snapshot_available=0, rather than borrowing newer source text.
+CREATE OR REPLACE VIEW v_dashboard_job_details AS
+SELECT dashboard_release_id, release_key, job_id, source_key,
+  job_description, role_summary, responsibilities_json, requirements_json,
+  detail_snapshot_available
+FROM v_frozen_av_job_details
+WHERE release_status='published';
+
 -- A weekly collection can be official before classification exists. These
 -- read-only views are the backend's version catalogue and historical inputs;
 -- draft analysis and non-AV classifier rows are never exposed here.
@@ -329,6 +372,16 @@ JOIN JSON_TABLE(r.payload_json, '$' COLUMNS (
   is_noise TINYINT PATH '$.is_noise'
 )) AS snap
 WHERE dr.status IN ('published','retired') AND dr.snapshot_frozen_at IS NOT NULL;
+
+CREATE OR REPLACE VIEW v_weekly_av_job_details AS
+SELECT wv.week_date, details.dashboard_release_id, details.release_key,
+  details.job_id, details.source_key, details.job_description, details.role_summary,
+  details.responsibilities_json, details.requirements_json,
+  details.detail_snapshot_available
+FROM weekly_versions AS wv
+JOIN v_frozen_av_job_details AS details
+  ON details.collection_run_id=wv.collection_run_id
+ AND details.analysis_run_id=wv.selected_analysis_run_id;
 
 CREATE OR REPLACE VIEW v_weekly_av_job_skills AS
 SELECT

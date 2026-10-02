@@ -38,7 +38,8 @@ the backend must not expose it as the public AV job list.
 For a shared server, an administrator should give the backend account `SELECT`
 only on these views: `v_dashboard_jobs`, `v_dashboard_job_skills`,
 `v_dashboard_skill_demand`, `v_dashboard_clusters`, `v_weekly_versions`,
-`v_weekly_jobs`, `v_weekly_av_jobs`, and `v_weekly_av_job_skills`. Grant neither
+`v_weekly_jobs`, `v_weekly_av_jobs`, `v_weekly_av_job_skills`,
+`v_dashboard_job_details`, and `v_weekly_av_job_details`. Grant neither
 base-table access nor `v_candidate_dashboard_*` access to that account. Keep
 schema creation, restore and importer write/backup credentials with the
 database operator. The frontend must never contain a MySQL password.
@@ -243,10 +244,12 @@ GRANT SELECT ON av_job_profiles.v_dashboard_jobs TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_dashboard_job_skills TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_dashboard_skill_demand TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_dashboard_clusters TO 'av_backend'@'127.0.0.1';
+GRANT SELECT ON av_job_profiles.v_dashboard_job_details TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_weekly_versions TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_weekly_jobs TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_weekly_av_jobs TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_weekly_av_job_skills TO 'av_backend'@'127.0.0.1';
+GRANT SELECT ON av_job_profiles.v_weekly_av_job_details TO 'av_backend'@'127.0.0.1';
 ```
 
 Test by connecting as `av_backend` and selecting from a granted view; a

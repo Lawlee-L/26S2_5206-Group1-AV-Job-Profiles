@@ -10,6 +10,10 @@ it is not a substitute for the runnable guide. The current importer/database
 are sufficient to **supply data to the MVP Dashboard**, but the backend API,
 frontend, cluster-name approvals and automated schedule remain separate work.
 
+For full description, extracted responsibilities and requirements in a selected
+job's detail page, see the [job detail read contract](JOB_DETAILS.md). It adds
+current and historical detail views without changing the job-list contract.
+
 ## 1. Database scope and choice
 
 The implementation target is **MySQL 8.0.16 or newer** because the current
