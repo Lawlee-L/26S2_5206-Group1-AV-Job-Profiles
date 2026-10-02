@@ -8,6 +8,9 @@ import {
   History,
 } from "lucide-react";
 
+import Header from "../components/Header";
+import CompanyLogo from "../components/CompanyLogo";
+
 export default function Home() {
   const companies = [
     { name: "NVIDIA", className: "nvidia-logo" },
@@ -59,32 +62,7 @@ export default function Home() {
   return (
     <div className="website">
       {/* NAVIGATION */}
-      <header className="navbar">
-        <Link to="/" className="logo">
-          <span className="logo-circle">
-            <Bot size={16} />
-          </span>
-          <span>AV Job Tracker</span>
-        </Link>
-
-        <nav className="nav-menu">
-          <Link className="active" to="/">
-            Home
-          </Link>
-
-          <Link to="/jobs">Jobs</Link>
-
-          <a href="#companies">Companies</a>
-
-          <a href="#insights">Insights</a>
-
-          <a href="#about">About</a>
-        </nav>
-
-        <Link to="/jobs" className="nav-button">
-          View Jobs
-        </Link>
-      </header>
+       <Header />
 
       {/* HERO */}
 <section className="hero-section">

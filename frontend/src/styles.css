@@ -681,8 +681,10 @@ select {
 
 .jobs-meta {
     display: flex;
-    justify-content: space-between;
     margin: 22px 0 13px;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
     color: #4d566a;
     font-size: 12px;
 }
