@@ -4,7 +4,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-# Load backend/.env before Config reads any environment variables.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
@@ -20,6 +19,16 @@ class Config:
     DB_USER = os.getenv("DB_USER", "av_backend")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "")
     DB_CONNECT_TIMEOUT = int(os.getenv("DB_CONNECT_TIMEOUT", "5"))
+
+    DATA_VIEW_MODE = os.getenv(
+        "DATA_VIEW_MODE",
+        "published"
+    ).strip().lower()
+
+    if DATA_VIEW_MODE not in {"published", "candidate"}:
+        raise RuntimeError(
+            "DATA_VIEW_MODE must be either 'published' or 'candidate'"
+        )
 
     CORS_ORIGINS = [
         origin.strip()

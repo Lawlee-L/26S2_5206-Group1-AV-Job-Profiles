@@ -7,8 +7,36 @@ from decimal import Decimal
 from app.db import fetch_all, fetch_one
 
 
+VIEW_SETS = {
+    "published": {
+        "jobs": "v_dashboard_jobs",
+        "job_skills": "v_dashboard_job_skills",
+        "skills": "v_dashboard_skill_demand",
+        "clusters": "v_dashboard_clusters",
+    },
+    "candidate": {
+        "jobs": "v_candidate_dashboard_jobs",
+        "job_skills": "v_candidate_dashboard_job_skills",
+        "skills": None,
+        "clusters": "v_candidate_dashboard_clusters",
+    },
+}
+
+
 class JobRepository:
     """Read-only access to the published dashboard database contract."""
+
+
+    def __init__(self, view_mode="published"):
+        if view_mode not in VIEW_SETS:
+            raise ValueError(
+                f"Unsupported data view mode: {view_mode}"
+            )
+
+        self.view_mode = view_mode
+        self.views = VIEW_SETS[view_mode]
+
+
 
     JOB_COLUMNS = """
         j.dashboard_release_id,
@@ -62,6 +90,9 @@ class JobRepository:
         remote_type=None,
         seniority=None,
     ):
+
+        jobs_view = self.views["jobs"]
+        
         where_sql, params = self._build_filters(
             search=search,
             company=company,
@@ -73,7 +104,7 @@ class JobRepository:
         count_row = fetch_one(
             f"""
             SELECT COUNT(*) AS total
-            FROM v_dashboard_jobs AS j
+            FROM {jobs_view} AS j
             {where_sql}
             """,
             tuple(params),
@@ -84,7 +115,7 @@ class JobRepository:
         rows = fetch_all(
             f"""
             SELECT {self.JOB_COLUMNS}
-            FROM v_dashboard_jobs AS j
+            FROM {jobs_view} AS j
             {where_sql}
             ORDER BY
               COALESCE(j.date_posted, TIMESTAMP(j.last_seen_date)) DESC,
@@ -108,12 +139,14 @@ class JobRepository:
         }
 
     def list_companies(self):
+        jobs_view = self.views["jobs"]
+
         rows = fetch_all(
-            """
+            f"""
             SELECT
                 j.company_name,
                 COUNT(*) AS job_count
-            FROM v_dashboard_jobs AS j
+            FROM {jobs_view} AS j
             WHERE j.is_active = TRUE
               AND j.av_relevant = TRUE
               AND j.company_name IS NOT NULL
@@ -132,18 +165,33 @@ class JobRepository:
         ]
 
     def list_skills(self):
-        rows = fetch_all(
-            """
-            SELECT
-                skill_id,
-                skill_name,
-                skill_type,
-                job_count,
-                company_count
-            FROM v_dashboard_skill_demand
-            ORDER BY job_count DESC, skill_name ASC
-            """
-        )
+        if self.view_mode == "candidate":
+            rows = fetch_all(
+                """
+                SELECT
+                    skill_id,
+                    skill_name,
+                    skill_type,
+                    COUNT(DISTINCT job_id) AS job_count,
+                    COUNT(DISTINCT company_id) AS company_count
+                FROM v_candidate_dashboard_job_skills
+                GROUP BY skill_id, skill_name, skill_type
+                ORDER BY job_count DESC, skill_name ASC
+                """
+            )
+        else:
+            rows = fetch_all(
+                """
+                SELECT
+                    skill_id,
+                    skill_name,
+                    skill_type,
+                    job_count,
+                    company_count
+                FROM v_dashboard_skill_demand
+                ORDER BY job_count DESC, skill_name ASC
+                """
+            )
 
         return [
             {
@@ -157,8 +205,10 @@ class JobRepository:
         ]
 
     def list_clusters(self):
+        clusters_view = self.views["clusters"]
+
         rows = fetch_all(
-            """
+            f"""
             SELECT
                 cluster_pk,
                 cluster_number,
@@ -177,7 +227,7 @@ class JobRepository:
                 example_titles_json,
                 top_companies_json,
                 notes
-            FROM v_dashboard_clusters
+            FROM {clusters_view}
             ORDER BY
                 is_noise ASC,
                 size_cached DESC,
@@ -218,10 +268,12 @@ class JobRepository:
 
 
     def get_job(self, source_key):
+        jobs_view = self.views["jobs"]
+
         row = fetch_one(
             f"""
             SELECT {self.JOB_COLUMNS}
-            FROM v_dashboard_jobs AS j
+            FROM {jobs_view} AS j
             WHERE j.source_key = %s
               AND j.is_active = TRUE
               AND j.av_relevant = TRUE
@@ -229,21 +281,24 @@ class JobRepository:
             """,
             (source_key,),
         )
+
         if row is None:
             return None
 
         skills = self._skills_for_job_ids([row["job_id"]]).get(row["job_id"], [])
         return self._job_to_api(row, skills)
 
-    @staticmethod
-    def _build_filters(*, search, company, country, remote_type, seniority):
+
+    def _build_filters(self, *, search, company, country, remote_type, seniority):
         clauses = ["j.is_active = TRUE", "j.av_relevant = TRUE"]
         params = []
+
+        skills_view = self.views["job_skills"]
 
         if search:
             pattern = f"%{search.strip()}%"
             clauses.append(
-                """
+                f"""
                 (
                     j.advertised_job_title LIKE %s
                     OR j.generic_job_title LIKE %s
@@ -251,7 +306,7 @@ class JobRepository:
                     OR j.location_raw LIKE %s
                     OR EXISTS (
                         SELECT 1
-                        FROM v_dashboard_job_skills AS s
+                        FROM {skills_view} AS s
                         WHERE s.job_id = j.job_id
                           AND s.skill_name LIKE %s
                     )
@@ -278,23 +333,35 @@ class JobRepository:
 
         return "WHERE " + " AND ".join(clauses), params
 
-    @staticmethod
-    def _skills_for_job_ids(job_ids):
+
+    def _skills_for_job_ids(self, job_ids):
         if not job_ids:
             return {}
+
+        skills_view = self.views["job_skills"]
 
         placeholders = ", ".join(["%s"] * len(job_ids))
         rows = fetch_all(
             f"""
-            SELECT job_id, skill_name, skill_type, confidence, skill_rank
-            FROM v_dashboard_job_skills
+            SELECT 
+                job_id, 
+                skill_name, 
+                skill_type, 
+                confidence, 
+                skill_rank
+            FROM {skills_view}
             WHERE job_id IN ({placeholders})
-            ORDER BY job_id, skill_rank IS NULL, skill_rank, skill_name
+            ORDER BY 
+                job_id, 
+                skill_rank IS NULL, 
+                skill_rank, 
+                skill_name
             """,
             tuple(job_ids),
         )
 
         result = defaultdict(list)
+
         for row in rows:
             result[row["job_id"]].append(
                 {

@@ -23,7 +23,7 @@ def create_app(config_overrides=None, job_repository=None):
         resources={r"/api/*": {"origins": app.config["CORS_ORIGINS"]}},
     )
 
-    app.extensions["job_repository"] = job_repository or JobRepository()
+    app.extensions["job_repository"] = job_repository or JobRepository(app.config["DATA_VIEW_MODE"])
 
     app.register_blueprint(health_bp, url_prefix="/api")
     app.register_blueprint(jobs_bp, url_prefix="/api")
