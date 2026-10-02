@@ -1,16 +1,16 @@
 # Same-week classification revisions and safe re-publication
 
-## 1. Plain-language summary / 大白话
+## 1. Plain-language summary
 
-An official collection date stays the same. Several analyses or dashboard
-snapshots can belong to that date, but **only one release is selected for that
-week**. Importing a candidate does not take the working dashboard offline.
-After review, activate the candidate. If it is wrong, activate the previous
-frozen release again. Nothing is deleted just to change what people see.
+Think of three things: **the collected jobs**, **the analysis of those jobs**,
+and **the saved version that the Dashboard reads**. The collection date stays
+the same when we correct an analysis. A week can have several saved versions,
+but the Dashboard reads only the one we select for that week.
 
-**大白话：日期是“这一周的数据”，分类是“对这份数据的解读”，发布快照是
-“让 Dashboard 实际读取的成品”。先做好新成品，再换展示版本；出问题就换回
-旧成品，不先删旧数据。只补正文等读取能力，可以复用分类，不需要重新跑 AI。**
+Prepare and check the new version first. Then switch to it. The old version
+keeps working while we prepare the new one. If the new version is wrong,
+switch back; do not delete the old data. Adding job descriptions to a saved
+version can reuse the existing analysis: **no new AI run is needed**.
 
 | Identifier | What changes? |
 | --- | --- |
@@ -23,8 +23,16 @@ release**. Updating an earlier week does not rewind the current dashboard.
 
 ## 2. Install before using the new commands
 
-Use the environment and MySQL setup in [TEAM_GUIDE.md](TEAM_GUIDE.md). New empty
-databases use the current `schema.mysql.sql` and `views.mysql.sql` only.
+Use the environment and MySQL setup in [TEAM_GUIDE.md](TEAM_GUIDE.md).
+Choose the installation route before running SQL:
+
+| Your local database | What to apply |
+| --- | --- |
+| New, empty database | Current `schema.mysql.sql`, then `views.mysql.sql`; do not also run migrations 006/007 |
+| Verified Stage 3 database without `weekly_versions` | Backup/test a restored copy, then migration 006, migration 007 and current views |
+| Weekly database already using 006, without `selected_release_id` | Backup/test a restored copy, then migration 007 and current views |
+| Already upgraded to 007 | Do not rerun 007; update views when the read contract changes |
+| Older or unknown schema | Inspect it first; do not guess which numbered migrations apply |
 
 For an existing database already using migration 006:
 
@@ -32,7 +40,16 @@ For an existing database already using migration 006:
 2. Run `python database/weekly_import.py backup` and keep the verified backup.
 3. Restore/test on a **new database name** first if this copy matters.
 4. In MySQL Workbench, select that target schema and execute
-   `migrations/007_release_revisions.sql` **once**.
+   `database/migrations/007_release_revisions.sql` **once**. For the
+   command-line alternative, using the configured MySQL tool and credentials:
+
+   ```powershell
+   $env:MYSQL_PWD = $env:AVDB_PASSWORD
+   Get-Content -Raw database/migrations/007_release_revisions.sql | & $env:AVDB_MYSQL -h $env:AVDB_HOST -P $env:AVDB_PORT -u $env:AVDB_USER -D $env:AVDB_NAME
+   if ($LASTEXITCODE -ne 0) { throw 'Migration 007 failed. Stop and inspect the database before retrying.' }
+   ```
+
+   Check that the command completed successfully before proceeding.
 5. Apply `views.mysql.sql`; check its `USE av_job_profiles` line and change
    it to the intended test database name when using a different local name.
 6. Keep the public-view grants in the team guide. Do not grant the new audit
@@ -43,11 +60,20 @@ provenance and the `release_operations` audit table. It does not replace Li's
 data, classification results or frozen payloads. MySQL table-structure changes
 are not transactional: do not blindly rerun this one-time migration after an
 error. Inspect the target or restore into another new test database.
+If a previous attempt failed, some table changes may already exist; do not
+treat that database as an untouched 006 schema.
 
 The migration selects an existing matching frozen current release, or a sole
 matching frozen historical release. If several historical releases match and
 none is current, it leaves the selection empty for explicit operator review.
 An empty release selection is passed as `none` below.
+
+After installing the views, run `list-releases` and check the selected/current
+keys before any write. Migration 007 keeps the existing frozen snapshots;
+it does **not** add descriptions to an old snapshot. If details are needed,
+use section 5 to create a new release from the same analysis, then review and
+activate it. There is no need to reimport Li's files or rerun Sunjol's model
+just to upgrade this schema.
 
 ## 3. Inspect the actual selections first
 
@@ -224,6 +250,13 @@ required for this feature. `v_weekly_*` now exposes **only the exact selected
 release**, not every frozen revision of the same analysis. `v_dashboard_*`
 still exposes only the current published release. Previously supplied view
 columns remain available.
+
+Use Leon's `DATA_VIEW_MODE=published` for normal integration and display.
+His optional `candidate` mode reads internal draft views, not the selected
+release. These views can contain several same-week revisions. A candidate
+preview must explicitly filter **all** its job, skill and cluster queries to
+one `dashboard_release_id`; changing the view name alone is not sufficient.
+Keep the normal read-only backend account restricted to public views.
 
 The backend must keep related reads on the same release ID/transaction and
 invalidate or version any cached results. Release switching, audit and write

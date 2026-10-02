@@ -16,6 +16,30 @@ most cluster names still await human approval.
 snapshot?** Follow [safe release revisions](RELEASE_REVISIONS.md): stage a
 candidate, review it, then switch. Old versions remain available for reversion.
 
+## Quick route: choose your task
+
+You do not need every command for every update. Only the database operator
+runs imports and switches releases. Other members supply files or read the
+published views.
+
+| What you need to do | Normal route | Instructions |
+| --- | --- | --- |
+| Set up an empty local database | Install tables/views, then import the available files | Sections 3–6 below |
+| Add Li's new weekly file | `plan-collection` → `import-collection` | Section 4; change the file and date |
+| Add that week's first classification | `plan-analysis` → `import-analysis` → `qa-release` → `publish-release` | Sections 5–6; keep the input/output pairing exact |
+| Correct a classification already published for that week | `plan-analysis` → `import-analysis --candidate` → `qa-release` → `activate-release` | [Revision guide, sections 3–6](RELEASE_REVISIONS.md#3-inspect-the-actual-selections-first) |
+| Add details to a saved release without changing the classification | `create-release` → `qa-release` → `activate-release` | [Revision guide, section 5](RELEASE_REVISIONS.md#5-same-analysis-new-dashboard-snapshot-no-ai-rerun) |
+| Switch back after a bad release | `list-releases` → `activate-release` with the old frozen key | [Revision guide, section 7](RELEASE_REVISIONS.md#7-switch-back-retain-both-versions) |
+| Use the Dashboard data | Read the public views; do not run import commands | Section 7 |
+
+The classification example sets the file paths once in `$files`, so reuse
+that variable for validation and import. Copy the returned release key; do
+not guess it. The two `--expected-*` keys in a release switch are intentional
+safety checks: they prevent you from replacing a version that changed since
+you reviewed it. Import and release-switch commands create backups and
+operation reports automatically; run a manual `backup` before a SQL schema
+upgrade.
+
 ## 1. Who supplies, changes, and reads what?
 
 These are **workflow permissions**. A person who installs MySQL locally may
@@ -123,13 +147,14 @@ committed script, screenshot, GitHub issue or Teams post. Use a dedicated
 least-privilege account instead of `root` when a shared server is deployed.
 
 **Already have a populated Stage 3 development database?** Take and verify a
-full backup first. Apply `database/migrations/006_weekly_versions.sql`
-to a **verified Stage 3 schema** only if the weekly table does not yet exist.
-Then apply `007_release_revisions.sql` once to add exact release selection and
-revision evidence; a database already using 006 needs only 007. Replace views using
-`database/views.mysql.sql`. Migration 001–005 are history, not a recipe to
-upgrade an arbitrary database. Test a restored copy first; never apply the
-fresh schema over populated tables. See [version details](WEEKLY_VERSIONS.md).
+full backup first. A verified Stage 3 schema without `weekly_versions` needs
+006, then 007 and current views. A database already using 006 needs only 007
+and current views. An already upgraded database must **not** rerun 007.
+Migration 001–005 are history, not a recipe to upgrade an arbitrary database.
+Test a restored copy first; never apply the fresh schema over populated
+tables. The [upgrade decision table and exact 007 command](RELEASE_REVISIONS.md#2-install-before-using-the-new-commands)
+explain which route to take. The upgrade keeps existing data; adding details
+to an old frozen release is a separate, no-AI re-publication step.
 
 ## 4. Import the four available collection versions
 
@@ -240,6 +265,12 @@ are two equally complete crawls. A `pending` classification week can still
 show collected job states, but not historical AV-skill results. The **frontend**
 calls the backend API, not MySQL. For Power BI, connect locally to the same
 read-only views; a static chart is a prototype, not the versioned API.
+
+For Leon's backend, keep `DATA_VIEW_MODE=published`. Its optional candidate
+mode is for internal testing only and must select one release explicitly
+before it is safe to use with several drafts. The new database detail views
+do not automatically add description fields to an HTTP response; Leon must
+connect them to the job-detail route as shown in [JOB_DETAILS.md](JOB_DETAILS.md).
 
 For a local backend account, a MySQL administrator can execute the following
 **after replacing the example secret**. Use `127.0.0.1` for the backend's

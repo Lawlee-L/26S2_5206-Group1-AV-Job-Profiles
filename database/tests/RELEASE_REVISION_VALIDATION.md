@@ -53,3 +53,28 @@ The existing one skill-less job and missing approved cluster names remain
 quality warnings. These tests verify data movement, boundaries and version
 safety; they do not certify the classifier's semantic correctness or approve
 cluster names.
+
+## Latest backend compatibility check
+
+On 3 October, Leon's `backend-Nel` commit `127e502` was tested against the
+upgraded real-data copy using `DATA_VIEW_MODE=published`. No database writes
+were performed for this check.
+
+- All **38** columns selected by the backend's job repository remain available.
+- Seven GET requests returned HTTP 200: health, database health, paginated
+  jobs, one job detail, companies, skills and clusters.
+- The job-list total matched the database's **2,412 active AV jobs**. The
+  published database contains 2,902 AV jobs when inactive history is included.
+- All **2,902** detail rows in that new snapshot contain the detail contract.
+- The backend's **10 tests passed**. The importer suite was rerun: 57 passed,
+  with the two opt-in MySQL tests skipped in this documentation-only rerun;
+  their earlier successful full run is recorded above.
+
+This is basic read compatibility, not proof of safe concurrent release
+switching. The backend still needs to join the new detail view to return
+descriptions, and pin related queries to one release/read transaction.
+Its optional candidate mode does not currently select a release: several
+drafts could be mixed. The tested copy had only one candidate-visible release,
+so this multi-draft risk was identified from the query/view definitions, not
+observed as a duplicate in this smoke check. Keep normal integration on
+`published` and do not grant candidate views to the public backend account.
