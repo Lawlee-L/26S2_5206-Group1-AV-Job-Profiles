@@ -20,15 +20,6 @@ class Config:
     DB_PASSWORD = os.getenv("DB_PASSWORD", "")
     DB_CONNECT_TIMEOUT = int(os.getenv("DB_CONNECT_TIMEOUT", "5"))
 
-    DATA_VIEW_MODE = os.getenv(
-        "DATA_VIEW_MODE",
-        "published"
-    ).strip().lower()
-
-    if DATA_VIEW_MODE not in {"published", "candidate"}:
-        raise RuntimeError(
-            "DATA_VIEW_MODE must be either 'published' or 'candidate'"
-        )
 
     CORS_ORIGINS = [
         origin.strip()

@@ -23,45 +23,9 @@ def test_detail_array_rejects_invalid_structure():
         _detail_array('{"skill": "Python"}')
 
 
-def test_candidate_job_returns_empty_detail_fields(monkeypatch):
-    repository = JobRepository("candidate")
-
-    monkeypatch.setattr(
-        jobs_module,
-        "fetch_one",
-        lambda query, params: {
-            "job_id": 101,
-            "source_key": "test|job|101",
-            "dashboard_release_id": 7,
-        },
-    )
-
-    monkeypatch.setattr(
-        repository,
-        "_skills_for_job_ids",
-        lambda job_ids: {101: []},
-    )
-
-    monkeypatch.setattr(
-        repository,
-        "_job_to_api",
-        lambda row, skills: {
-            "id": row["source_key"],
-            "jobId": row["job_id"],
-        },
-    )
-
-    result = repository.get_job("test|job|101")
-
-    assert result["description"] is None
-    assert result["roleSummary"] is None
-    assert result["responsibilities"] == []
-    assert result["requirements"] == []
-    assert result["detailSnapshotAvailable"] is False
-
 
 def test_published_job_adds_frozen_details(monkeypatch):
-    repository = JobRepository("published")
+    repository = JobRepository()
 
     responses = iter(
         [
@@ -125,7 +89,7 @@ def test_published_job_adds_frozen_details(monkeypatch):
 
 
 def test_missing_detail_row_does_not_remove_job(monkeypatch):
-    repository = JobRepository("published")
+    repository = JobRepository()
 
     responses = iter(
         [

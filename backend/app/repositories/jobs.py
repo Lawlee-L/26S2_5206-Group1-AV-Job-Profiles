@@ -7,36 +7,18 @@ from decimal import Decimal
 from app.db import fetch_all, fetch_one
 
 
-VIEW_SETS = {
-    "published": {
-        "jobs": "v_dashboard_jobs",
-        "job_skills": "v_dashboard_job_skills",
-        "skills": "v_dashboard_skill_demand",
-        "clusters": "v_dashboard_clusters",
-        "job_details": "v_dashboard_job_details",
-    },
-    "candidate": {
-        "jobs": "v_candidate_dashboard_jobs",
-        "job_skills": "v_candidate_dashboard_job_skills",
-        "skills": None,
-        "clusters": "v_candidate_dashboard_clusters",
-        "job_details": None,
-    },
+VIEWS = {
+    "jobs": "v_dashboard_jobs",
+    "job_skills": "v_dashboard_job_skills",
+    "skills": "v_dashboard_skill_demand",
+    "clusters": "v_dashboard_clusters",
+    "job_details": "v_dashboard_job_details",
 }
 
 
 class JobRepository:
-    """Read-only access to the published dashboard database contract."""
-
-
-    def __init__(self, view_mode="published"):
-        if view_mode not in VIEW_SETS:
-            raise ValueError(
-                f"Unsupported data view mode: {view_mode}"
-            )
-
-        self.view_mode = view_mode
-        self.views = VIEW_SETS[view_mode]
+    def __init__(self):
+        self.views = VIEWS
 
 
 
@@ -95,7 +77,7 @@ class JobRepository:
 
         jobs_view = self.views["jobs"]
         
-        where_sql, params = self._build_filters(
+        join_sql, where_sql, params = self._build_filters(
             search=search,
             company=company,
             country=country,
@@ -107,6 +89,7 @@ class JobRepository:
             f"""
             SELECT COUNT(*) AS total
             FROM {jobs_view} AS j
+            {join_sql}
             {where_sql}
             """,
             tuple(params),
@@ -118,6 +101,7 @@ class JobRepository:
             f"""
             SELECT {self.JOB_COLUMNS}
             FROM {jobs_view} AS j
+            {join_sql}
             {where_sql}
             ORDER BY
               COALESCE(j.date_posted, TIMESTAMP(j.last_seen_date)) DESC,
@@ -167,34 +151,19 @@ class JobRepository:
         ]
 
     def list_skills(self):
-        if self.view_mode == "candidate":
-            rows = fetch_all(
-                """
-                SELECT
-                    skill_id,
-                    skill_name,
-                    skill_type,
-                    COUNT(DISTINCT job_id) AS job_count,
-                    COUNT(DISTINCT company_id) AS company_count
-                FROM v_candidate_dashboard_job_skills
-                GROUP BY skill_id, skill_name, skill_type
-                ORDER BY job_count DESC, skill_name ASC
-                """
-            )
-        else:
-            rows = fetch_all(
-                """
-                SELECT
-                    skill_id,
-                    skill_name,
-                    skill_type,
-                    job_count,
-                    company_count
-                FROM v_dashboard_skill_demand
-                ORDER BY job_count DESC, skill_name ASC
-                """
-            )
-
+        skills_view = self.views["skills"]
+        rows = fetch_all(
+            f"""
+            SELECT
+                skill_id,
+                skill_name,
+                skill_type,
+                job_count,
+                company_count
+            FROM {skills_view}
+            ORDER BY job_count DESC, skill_name ASC
+            """
+        )
         return [
             {
                 "id": row["skill_id"],
@@ -357,30 +326,46 @@ class JobRepository:
 
 
     def _build_filters(self, *, search, company, country, remote_type, seniority):
+        join_sql = ""
         clauses = ["j.is_active = TRUE", "j.av_relevant = TRUE"]
         params = []
 
-        skills_view = self.views["job_skills"]
+        query = (search or "").strip()
 
-        if search:
-            pattern = f"%{search.strip()}%"
+        if query:
+            pattern = f"%{query}%"
+
+            skills_view = self.views["job_skills"]
+
+            join_sql = f"""
+                LEFT JOIN (
+                    SELECT DISTINCT
+                        dashboard_release_id,
+                        job_id
+                    FROM {skills_view}
+                    WHERE skill_name LIKE %s
+                ) AS skill_matches
+                  ON skill_matches.dashboard_release_id =
+                        j.dashboard_release_id
+                  AND skill_matches.job_id = j.job_id
+            """
+
+            # JOIN parameter appears first in the SQL.
+            params.append(pattern)
+
             clauses.append(
-                f"""
+                """
                 (
                     j.advertised_job_title LIKE %s
                     OR j.generic_job_title LIKE %s
                     OR j.company_name LIKE %s
                     OR j.location_raw LIKE %s
-                    OR EXISTS (
-                        SELECT 1
-                        FROM {skills_view} AS s
-                        WHERE s.job_id = j.job_id
-                          AND s.skill_name LIKE %s
-                    )
+                    OR skill_matches.job_id IS NOT NULL
                 )
                 """
             )
-            params.extend([pattern] * 5)
+
+            params.extend([pattern] * 4)
 
         if company:
             clauses.append("j.company_name = %s")
@@ -398,7 +383,9 @@ class JobRepository:
             clauses.append("j.seniority_code = %s")
             params.append(seniority)
 
-        return "WHERE " + " AND ".join(clauses), params
+        where_sql = "WHERE " + " AND ".join(clauses)
+
+        return join_sql, where_sql, params
 
 
     def _skills_for_job_ids(self, job_ids):
