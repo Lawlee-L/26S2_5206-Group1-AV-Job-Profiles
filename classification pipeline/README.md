@@ -49,8 +49,11 @@ first use.
 
 ## Input data
 
-The dataset is **not** in this repository. The pipeline reads a JSON list of
-postings, each shaped like:
+Reviewed dated input datasets are now tracked under
+`../data-collection/deliverables/<week-date>/jobs_history_translated.json`.
+Always select the exact file for the intended run; the available
+`output_full/` example corresponds to **2026-09-25**. The pipeline reads a
+JSON list of postings, each shaped like:
 
 ```json
 {
@@ -121,9 +124,11 @@ same command: finished postings are skipped.
 
 ## Database
 
-`schema.mysql.sql` is the project's database design (MySQL 8). While the layout is
-being checked, `--db` writes the same tables and columns to SQLite
-(`avjobs/schema.sql`), so the file opens in any SQLite viewer:
+The **integration MySQL schema** is `../database/schema.mysql.sql`, and the
+team's import procedure is in `../database/TEAM_GUIDE.md`. This pipeline's
+`schema.mysql.sql` and optional `--db` SQLite tables are local pipeline
+artifacts, **not** a second authoritative backend database. `--db` writes
+local SQLite results (`avjobs/schema.sql`) for pipeline inspection:
 
 | Table | Holds |
 |---|---|
@@ -139,8 +144,10 @@ pointing at the original, only when the model, the exact prompt
 (`analysis_runs.prompt_version`, e.g. `p5-72e4e4cb`) and the posting text
 (`job_analyses.input_content_hash`) all match.
 
-An optional MySQL container is included: `docker compose up -d` loads
-`schema.mysql.sql` (needs `MYSQL_ROOT_PASSWORD` and `MYSQL_PASSWORD` in `.env`).
+An optional **pipeline-local** MySQL container is included: `docker compose up -d`
+loads this folder's `schema.mysql.sql` (needs `MYSQL_ROOT_PASSWORD` and
+`MYSQL_PASSWORD` in `.env`). It is not the integration database described in
+`../database/TEAM_GUIDE.md`.
 
 ## Configuration
 
@@ -188,8 +195,8 @@ avjobs/
   embed.py             MiniLM embeddings
   cluster.py           UMAP, HDBSCAN, cluster summaries, labelling worksheet
   validate.py          reference-posting checks
-  store.py, schema.sql SQLite storage in the tables of schema.mysql.sql
-schema.mysql.sql       full database design (MySQL 8)
+  store.py, schema.sql pipeline-local SQLite storage
+schema.mysql.sql       earlier pipeline-local MySQL design; integration schema is ../database/schema.mysql.sql
 docker-compose.yml     optional local MySQL
 tests/                 offline tests
 ```

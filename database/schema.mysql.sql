@@ -1,7 +1,8 @@
 -- AV Job Profiles relational database foundation
 -- Target: MySQL 8.0.16+
 -- All timestamps are UTC. Application connections should also use UTC.
--- This is the project's single schema: run_pipeline_v2.py writes here.
+-- This is the project's relational schema. The importer loads Li and Sunjol
+-- artifacts here; the classifier does not write directly to this database.
 -- Identifier and hash columns use binary collations. The database default
 -- (utf8mb4_0900_ai_ci) ignores case and accents, so it would treat IDs that
 -- differ only in case as duplicates.
@@ -33,7 +34,7 @@ CREATE TABLE import_batches (
   PRIMARY KEY (import_batch_id),
   UNIQUE KEY uq_import_batch_file (batch_type, file_sha256),
   CONSTRAINT chk_import_batch_status
-    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial')),
+    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial', 'rolled_back')),
   CONSTRAINT chk_import_batch_counts
     CHECK (accepted_rows + rejected_rows <= total_rows)
 ) ENGINE=InnoDB;
@@ -42,7 +43,7 @@ CREATE TABLE import_rejections (
   import_rejection_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   import_batch_id BIGINT UNSIGNED NOT NULL,
   source_row_number INT UNSIGNED NULL,
-  source_key VARCHAR(191) COLLATE utf8mb4_bin NULL,
+  source_key VARCHAR(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   error_code VARCHAR(64) NOT NULL,
   error_message TEXT NOT NULL,
   raw_record JSON NULL,
@@ -53,6 +54,25 @@ CREATE TABLE import_rejections (
   CONSTRAINT fk_import_rejections_batch
     FOREIGN KEY (import_batch_id) REFERENCES import_batches (import_batch_id)
     ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Before-images make a committed weekly import reversible without restoring
+-- the entire database or overwriting work added by another owner.
+CREATE TABLE import_job_undo (
+  import_batch_id BIGINT UNSIGNED NOT NULL,
+  source_key VARCHAR(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  change_kind VARCHAR(8) NOT NULL,
+  previous_row_json JSON NULL,
+  applied_row_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  PRIMARY KEY (import_batch_id, source_key),
+  CONSTRAINT fk_import_job_undo_batch
+    FOREIGN KEY (import_batch_id) REFERENCES import_batches (import_batch_id)
+    ON DELETE CASCADE,
+  CONSTRAINT chk_import_job_undo_kind
+    CHECK (change_kind IN ('insert', 'update')),
+  CONSTRAINT chk_import_job_undo_before
+    CHECK ((change_kind = 'insert' AND previous_row_json IS NULL)
+       OR (change_kind = 'update' AND previous_row_json IS NOT NULL))
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------------
@@ -99,6 +119,12 @@ CREATE TABLE collection_runs (
   pipeline_version VARCHAR(64) NULL,
   git_commit_sha CHAR(40) NULL,
   source_scope_json JSON NULL,
+  -- A cumulative export is not evidence that every source was crawled at this time.
+  run_kind VARCHAR(32) NOT NULL DEFAULT 'cumulative_state_export',
+  snapshot_as_of_date DATE NULL,
+  snapshot_generated_at DATETIME(6) NULL,
+  time_quality VARCHAR(24) NOT NULL DEFAULT 'date_only',
+  source_report_available BOOLEAN NOT NULL DEFAULT FALSE,
   notes TEXT NULL,
   started_at DATETIME(6) NOT NULL,
   completed_at DATETIME(6) NULL,
@@ -107,7 +133,11 @@ CREATE TABLE collection_runs (
   UNIQUE KEY uq_collection_runs_key (run_key),
   KEY idx_collection_runs_completed (completed_at),
   CONSTRAINT chk_collection_run_status
-    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial'))
+    CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial')),
+  CONSTRAINT chk_collection_run_kind
+    CHECK (run_kind IN ('cumulative_state_export', 'verified_crawl')),
+  CONSTRAINT chk_collection_time_quality
+    CHECK (time_quality IN ('date_only', 'exact_utc'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE source_run_results (
@@ -132,9 +162,9 @@ CREATE TABLE source_run_results (
 
 CREATE TABLE jobs (
   job_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  source_key VARCHAR(191) COLLATE utf8mb4_bin NOT NULL,
+  source_key VARCHAR(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   source_id VARCHAR(64) NOT NULL,
-  source_job_id VARCHAR(255) COLLATE utf8mb4_bin NULL,
+  source_job_id VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   advertised_job_title VARCHAR(512) NULL,
   job_description LONGTEXT NULL,
   job_url VARCHAR(2048) NULL,
@@ -154,10 +184,13 @@ CREATE TABLE jobs (
   latest_collected_at DATETIME(6) NOT NULL,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   is_new_in_latest_run BOOLEAN NOT NULL DEFAULT FALSE,
-  -- SHA-1 of the whitespace-normalised description (clean._content_hash).
+  -- Pipeline-compatible SHA-1 of the normalized description; used for exact-text
+  -- deduplication and to prove which description a classifier analysis read.
   content_hash CHAR(40) CHARACTER SET ascii COLLATE ascii_bin NULL,
-  -- Set when dedupe folds this posting into an earlier one: an exact hash match,
-  -- or near-identical text from the same company. Duplicates are not analysed.
+  -- SHA-256 of six canonical source fields; used only for source-record change detection.
+  record_hash_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
+  -- Optional current pipeline cache. Release-specific deduplication lives in
+  -- job_deduplication_links and must not rely on this mutable pointer.
   duplicate_of_job_id BIGINT UNSIGNED NULL,
   duplicate_type VARCHAR(8) NULL,
   duplicate_similarity DECIMAL(5,4) NULL,
@@ -206,11 +239,26 @@ CREATE TABLE job_observations (
   job_description LONGTEXT NULL,
   job_url VARCHAR(2048) NULL,
   location_raw VARCHAR(1024) NULL,
+  city VARCHAR(191) NULL,
+  state_region VARCHAR(191) NULL,
+  country_code CHAR(2) NULL,
+  remote_type VARCHAR(24) NULL,
   salary_raw VARCHAR(1024) NULL,
+  salary_min DECIMAL(18,2) NULL,
+  salary_max DECIMAL(18,2) NULL,
+  salary_currency CHAR(3) NULL,
+  salary_period VARCHAR(24) NULL,
   date_posted DATETIME(6) NULL,
-  collected_at DATETIME(6) NOT NULL,
+  first_seen_date DATE NOT NULL,
+  last_seen_date DATE NOT NULL,
+  -- NULL for cumulative exports: no per-row crawl observation was supplied.
+  collected_at DATETIME(6) NULL,
+  state_as_of_date DATE NOT NULL,
+  source_last_collected_at DATETIME(6) NULL,
   is_active_at_run BOOLEAN NOT NULL DEFAULT TRUE,
+  is_new_at_run BOOLEAN NOT NULL DEFAULT FALSE,
   content_hash CHAR(40) CHARACTER SET ascii COLLATE ascii_bin NULL,
+  record_hash_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
   raw_payload_json JSON NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (job_observation_id),
@@ -234,7 +282,7 @@ CREATE TABLE job_observations (
 
 CREATE TABLE analysis_runs (
   analysis_run_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  run_key VARCHAR(96) COLLATE utf8mb4_bin NOT NULL,
+  run_key VARCHAR(96) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   method VARCHAR(32) NOT NULL,
   provider VARCHAR(64) NULL,
   model_name VARCHAR(128) NULL,
@@ -243,8 +291,10 @@ CREATE TABLE analysis_runs (
   taxonomy_version VARCHAR(64) NULL,
   code_version VARCHAR(64) NULL,
   source_dataset_version VARCHAR(128) NULL,
+  collection_run_id BIGINT UNSIGNED NULL,
+  source_snapshot_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
   parameters_json JSON NULL,
-  -- Totals for paid model calls, from the billed usage the API reports.
+  -- Aggregate billed usage for paid model calls in this run, when supplied.
   prompt_tokens BIGINT UNSIGNED NULL,
   output_tokens BIGINT UNSIGNED NULL,
   cost_usd DECIMAL(12,6) NULL,
@@ -255,11 +305,40 @@ CREATE TABLE analysis_runs (
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (analysis_run_id),
   UNIQUE KEY uq_analysis_runs_key (run_key),
+  UNIQUE KEY uq_analysis_collection_pair (analysis_run_id, collection_run_id),
+  KEY idx_analysis_collection (collection_run_id),
   KEY idx_analysis_runs_completed (completed_at),
+  CONSTRAINT fk_analysis_collection
+    FOREIGN KEY (collection_run_id) REFERENCES collection_runs (collection_run_id)
+    ON DELETE RESTRICT,
   CONSTRAINT chk_analysis_method
     CHECK (method IN ('llm', 'dictionary', 'hybrid', 'manual')),
   CONSTRAINT chk_analysis_run_status
     CHECK (status IN ('pending', 'running', 'completed', 'failed', 'partial'))
+) ENGINE=InnoDB;
+
+-- A human-readable weekly version selects exactly one collection file. Analysis
+-- is optional and may be attached later; internal run IDs and file hashes still
+-- distinguish technical reruns from the selected weekly version.
+CREATE TABLE weekly_versions (
+  week_date DATE NOT NULL,
+  collection_run_id BIGINT UNSIGNED NOT NULL,
+  selected_analysis_run_id BIGINT UNSIGNED NULL,
+  selected_release_id BIGINT UNSIGNED NULL,
+  created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+    ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (week_date),
+  UNIQUE KEY uq_weekly_collection (collection_run_id),
+  UNIQUE KEY uq_weekly_analysis (selected_analysis_run_id),
+  KEY idx_weekly_analysis_pair (selected_analysis_run_id, collection_run_id),
+  CONSTRAINT fk_weekly_collection
+    FOREIGN KEY (collection_run_id) REFERENCES collection_runs (collection_run_id)
+    ON DELETE RESTRICT,
+  CONSTRAINT fk_weekly_analysis_pair
+    FOREIGN KEY (selected_analysis_run_id, collection_run_id)
+    REFERENCES analysis_runs (analysis_run_id, collection_run_id)
+    ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 CREATE TABLE job_analyses (
@@ -338,6 +417,35 @@ CREATE TABLE job_analyses (
       OR experience_max_years IS NULL
       OR experience_max_years >= experience_min_years
     )
+) ENGINE=InnoDB;
+
+-- Preserve intentional exact/near deduplication decisions for each analysis run.
+-- This keeps the source job rows while making reduced model coverage auditable.
+CREATE TABLE job_deduplication_links (
+  analysis_run_id BIGINT UNSIGNED NOT NULL,
+  duplicate_job_id BIGINT UNSIGNED NOT NULL,
+  kept_job_id BIGINT UNSIGNED NOT NULL,
+  duplicate_type VARCHAR(8) NOT NULL,
+  similarity DECIMAL(5,4) NOT NULL,
+  source_row_index INT NULL,
+  created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (analysis_run_id, duplicate_job_id),
+  KEY idx_job_deduplication_kept (analysis_run_id, kept_job_id),
+  CONSTRAINT fk_job_deduplication_run
+    FOREIGN KEY (analysis_run_id) REFERENCES analysis_runs (analysis_run_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_job_deduplication_duplicate
+    FOREIGN KEY (duplicate_job_id) REFERENCES jobs (job_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_job_deduplication_kept
+    FOREIGN KEY (kept_job_id) REFERENCES jobs (job_id)
+    ON DELETE CASCADE,
+  CONSTRAINT chk_job_deduplication_pair
+    CHECK (duplicate_job_id <> kept_job_id),
+  CONSTRAINT chk_job_deduplication_type
+    CHECK (duplicate_type IN ('exact', 'near')),
+  CONSTRAINT chk_job_deduplication_similarity
+    CHECK (similarity BETWEEN 0 AND 1)
 ) ENGINE=InnoDB;
 
 CREATE TABLE skills (
@@ -433,6 +541,7 @@ CREATE TABLE cluster_runs (
 CREATE TABLE clusters (
   cluster_pk BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   cluster_run_id BIGINT UNSIGNED NOT NULL,
+  population VARCHAR(24) NOT NULL,
   cluster_number INT NOT NULL,
   current_label_revision_id BIGINT UNSIGNED NULL,
   cluster_name VARCHAR(255) NULL,
@@ -450,7 +559,7 @@ CREATE TABLE clusters (
   updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
     ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (cluster_pk),
-  UNIQUE KEY uq_clusters_run_number (cluster_run_id, cluster_number),
+  UNIQUE KEY uq_clusters_run_population_number (cluster_run_id, population, cluster_number),
   UNIQUE KEY uq_clusters_pk_run (cluster_pk, cluster_run_id),
   KEY idx_clusters_family (job_family, specialisation),
   CONSTRAINT fk_clusters_run
@@ -458,6 +567,8 @@ CREATE TABLE clusters (
     ON DELETE CASCADE,
   CONSTRAINT chk_cluster_lean
     CHECK (lean IS NULL OR lean IN ('technical', 'corporate', 'mixed', 'noise')),
+  CONSTRAINT chk_cluster_population
+    CHECK (population IN ('av_relevant', 'not_av_relevant')),
   CONSTRAINT chk_cluster_technical_score
     CHECK (technical_score IS NULL OR technical_score BETWEEN 0 AND 1)
 ) ENGINE=InnoDB;
@@ -566,8 +677,11 @@ CREATE TABLE dashboard_releases (
   analysis_run_id BIGINT UNSIGNED NOT NULL,
   cluster_run_id BIGINT UNSIGNED NOT NULL,
   data_cutoff_date DATE NOT NULL,
+  parent_release_id BIGINT UNSIGNED NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'draft',
   published_at DATETIME(6) NULL,
+  snapshot_frozen_at DATETIME(6) NULL,
+  snapshot_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
   notes TEXT NULL,
   published_guard TINYINT
     GENERATED ALWAYS AS (CASE WHEN status = 'published' THEN 1 ELSE NULL END) STORED,
@@ -576,6 +690,7 @@ CREATE TABLE dashboard_releases (
     ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (dashboard_release_id),
   UNIQUE KEY uq_dashboard_release_key (release_key),
+  UNIQUE KEY uq_release_week_pair (dashboard_release_id, collection_run_id, analysis_run_id),
   UNIQUE KEY uq_single_published_release (published_guard),
   KEY idx_dashboard_release_runs (analysis_run_id, cluster_run_id),
   CONSTRAINT fk_dashboard_release_collection
@@ -583,6 +698,9 @@ CREATE TABLE dashboard_releases (
     ON DELETE RESTRICT,
   CONSTRAINT fk_dashboard_release_analysis
     FOREIGN KEY (analysis_run_id) REFERENCES analysis_runs (analysis_run_id)
+    ON DELETE RESTRICT,
+  CONSTRAINT fk_release_parent
+    FOREIGN KEY (parent_release_id) REFERENCES dashboard_releases (dashboard_release_id)
     ON DELETE RESTRICT,
   CONSTRAINT fk_dashboard_release_cluster
     FOREIGN KEY (cluster_run_id, analysis_run_id)
@@ -592,4 +710,62 @@ CREATE TABLE dashboard_releases (
     CHECK (status IN ('draft', 'published', 'retired')),
   CONSTRAINT chk_dashboard_release_published_at
     CHECK (status <> 'published' OR published_at IS NOT NULL)
+) ENGINE=InnoDB;
+
+-- Pin the exact frozen release, not every release using the same analysis.
+-- Added here because dashboard_releases is created after weekly_versions.
+ALTER TABLE weekly_versions
+  ADD KEY idx_weekly_release_pair (selected_release_id, collection_run_id, selected_analysis_run_id),
+  ADD CONSTRAINT fk_weekly_release_pair
+    FOREIGN KEY (selected_release_id, collection_run_id, selected_analysis_run_id)
+    REFERENCES dashboard_releases (dashboard_release_id, collection_run_id, analysis_run_id)
+    ON DELETE RESTRICT,
+  ADD CONSTRAINT chk_weekly_release_analysis
+    CHECK (selected_release_id IS NULL OR selected_analysis_run_id IS NOT NULL);
+
+-- Append-only workflow evidence. Failed attempts also have local CLI reports;
+-- successful state changes and their evidence commit in the same transaction.
+CREATE TABLE release_operations (
+  operation_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  action VARCHAR(24) NOT NULL,
+  week_date DATE NOT NULL,
+  target_release_id BIGINT UNSIGNED NOT NULL,
+  previous_week_release_id BIGINT UNSIGNED NULL,
+  previous_current_release_id BIGINT UNSIGNED NULL,
+  next_current_release_id BIGINT UNSIGNED NULL,
+  reason TEXT NOT NULL,
+  actor VARCHAR(128) NOT NULL,
+  backup_file VARCHAR(1024) NOT NULL,
+  backup_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  details_json JSON NOT NULL,
+  created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (operation_id),
+  KEY idx_release_operations_week (week_date, created_at),
+  CONSTRAINT fk_operation_target FOREIGN KEY (target_release_id)
+    REFERENCES dashboard_releases (dashboard_release_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_operation_previous_week FOREIGN KEY (previous_week_release_id)
+    REFERENCES dashboard_releases (dashboard_release_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_operation_previous_current FOREIGN KEY (previous_current_release_id)
+    REFERENCES dashboard_releases (dashboard_release_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_operation_next_current FOREIGN KEY (next_current_release_id)
+    REFERENCES dashboard_releases (dashboard_release_id) ON DELETE RESTRICT,
+  CONSTRAINT chk_release_operation_action
+    CHECK (action IN ('create', 'freeze_candidate', 'activate', 'reactivate', 'publish', 'freeze_legacy'))
+) ENGINE=InnoDB;
+
+-- Immutable, release-scoped copies of the exact rows exposed to the backend.
+-- They deliberately do not join mutable jobs, skills or current cluster labels.
+CREATE TABLE dashboard_release_snapshot_rows (
+  dashboard_release_id BIGINT UNSIGNED NOT NULL,
+  row_kind VARCHAR(16) NOT NULL,
+  entity_key VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  payload_json JSON NOT NULL,
+  row_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  PRIMARY KEY (dashboard_release_id, row_kind, entity_key),
+  KEY idx_release_snapshot_kind (row_kind),
+  CONSTRAINT fk_snapshot_release
+    FOREIGN KEY (dashboard_release_id) REFERENCES dashboard_releases (dashboard_release_id)
+    ON DELETE RESTRICT,
+  CONSTRAINT chk_release_snapshot_kind
+    CHECK (row_kind IN ('job', 'job_skill', 'cluster'))
 ) ENGINE=InnoDB;

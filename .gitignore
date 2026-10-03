@@ -10,4 +10,6 @@ data-collection/data/run_reports/
 data-collection/data/translation/
 *.egg-info/
 data-collection/data/history/
+/database/backups/
+/database/operation_logs/
 node_modules/
