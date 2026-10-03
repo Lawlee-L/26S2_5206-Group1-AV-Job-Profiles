@@ -9,12 +9,14 @@ from __future__ import annotations
 
 from importlib import import_module
 from pathlib import Path
+from datetime import date
 from types import ModuleType
 from typing import Any
 
-from .contracts import AnalysisFiles, CollectionFiles
+from .contracts import AnalysisFiles, CollectionFiles, ReleaseActivation
 from .release_metrics import release_qa_report
 from .publication import publish_release
+from .release_revisions import create_release, activate_release, list_releases
 from .trends import trend_readiness_report
 
 
@@ -58,6 +60,7 @@ class MySQLImporterBackend:
             files.av_cluster_summary, files.other_cluster_summary,
             files.duplicates, files.failures, backup_dir, git_commit,
             week_date=files.week_date,
+            candidate=files.candidate,
         )
 
     def backup(self, backup_dir: Path) -> dict[str, Any]:
@@ -103,3 +106,13 @@ class MySQLImporterBackend:
             return trend_readiness_report(connection)
         finally:
             connection.close()
+
+    def create_release(self, source_key: str, reason: str, actor: str,
+                       backup_dir: Path) -> dict[str, Any]:
+        return create_release(self._engine(),source_key,reason,actor,backup_dir)
+
+    def activate_release(self, request: ReleaseActivation, backup_dir: Path) -> dict[str, Any]:
+        return activate_release(self._engine(),request,backup_dir)
+
+    def list_releases(self, week_date: date | None = None) -> dict[str, Any]:
+        return list_releases(self._engine(),week_date)

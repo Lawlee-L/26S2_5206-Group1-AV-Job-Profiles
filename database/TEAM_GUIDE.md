@@ -12,6 +12,34 @@ API, frontend, automatic scheduling, cluster-label approval UI, or a verified
 labour-market trend. The 25 September example has 2,902 displayable AV jobs;
 most cluster names still await human approval.
 
+**Need to correct the same week's classification or add detail fields to an old
+snapshot?** Follow [safe release revisions](RELEASE_REVISIONS.md): stage a
+candidate, review it, then switch. Old versions remain available for reversion.
+
+## Quick route: choose your task
+
+You do not need every command for every update. Only the database operator
+runs imports and switches releases. Other members supply files or read the
+published views.
+
+| What you need to do | Normal route | Instructions |
+| --- | --- | --- |
+| Set up an empty local database | Install tables/views, then import the available files | Sections 3–6 below |
+| Add Li's new weekly file | `plan-collection` → `import-collection` | Section 4; change the file and date |
+| Add that week's first classification | `plan-analysis` → `import-analysis` → `qa-release` → `publish-release` | Sections 5–6; keep the input/output pairing exact |
+| Correct a classification already published for that week | `plan-analysis` → `import-analysis --candidate` → `qa-release` → `activate-release` | [Revision guide, sections 3–6](RELEASE_REVISIONS.md#3-inspect-the-actual-selections-first) |
+| Add details to a saved release without changing the classification | `create-release` → `qa-release` → `activate-release` | [Revision guide, section 5](RELEASE_REVISIONS.md#5-same-analysis-new-dashboard-snapshot-no-ai-rerun) |
+| Switch back after a bad release | `list-releases` → `activate-release` with the old frozen key | [Revision guide, section 7](RELEASE_REVISIONS.md#7-switch-back-retain-both-versions) |
+| Use the Dashboard data | Read the public views; do not run import commands | Section 7 |
+
+The classification example sets the file paths once in `$files`, so reuse
+that variable for validation and import. Copy the returned release key; do
+not guess it. The two `--expected-*` keys in a release switch are intentional
+safety checks: they prevent you from replacing a version that changed since
+you reviewed it. Import and release-switch commands create backups and
+operation reports automatically; run a manual `backup` before a SQL schema
+upgrade.
+
 ## 1. Who supplies, changes, and reads what?
 
 These are **workflow permissions**. A person who installs MySQL locally may
@@ -38,7 +66,8 @@ the backend must not expose it as the public AV job list.
 For a shared server, an administrator should give the backend account `SELECT`
 only on these views: `v_dashboard_jobs`, `v_dashboard_job_skills`,
 `v_dashboard_skill_demand`, `v_dashboard_clusters`, `v_weekly_versions`,
-`v_weekly_jobs`, `v_weekly_av_jobs`, and `v_weekly_av_job_skills`. Grant neither
+`v_weekly_jobs`, `v_weekly_av_jobs`, `v_weekly_av_job_skills`,
+`v_dashboard_job_details`, and `v_weekly_av_job_details`. Grant neither
 base-table access nor `v_candidate_dashboard_*` access to that account. Keep
 schema creation, restore and importer write/backup credentials with the
 database operator. The frontend must never contain a MySQL password.
@@ -118,11 +147,14 @@ committed script, screenshot, GitHub issue or Teams post. Use a dedicated
 least-privilege account instead of `root` when a shared server is deployed.
 
 **Already have a populated Stage 3 development database?** Take and verify a
-full backup first. Apply only `database/migrations/006_weekly_versions.sql`
-to a **verified Stage 3 schema**, then replace its views using
-`database/views.mysql.sql`. Migration 001–005 are history, not a recipe to
-upgrade an arbitrary database. Test a restored copy first; never apply the
-fresh schema over populated tables. See [version details](WEEKLY_VERSIONS.md).
+full backup first. A verified Stage 3 schema without `weekly_versions` needs
+006, then 007 and current views. A database already using 006 needs only 007
+and current views. An already upgraded database must **not** rerun 007.
+Migration 001–005 are history, not a recipe to upgrade an arbitrary database.
+Test a restored copy first; never apply the fresh schema over populated
+tables. The [upgrade decision table and exact 007 command](RELEASE_REVISIONS.md#2-install-before-using-the-new-commands)
+explain which route to take. The upgrade keeps existing data; adding details
+to an old frozen release is a separate, no-AI re-publication step.
 
 ## 4. Import the four available collection versions
 
@@ -199,6 +231,9 @@ If an older week's classification is added later, QA it and use
 `publish-release --release-key <older-draft-key> --historical`: it freezes an
 older version for `v_weekly_av_*` but **does not** replace the current
 Dashboard. A frozen release cannot be edited or rolled back as a normal draft.
+Same-week replacements use `import-analysis --candidate` and `activate-release`,
+not another first `publish-release`. Re-publication of unchanged analysis uses
+`create-release`. See [the step-by-step examples](RELEASE_REVISIONS.md).
 
 ## 7. Read the data
 
@@ -231,6 +266,12 @@ show collected job states, but not historical AV-skill results. The **frontend**
 calls the backend API, not MySQL. For Power BI, connect locally to the same
 read-only views; a static chart is a prototype, not the versioned API.
 
+For Leon's backend, keep `DATA_VIEW_MODE=published`. Its optional candidate
+mode is for internal testing only and must select one release explicitly
+before it is safe to use with several drafts. The new database detail views
+do not automatically add description fields to an HTTP response; Leon must
+connect them to the job-detail route as shown in [JOB_DETAILS.md](JOB_DETAILS.md).
+
 For a local backend account, a MySQL administrator can execute the following
 **after replacing the example secret**. Use `127.0.0.1` for the backend's
 MySQL host, and give Power BI its own account if it needs one. This account
@@ -243,10 +284,12 @@ GRANT SELECT ON av_job_profiles.v_dashboard_jobs TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_dashboard_job_skills TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_dashboard_skill_demand TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_dashboard_clusters TO 'av_backend'@'127.0.0.1';
+GRANT SELECT ON av_job_profiles.v_dashboard_job_details TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_weekly_versions TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_weekly_jobs TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_weekly_av_jobs TO 'av_backend'@'127.0.0.1';
 GRANT SELECT ON av_job_profiles.v_weekly_av_job_skills TO 'av_backend'@'127.0.0.1';
+GRANT SELECT ON av_job_profiles.v_weekly_av_job_details TO 'av_backend'@'127.0.0.1';
 ```
 
 Test by connecting as `av_backend` and selecting from a granted view; a
@@ -262,9 +305,12 @@ Run `python database/weekly_import.py <command> --help` for exact flags.
 | `plan-collection --input FILE [--previous FILE]` | Validate/count a Li file and optionally compare it with an earlier one | None |
 | `import-collection --input FILE --week-date YYYY-MM-DD [--historical]` | Select one official Li file for that week; use `--historical` only to backfill an older week | Backup, collection run, observations; normal import also updates latest jobs |
 | `plan-analysis --source-input FILE --postings FILE --metadata FILE --av-summary FILE --other-summary FILE --duplicates FILE --failures FILE` | Reconcile one complete Sunjol run against the Li file | None |
-| `import-analysis` with the same seven file flags, `--week-date` and `--git-commit` | Check exact weekly pairing and load derived results | Backup, analysis/skills/clusters and draft release |
+| `import-analysis` with the same seven file flags, `--week-date`, `--git-commit` and optional `--candidate` | Check exact weekly pairing and load derived results; candidate mode never changes the formal selection | Backup, analysis/skills/clusters and draft release |
 | `qa-release --release-key KEY` | Check counts, AV-only scope, skill/cluster gaps and release consistency | None; writes only local operation log |
-| `publish-release --release-key KEY [--historical]` | Freeze approved draft; without the flag switch current Dashboard, with it preserve current release | Backup and immutable release snapshot |
+| `publish-release --release-key KEY [--historical]` | First publication of a normally imported, selected analysis; revisions require explicit activation | Backup, frozen snapshot and exact weekly release selection |
+| `list-releases [--week-date YYYY-MM-DD]` | Show drafts, frozen revisions, selected weekly releases and current Dashboard | None; local operation log |
+| `create-release --from-release-key KEY --reason TEXT [--actor NAME]` | New draft reusing existing collection/analysis/clusters; no AI rerun | Backup, draft with parent provenance and creation evidence |
+| `activate-release --release-key KEY --expected-week-release OLD --expected-current-release CURRENT --reason TEXT [--historical] [--actor NAME]` | Activate a reviewed draft or reactivate an intact old snapshot; use `none` for an absent selection | Backup, optional preparation, atomic pointer/status switch and operation evidence |
 | `backup [--backup-dir DIR]` | Make a compressed full MySQL dump and checksum | Local `.sql.gz`, no DB data change |
 | `restore --file BACKUP --target-db NEW_NAME` | Verify dump and restore **only into a new database name** | New database; never overwrites one |
 | `rollback [--batch-id ID]` | Undo only the latest eligible import batch | Backup first; refuses dependent/frozen data |
@@ -275,8 +321,11 @@ Every parsed operation writes a JSON report and append-only JSONL log under
 `database/operation_logs/` by default. Backups go to `database/backups/`.
 Both directories are Git-ignored; never upload them as team deliverables.
 Use `--audit-dir DIR` or `--backup-dir DIR` where supported to redirect local
-files. A failed import is transactional, but do not rely on rollback after
-publication: restore a verified backup into a **new** database for recovery.
+files. Failed imports roll back. For a wrong published classification, use
+`activate-release` to switch back, not the destructive import-batch `rollback`.
+If final activation fails, the previous release stays visible; a prepared,
+frozen draft may remain for retry. Use backup restore into a **new** database
+for actual database recovery, not routine version switching.
 
 ## 9. Before handing data to the backend
 

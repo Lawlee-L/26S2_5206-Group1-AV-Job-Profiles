@@ -28,3 +28,16 @@ class AnalysisFiles:
     duplicates: Path
     failures: Path
     week_date: date | None = None
+    candidate: bool = False
+
+
+@dataclass(frozen=True)
+class ReleaseActivation:
+    """An explicit compare-and-switch request; None means no previous selection."""
+
+    release_key: str
+    expected_week_release: str | None
+    expected_current_release: str | None
+    reason: str
+    actor: str
+    historical: bool = False

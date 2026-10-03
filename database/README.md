@@ -10,6 +10,15 @@ it is not a substitute for the runnable guide. The current importer/database
 are sufficient to **supply data to the MVP Dashboard**, but the backend API,
 frontend, cluster-name approvals and automated schedule remain separate work.
 
+For full description, extracted responsibilities and requirements in a selected
+job's detail page, see the [job detail read contract](JOB_DETAILS.md). It adds
+current and historical detail views without changing the job-list contract.
+
+For a corrected classification of the **same week**, safe version switching,
+switching back, or rebuilding a snapshot without rerunning AI, see
+[the release revision guide](RELEASE_REVISIONS.md). Candidate import leaves
+the working release visible; activation changes the exact official selection.
+
 ## 1. Database scope and choice
 
 The implementation target is **MySQL 8.0.16 or newer** because the current
@@ -289,7 +298,7 @@ from disappearing silently.
 | `companies` | Provide one canonical company identity instead of repeating inconsistent company names in every job. | Numeric `company_id`, canonical name, slug, optional website and headquarters country. | One company has many `job_sources`. Maintained by Li's source configuration/import process. |
 | `job_sources` | Describe each configured careers source from which jobs are collected. | Stable `source_id`, `company_id`, platform/ATS, region, endpoint, enabled flag and source configuration JSON. | One source belongs to one company and publishes many `jobs`; it also has one result per collection run. Written from the checked source configuration. |
 | `collection_runs` | Version a cumulative export or a verified crawl without confusing the two. | Run ID/key, kind, date/exact-time quality, source-report availability, operation times. | Parent of `source_run_results` and `job_observations`. The current importer records cumulative exports as partial, not complete crawls. |
-| `weekly_versions` | Select exactly one official collection file per week and, optionally, its matching analysis. | `week_date`, selected collection run, nullable selected analysis run and timestamps. | One week points to one collection; a composite foreign key ensures the selected analysis belongs to that collection. Written only by the importer. |
+| `weekly_versions` | Select exactly one official collection file per week and, optionally, its matching analysis and exact frozen release. | `week_date`, selected collection run, nullable selected analysis run, nullable selected release ID and timestamps. | Composite foreign keys enforce that the analysis and release belong to that collection. Multiple revisions may exist, but only one is selected. Written only by the importer. |
 | `source_run_results` | Distinguish a genuinely removed job from a source that failed during collection. | Composite run/source key, success/failure/skipped status, job count, error message, snapshot path and completion time. | A future verified-crawl integration must write these; the current cumulative export has no such evidence and leaves this table empty. |
 | `jobs` | Store the latest canonical state of every known source advertisement for fast backend access. | Internal `job_id`, unique `source_key`, source job ID, title, description, URL, raw/normalised location, raw/normalised salary, posting/seen/collection dates, active/new flags, classifier `content_hash` (SHA-1), and change-detection `record_hash_sha256`. | One job belongs to one source and has many observations and analysis versions. Upserted by the collection importer; classification must not overwrite it. |
 | `job_observations` | Preserve the full job state in each supplied export, including inactive jobs. | Job/run IDs, all dashboard source fields, state date, nullable actual observation time, last source collection time, active/new flags, hashes and raw payload. | Unique per `(job_id, collection_run_id)`. Appended by the importer. Cumulative-state rows are **not** real crawl observations for trend charts. |
@@ -332,7 +341,8 @@ overlap; cluster `29` in a later run may also represent a different group.
 
 | Table | Purpose | Main contents | Relationship and writer |
 | --- | --- | --- | --- |
-| `dashboard_releases` | Select one mutually consistent collection, analysis and clustering version for public Dashboard reads. | Release ID/key, collection/analysis/cluster run IDs, data cutoff date, draft/published/retired status, publication time and notes. | References the three versioned stages. Nyx creates drafts and changes status only after QA/owner approval; backend views read the single published row. |
+| `dashboard_releases` | Record mutually consistent collection, analysis and clustering versions and their display snapshots. | Release ID/key, collection/analysis/cluster run IDs, optional parent release, data cutoff date, draft/published/retired status, first publication time and notes. | Multiple releases may reuse one analysis. Nyx creates drafts and activates after QA/owner approval; current views read the single published row and weekly views read the exact selected release. |
+| `release_operations` | Preserve workflow evidence for creation, preparation, activation and reactivation. | Operation UUID, target week/release, previous weekly/current and next current IDs, reason, actor label, UTC time, backup path/hash and details JSON. | Successful changes and their evidence commit together. Operator-only, append-only by workflow; backend has no direct read/write grant. |
 | `dashboard_release_snapshot_rows` | Freeze the exact rows displayed in a release. | Release ID, row kind (`job`, `job_skill`, `cluster`), entity key, JSON payload and SHA-256 row fingerprint. | Built transactionally at publication; public views read these rows, not mutable source tables. |
 
 Only one release can be `published`. Incomplete runs can remain stored without
@@ -531,6 +541,7 @@ release's collection snapshot. Non-AV and incomplete results remain internal:
 - `v_dashboard_job_skills`: job-to-skill details;
 - `v_dashboard_skill_demand`: aggregate skill demand;
 - `v_dashboard_clusters`: cluster cards, labels, and summaries.
+- `v_dashboard_job_details`: full description and extracted sections for a selected job.
 
 For version-aware reads, use `v_weekly_versions` as the catalogue,
 `v_weekly_jobs` for raw collection states, and `v_weekly_av_jobs` /
@@ -538,6 +549,9 @@ For version-aware reads, use `v_weekly_versions` as the catalogue,
 `pending` classification. The backend computes differences and must not
 misrepresent cumulative files as verified complete crawls. See
 [the operating guide](TEAM_GUIDE.md) for example SQL and access boundaries.
+Each classified week exposes only its `selected_release_id`; superseded
+revisions remain stored but do not duplicate historical query rows.
+`v_weekly_av_job_details` supplies the matching frozen historical text.
 
 The public backend is read-only. It must not update canonical jobs, model
 outputs, skills, assignments, or labels from public API handlers. If an
@@ -553,7 +567,7 @@ Suggested API mapping:
 | Endpoint | Primary database source |
 | --- | --- |
 | `GET /jobs` | `v_dashboard_jobs` |
-| `GET /jobs/{source_key}` | `v_dashboard_jobs` plus `v_dashboard_job_skills` |
+| `GET /jobs/{source_key}` | `v_dashboard_jobs` plus `v_dashboard_job_skills` and `v_dashboard_job_details`, joined by release and job |
 | `GET /skills` | `v_dashboard_skill_demand` |
 | `GET /clusters` | `v_dashboard_clusters` |
 | `GET /companies` | distinct companies from `v_dashboard_jobs` |
@@ -705,7 +719,9 @@ database, and do not replay old migration scripts on a fresh schema.
 Migration scripts 001–005 document earlier schema changes and do **not**
 upgrade an arbitrary populated database to the Stage 3 contract. Migration
 `006_weekly_versions.sql` adds the weekly selection table to a verified Stage 3
-database only; apply it after a full backup and then replace `views.mysql.sql`.
+database only. `007_release_revisions.sql` then adds exact release selection
+and revision evidence. An existing 006 database needs only 007, applied once
+after a verified backup/test restore, followed by the current views.
 For a new empty database, use the current schema and views directly. Do not
 replay old migrations onto it.
 
@@ -715,7 +731,9 @@ an incompatible schema instead of truncating identifiers or hash values.
 ### Stable importer boundary
 
 The command line is only one caller of the import service. `CollectionFiles`
-and `AnalysisFiles` are immutable input descriptions; `ImporterService` accepts
+and `AnalysisFiles` are immutable input descriptions; `ReleaseActivation`
+captures the target, expected old selections, reason and operator.
+`ImporterService` accepts
 those inputs and delegates each use case to the injected `ImportBackend`
 protocol. `importer/cli.py` owns argument parsing and terminal/audit output;
 `importer/mysql_backend.py` adapts the service API to the current MySQL
@@ -813,6 +831,11 @@ not copied into these records. This local directory is Git-ignored. Use
 `--audit-dir <path>` after any command to choose another local audit directory.
 The command also prints the report and log paths. These files complement the
 database `import_batches` audit rows; they are not a replacement for backups.
+
+Release revision operations also keep transactional `release_operations`
+evidence. See [the revision guide](RELEASE_REVISIONS.md) for candidate import,
+activation, historical switching and safe reversion. A release reversion
+changes a selection; it does not delete an import batch.
 
 ```text
 python database/weekly_import.py import-collection --week-date 2026-09-25 --input data-collection/deliverables/2026-09-25/jobs_history_translated.json

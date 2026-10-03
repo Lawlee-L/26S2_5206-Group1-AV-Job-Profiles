@@ -1,9 +1,10 @@
 """Application API used by command-line, GUI, and automation front ends."""
 
 from pathlib import Path
+from datetime import date
 from typing import Any
 
-from .contracts import AnalysisFiles, CollectionFiles
+from .contracts import AnalysisFiles, CollectionFiles, ReleaseActivation
 from .ports import ImportBackend
 
 
@@ -46,3 +47,13 @@ class ImporterService:
 
     def trend_readiness(self) -> dict[str, Any]:
         return self._backend.trend_readiness()
+
+    def create_release(self, source_key: str, reason: str, actor: str,
+                       backup_dir: Path) -> dict[str, Any]:
+        return self._backend.create_release(source_key, reason, actor, backup_dir)
+
+    def activate_release(self, request: ReleaseActivation, backup_dir: Path) -> dict[str, Any]:
+        return self._backend.activate_release(request, backup_dir)
+
+    def list_releases(self, week_date: date | None = None) -> dict[str, Any]:
+        return self._backend.list_releases(week_date)

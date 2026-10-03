@@ -50,7 +50,8 @@ def ensure_unselected_week(cursor: Any, week_date: date) -> None:
         )
 
 
-def selected_collection(cursor: Any, week_date: date, collection_run_id: int) -> None:
+def selected_collection(cursor: Any, week_date: date, collection_run_id: int,
+                        *, candidate: bool = False) -> None:
     cursor.execute(
         "SELECT collection_run_id,selected_analysis_run_id FROM weekly_versions "
         "WHERE week_date=%s FOR UPDATE",
@@ -63,8 +64,8 @@ def selected_collection(cursor: Any, week_date: date, collection_run_id: int) ->
         raise ImportErrorSafe(
             f"Classification input is not the official collection file for week {week_date.isoformat()}"
         )
-    if selected["selected_analysis_run_id"] is not None:
+    if selected["selected_analysis_run_id"] is not None and not candidate:
         raise ImportErrorSafe(
             f"Week {week_date.isoformat()} already has a selected classification; "
-            "a replacement requires an explicit review workflow"
+            "use --candidate to stage a reviewed replacement without changing the official version"
         )

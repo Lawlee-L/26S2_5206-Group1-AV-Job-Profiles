@@ -259,6 +259,7 @@ def env_config() -> dict[str, Any]:
         "user": os.environ["AVDB_USER"], "password": os.environ["AVDB_PASSWORD"],
         "database": os.environ.get("AVDB_NAME", "av_job_profiles"),
         "charset": "utf8mb4", "autocommit": False, "connect_timeout": 8,
+        "init_command": "SET time_zone = '+00:00'",
         "cursorclass": None,
     }
 
@@ -329,6 +330,8 @@ def backup_database(backup_dir: Path) -> Path:
         temp.unlink(missing_ok=True)
         raise
     finally:
+        if proc.stdout is not None:
+            proc.stdout.close()
         stderr_file.close()
 
 
@@ -389,14 +392,15 @@ def release_import_lock(conn) -> None:
 
 def verify_schema(conn) -> None:
     required = {"import_batches", "import_job_undo", "companies", "job_sources", "collection_runs",
-                "weekly_versions",
+                "weekly_versions", "release_operations",
                 "jobs", "job_observations", "analysis_runs", "job_analyses", "skills", "job_skills",
                 "job_deduplication_links", "cluster_runs", "clusters", "cluster_label_revisions", "job_cluster_assignments",
                 "cluster_skills", "dashboard_releases", "dashboard_release_snapshot_rows"}
     required_views = {"v_candidate_dashboard_jobs", "v_candidate_dashboard_job_skills",
                       "v_candidate_dashboard_clusters", "v_dashboard_jobs",
                       "v_dashboard_job_skills", "v_dashboard_skill_demand", "v_dashboard_clusters",
-                      "v_weekly_versions", "v_weekly_jobs", "v_weekly_av_jobs", "v_weekly_av_job_skills"}
+                      "v_weekly_versions", "v_weekly_jobs", "v_weekly_av_jobs", "v_weekly_av_job_skills",
+                      "v_dashboard_job_details", "v_weekly_av_job_details"}
     with conn.cursor() as cur:
         cur.execute("SELECT VERSION() AS version")
         version = cur.fetchone()["version"]
@@ -429,7 +433,8 @@ def verify_schema(conn) -> None:
                     "(TABLE_NAME='collection_runs' AND COLUMN_NAME IN "
                     "('run_kind','snapshot_as_of_date','snapshot_generated_at','time_quality','source_report_available')) OR "
                     "(TABLE_NAME='dashboard_releases' AND COLUMN_NAME IN "
-                    "('snapshot_frozen_at','snapshot_sha256')) OR "
+                    "('snapshot_frozen_at','snapshot_sha256','parent_release_id')) OR "
+                    "(TABLE_NAME='weekly_versions' AND COLUMN_NAME IN ('selected_release_id')) OR "
                     "(TABLE_NAME='job_analyses' AND COLUMN_NAME IN "
                     "('input_content_hash','role_summary','responsibilities_json','requirements_json',"
                     "'language_of_posting','served_by','prompt_tokens','output_tokens','cost_usd')) OR "
@@ -450,6 +455,7 @@ def verify_schema(conn) -> None:
         ("collection_runs", "snapshot_generated_at"), ("collection_runs", "time_quality"),
         ("collection_runs", "source_report_available"),
         ("dashboard_releases", "snapshot_frozen_at"), ("dashboard_releases", "snapshot_sha256"),
+        ("dashboard_releases", "parent_release_id"), ("weekly_versions", "selected_release_id"),
         ("job_analyses", "input_content_hash"), ("job_analyses", "role_summary"),
         ("job_analyses", "responsibilities_json"), ("job_analyses", "requirements_json"),
         ("job_analyses", "language_of_posting"), ("job_analyses", "served_by"),
@@ -1020,7 +1026,8 @@ def get_or_create_skill(cur, name: str, skill_type: str,
 def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
                    av_summary_path: Path, other_summary_path: Path,
                    duplicates_path: Path, failures_path: Path, backup_dir: Path,
-                   git_commit: str | None = None, *, week_date: date | None = None) -> dict[str, Any]:
+                   git_commit: str | None = None, *, week_date: date | None = None,
+                   candidate: bool = False) -> dict[str, Any]:
     if not git_commit or not re.fullmatch(r"[0-9a-fA-F]{7,64}", git_commit):
         raise ImportErrorSafe("Provide the classification pipeline Git commit with --git-commit (7–64 hex characters)")
     report = load_analysis(postings_path, metadata_path, source_path, av_summary_path, other_summary_path,
@@ -1060,7 +1067,7 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
             collection_run_id = source_meta.get("collection_run_id")
             if not collection_run_id:
                 raise ImportErrorSafe("The matching collection batch has no collection_run_id")
-            selected_collection(cur, week_date, collection_run_id)
+            selected_collection(cur, week_date, collection_run_id, candidate=candidate)
             cur.execute(
                 "SELECT j.source_key,j.source_id,jo.content_hash,jo.record_hash_sha256 "
                 "FROM job_observations jo JOIN jobs j ON j.job_id=jo.job_id "
@@ -1238,7 +1245,7 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
                         (release_key, collection_run_id, analysis_run_id, cluster_run_id, cutoff,
                          "Candidate release from imported Sunjol analysis. It requires QA and approval before publication."))
             release_id = cur.lastrowid
-            if not report["llm_failures"]:
+            if not report["llm_failures"] and not candidate:
                 cur.execute(
                     "UPDATE weekly_versions SET selected_analysis_run_id=%s "
                     "WHERE week_date=%s AND collection_run_id=%s AND selected_analysis_run_id IS NULL",
@@ -1252,7 +1259,8 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
                               "collection_run_id": collection_run_id, "source_input_sha256": digest_source,
                               "analysis_sha256": digest, "week_date": week_date.isoformat(),
                               "created_skill_ids": skill_ids_created,
-                              "analysis_key_count": report["postings"], "release_key": release_key}
+                              "analysis_key_count": report["postings"], "release_key": release_key,
+                              "candidate_only": candidate}
             cur.execute("UPDATE import_batches SET status=%s,accepted_rows=%s,rejected_rows=%s,completed_at=UTC_TIMESTAMP(6),"
                         "metadata_json=%s WHERE import_batch_id=%s",
                         ("partial" if report["llm_failures"] else "completed", int(metadata["n_input_rows"]),
@@ -1261,6 +1269,7 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
         return {"status": "partial" if report["llm_failures"] else "completed",
                 "import_batch_id": batch_id, "analysis_run_id": analysis_run_id,
                 "cluster_run_id": cluster_run_id, "draft_release_id": release_id,
+                "release_key": release_key, "candidate_only": candidate,
                 "postings": report["postings"], "av_relevant": report["av_relevant"],
                 "not_av_relevant": report["not_av_relevant"], "duplicates_mapped": report["duplicates_removed"],
                 "llm_failures_recorded": report["llm_failures"], "backup": str(backup_path),
@@ -1366,6 +1375,14 @@ def rollback_latest(batch_id: int | None, backup_dir: Path) -> dict[str, Any]:
                 release_id = metadata.get("dashboard_release_id")
                 if not all((analysis_run_id, cluster_run_id, release_id)):
                     raise ImportErrorSafe("Analysis batch audit metadata is incomplete; cannot undo safely")
+                cur.execute("SELECT COUNT(*) AS n FROM dashboard_releases dr "
+                            "LEFT JOIN release_operations op ON op.target_release_id=dr.dashboard_release_id "
+                            "WHERE dr.analysis_run_id=%s AND "
+                            "(dr.dashboard_release_id<>%s OR op.operation_id IS NOT NULL)",
+                            (analysis_run_id, release_id))
+                if cur.fetchone()["n"]:
+                    raise ImportErrorSafe("This analysis has release revisions or operation history; "
+                                          "preserve it and use activate-release to change the official selection")
                 cur.execute("SELECT status,snapshot_frozen_at FROM dashboard_releases "
                             "WHERE dashboard_release_id=%s", (release_id,))
                 release = cur.fetchone()
