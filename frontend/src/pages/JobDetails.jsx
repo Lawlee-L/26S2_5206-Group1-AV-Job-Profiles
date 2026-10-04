@@ -1,9 +1,5 @@
 import React from "react";
-
-import {
-  Link,
-  useParams,
-} from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import {
   ArrowLeft,
@@ -18,22 +14,37 @@ import {
 
 import Header from "../components/Header";
 import CompanyLogo from "../components/CompanyLogo";
-import { jobs } from "../data/jobs";
+import { getJobById } from "../data/jobs";
 
 export default function JobDetails() {
   const { id } = useParams();
 
-  /*
-    Frontend-only temporary lookup.
+  // Get the selected job using its ID
+  const job = getJobById(id);
 
-    Later your teammates can replace this with
-    the real job object from their backend/database.
-  */
+  // Handle invalid job ID
+  if (!job) {
+    return (
+      <div className="app-shell">
+        <Header />
 
-  const job =
-    jobs.find(
-      (item) => String(item.id) === String(id)
-    ) || jobs[0];
+        <main className="job-details-page">
+          <Link to="/jobs" className="job-details-back">
+            <ArrowLeft size={13} />
+            Back to Jobs
+          </Link>
+
+          <section className="job-details-header">
+            <h1>Job not found</h1>
+            <p>
+              The job you are looking for is no longer available
+              or does not exist.
+            </p>
+          </section>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell">
@@ -41,26 +52,18 @@ export default function JobDetails() {
 
       <main className="job-details-page">
         {/* BACK BUTTON */}
-
-        <Link
-          to="/jobs"
-          className="job-details-back"
-        >
+        <Link to="/jobs" className="job-details-back">
           <ArrowLeft size={13} />
-
           Back to Jobs
         </Link>
 
         {/* ==========================
             TOP JOB CARD
         ========================== */}
-
         <section className="job-details-header">
           <div className="job-details-main">
             <div className="job-details-logo">
-              <CompanyLogo
-                company={job.company}
-              />
+              <CompanyLogo company={job.company} />
             </div>
 
             <div className="job-details-title">
@@ -71,7 +74,6 @@ export default function JobDetails() {
               <div className="job-details-meta">
                 <span>
                   <MapPin size={11} />
-
                   {job.location}
                 </span>
 
@@ -79,7 +81,6 @@ export default function JobDetails() {
 
                 <span>
                   <Briefcase size={11} />
-
                   {job.type}
                 </span>
 
@@ -87,7 +88,6 @@ export default function JobDetails() {
 
                 <span>
                   <GraduationCap size={11} />
-
                   {job.level}
                 </span>
               </div>
@@ -95,31 +95,34 @@ export default function JobDetails() {
           </div>
 
           {/* BUTTONS */}
-
           <div className="job-details-actions">
-            <button className="apply-job-button">
+            <a
+              href={job.originalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="apply-job-button"
+            >
               Apply Now
-            </button>
+            </a>
 
-            <button className="save-job-button">
+            <button
+              type="button"
+              className="save-job-button"
+            >
               <Bookmark size={14} />
-
               Save Job
             </button>
           </div>
 
           {/* JOB SUMMARY */}
-
           <div className="job-summary">
             <div className="job-summary-item">
               <CalendarDays size={19} />
 
               <div>
                 <span>Posted Date</span>
-
                 <strong>
-                  {job.postedDate ||
-                    "Aug 20, 2026"}
+                  {job.date || "Date not available"}
                 </strong>
               </div>
             </div>
@@ -129,10 +132,8 @@ export default function JobDetails() {
 
               <div>
                 <span>Salary</span>
-
                 <strong>
-                  {job.salary ||
-                    "$150,000 - $200,000 per year"}
+                  {job.salary || "Salary not available"}
                 </strong>
               </div>
             </div>
@@ -142,9 +143,8 @@ export default function JobDetails() {
 
               <div>
                 <span>Experience</span>
-
                 <strong>
-                  {job.experience || "5+ years"}
+                  {job.experience || "Not specified"}
                 </strong>
               </div>
             </div>
@@ -154,8 +154,9 @@ export default function JobDetails() {
 
               <div>
                 <span>Employment Type</span>
-
-                <strong>{job.type}</strong>
+                <strong>
+                  {job.type || "Not specified"}
+                </strong>
               </div>
             </div>
           </div>
@@ -164,155 +165,86 @@ export default function JobDetails() {
         {/* ==========================
             MAIN CONTENT
         ========================== */}
-
         <div className="job-details-layout">
           {/* LEFT */}
-
           <section className="job-description-card">
             <h2>Job Description</h2>
 
             <p>
-              NVIDIA is seeking a Senior Perception
-              Software Engineer to join our Autonomous
-              Machines team. You will work on developing
-              cutting-edge perception systems for
-              self-driving vehicles.
+              {job.description ||
+                "No job description is currently available."}
             </p>
 
             <h3>Responsibilities</h3>
 
             <ul>
-              <li>
-                Design and implement perception
-                algorithms for AV systems
-              </li>
-
-              <li>
-                Work with LiDAR, camera, and radar data
-              </li>
-
-              <li>
-                Optimize performance for real-time
-                systems
-              </li>
-
-              <li>
-                Collaborate with cross-functional teams
-              </li>
+              {job.responsibilities?.map((responsibility) => (
+                <li key={responsibility}>
+                  {responsibility}
+                </li>
+              ))}
             </ul>
 
             <h3>Requirements</h3>
 
             <ul>
-              <li>
-                5+ years of experience in C++ software
-                development
-              </li>
-
-              <li>
-                Strong knowledge of computer vision and
-                deep learning
-              </li>
-
-              <li>
-                Experience with LiDAR data processing
-              </li>
-
-              <li>
-                Bachelor's or Master's degree in
-                Computer Science or related field
-              </li>
+              {job.requirements?.map((requirement) => (
+                <li key={requirement}>
+                  {requirement}
+                </li>
+              ))}
             </ul>
 
             <h3>Preferred Skills</h3>
 
             <div className="job-details-skills">
-              {(job.skills || [
-                "C++",
-                "Python",
-                "CUDA",
-                "Computer Vision",
-              ]).map((skill) => (
+              {job.skills?.map((skill) => (
                 <span key={skill}>
                   {skill}
                 </span>
               ))}
-
-              <span>Deep Learning</span>
-              <span>LiDAR</span>
-              <span>ROS2</span>
             </div>
           </section>
 
           {/* RIGHT SIDEBAR */}
-
           <aside className="job-details-sidebar">
-            {/* ABOUT */}
-
             <div className="job-side-card">
-              <h2>
-                About {job.company}
-              </h2>
+              <h2>About {job.company}</h2>
 
               <p>
-                NVIDIA is a global leader in accelerated
-                computing. Our work in AI and autonomous
-                machines is transforming the future.
+                Learn more about {job.company} and its
+                autonomous vehicle opportunities.
               </p>
-
-              <a href="#company">
-                View Company Page
-                <span>→</span>
-              </a>
             </div>
-
-            {/* DETAILS */}
 
             <div className="job-side-card">
               <h2>Job Details</h2>
 
               <div className="job-detail-field">
                 <span>Job ID</span>
-
-                <strong>
-                  NVIDIA-123456
-                </strong>
+                <strong>{job.id}</strong>
               </div>
 
               <div className="job-detail-field">
                 <span>Location</span>
-
-                <strong>
-                  {job.location}
-                </strong>
+                <strong>{job.location}</strong>
               </div>
 
               <div className="job-detail-field">
-                <span>
-                  Experience Level
-                </span>
-
-                <strong>
-                  {job.level}
-                </strong>
+                <span>Experience Level</span>
+                <strong>{job.level}</strong>
               </div>
 
               <div className="job-detail-field">
                 <span>Education</span>
-
                 <strong>
-                  Bachelor's or Master's degree
+                  {job.education || "Not specified"}
                 </strong>
               </div>
 
               <div className="job-detail-field">
-                <span>
-                  Employment Type
-                </span>
-
-                <strong>
-                  {job.type}
-                </strong>
+                <span>Employment Type</span>
+                <strong>{job.type}</strong>
               </div>
             </div>
           </aside>
@@ -321,22 +253,29 @@ export default function JobDetails() {
         {/* ==========================
             ORIGINAL JOB
         ========================== */}
-
         <section className="original-job-card">
-          <h2>
-            Original Job Posting
-          </h2>
+          <h2>Original Job Posting</h2>
 
           <p>
             View the original job posting on{" "}
             {job.company}'s careers page.
           </p>
 
-          <button>
-            View Original Job
-
-            <ExternalLink size={13} />
-          </button>
+          {job.originalUrl && job.originalUrl !== "#" ? (
+            <a
+              href={job.originalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="original-job-button"
+            >
+              View Original Job
+              <ExternalLink size={13} />
+            </a>
+          ) : (
+            <button type="button" disabled>
+              Original Job Link Unavailable
+            </button>
+          )}
         </section>
       </main>
     </div>
