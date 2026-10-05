@@ -1,0 +1,235 @@
+# Group1-Facilitator Meeting Minutes-30-09-2026
+
+## Meeting Minutes
+
+**Meeting Type:** Facilitator Meeting – Project Integration and Final Development Discussion
+
+**Date:** 30-09-2026
+
+**Time:** [Insert Time]
+
+**Recorded by:** Leon Nel
+
+---
+
+## Attendees
+
+**Facilitator:** Dr Sumayyah Ahmad
+
+- Nyx Chen
+- Li Luo
+- Leon Nel
+- Sunjol Singh Paul
+
+## Absent
+
+- Thushamini Chathusika Hewa Pathegamage
+- Seonjeong Jeong
+
+---
+
+# Discussion
+
+## Topic 1: Project Integration
+
+The team discussed the current status of the project and the steps required to integrate the different components into the final system.
+
+The main focus moving forward is to ensure that the data collection, classification, database, backend, and frontend components work together correctly.
+
+The team should coordinate the remaining development work so that all components are ready for integration testing before the final project demonstration.
+
+---
+
+## Topic 2: Data Classification and Clustering
+
+Sunjol provided an update on the classification and clustering component of the project.
+
+Sunjol is currently working on improving the accuracy of the extracted and classified data. Further improvements will also be made to the clustering component.
+
+Sunjol will open another Pull Request (PR) containing the improvements to the clustering implementation so that the changes can be reviewed and integrated into the project.
+
+---
+
+## Topic 3: Database Importer
+
+Li provided an update regarding Nyx's database importer.
+
+Li reviewed Nyx's importer and confirmed that it is working as expected and is suitable for the current project requirements.
+
+The team can therefore proceed with integrating the importer and database with the other components of the project.
+
+---
+
+## Topic 4: Backend Development and Database Integration
+
+The integration between Nyx's database work and Leon's backend development was discussed.
+
+Leon has created a backend blueprint designed to work with Nyx's database schema. The blueprint has been tested, and the current tests are passing successfully.
+
+Nyx and Leon need to communicate closely during the next stage of development to complete the database and backend integration.
+
+The remaining backend work involves connecting the backend to the database so that it can:
+
+- Read the required data from the database.
+- Process the data required by the application.
+- Provide the required information to the frontend.
+
+Leon should have the backend ready before **03-10-2026**.
+
+---
+
+## Topic 5: Dashboard Requirements
+
+The facilitator highlighted the need for a clear draft showing what information needs to be displayed on the dashboard.
+
+The dashboard requirements need to be defined so that the backend and frontend implementations can be aligned with the information expected in the final system.
+
+This will also help determine which database information needs to be exposed through the backend.
+
+---
+
+## Topic 6: Database Deployment and Hosting
+
+The team discussed the need to determine how the database will be deployed for the final project.
+
+The database hosting environment has not yet been confirmed.
+
+Sunjol needs to contact the client to clarify where the database should be hosted.
+
+Once this information is received, the team can determine how the database should be deployed and connected to the final application.
+
+---
+
+## Topic 7: Code Completion and Integration Testing
+
+The team discussed establishing a deadline for completing the remaining development work.
+
+All remaining code should be submitted by **Sunday**.
+
+After Sunday, no additional code should be pushed unless changes are required to resolve problems discovered during integration testing.
+
+This will provide the team with a stable version of the project that can be used for integration testing before the individual video submission deadline.
+
+Integration testing should verify that the major project components work correctly together, including:
+
+- Data collection.
+- Data classification and clustering.
+- Database importing and storage.
+- Backend database access.
+- Backend API functionality.
+- Frontend and dashboard functionality.
+
+---
+
+## Topic 8: Final Integration and Demo Preparation
+
+The main project integration should be completed during the coming week.
+
+Leon should have the backend ready before **03-10-2026**, allowing the database, backend, and frontend components to be integrated.
+
+The team should aim to have the final product functional before the project demonstration date.
+
+Completing the integration ahead of the demonstration will provide time for the team to conduct testing and resolve any remaining issues.
+
+---
+
+# Key Decisions
+
+## Decision 1: Clustering Improvements Will Be Submitted Through a New PR
+
+Sunjol will continue improving the accuracy of the classification and clustering process.
+
+A new Pull Request will be created containing the clustering improvements for review and integration.
+
+---
+
+## Decision 2: Nyx's Importer Is Ready for Integration
+
+Li reviewed Nyx's importer and confirmed that it is suitable for the project.
+
+The importer can proceed to the integration stage.
+
+---
+
+## Decision 3: Backend and Database Integration Will Be Prioritised
+
+Leon and Nyx will coordinate the integration of the backend with the database.
+
+Leon's backend blueprint currently works with Nyx's database schema and has passed the existing tests.
+
+The next step is to connect the backend to the database so that the required data can be retrieved and provided to the frontend.
+
+---
+
+## Decision 4: Backend Should Be Ready Before 03-10-2026
+
+Leon should complete the required backend functionality before **03-10-2026**.
+
+This will allow the database, backend, and frontend integration to proceed during the following week.
+
+---
+
+## Decision 5: Remaining Code Should Be Submitted by Sunday
+
+The team agreed that the remaining development code should be submitted by **Sunday**.
+
+Following this deadline, the team will focus primarily on integration testing and resolving integration-related issues rather than introducing additional features.
+
+---
+
+## Decision 6: Database Hosting Requires Client Clarification
+
+The team requires clarification regarding where the database should be hosted.
+
+Sunjol will contact the client to obtain the required information.
+
+---
+
+## Decision 7: Dashboard Requirements Need to Be Defined
+
+A draft specifying what should be displayed on the dashboard is required.
+
+The dashboard requirements will guide the final database, backend, and frontend integration.
+
+---
+
+# Action Items
+
+| Task | Owner | Due Date |
+|---|---|---|
+| Improve the accuracy of the data classification and clustering | Sunjol Singh Paul | Before final integration |
+| Open a new PR containing clustering improvements | Sunjol Singh Paul | Before Sunday |
+| Coordinate backend and database integration | Nyx Chen & Leon Nel | Before integration testing |
+| Complete backend functionality for reading database data and providing it to the frontend | Leon Nel | Before 03-10-2026 |
+| Ask the client where the database should be hosted | Sunjol Singh Paul | As soon as possible |
+| Determine how the database will be deployed after receiving client clarification | Team | Before final deployment |
+| Prepare a draft of the information that needs to be displayed on the dashboard | Team | Before final integration |
+| Complete and push remaining development code | All team members | Sunday |
+| Perform integration testing across the complete system | All team members | Coming week |
+| Resolve issues identified during integration testing | Relevant team members | Before individual video/demo |
+| Prepare the final integrated product for the demonstration | All team members | Before final demo date |
+
+---
+
+# Follow-up / Next Meeting Agenda
+
+The next facilitator meeting should review the overall integration status of the project.
+
+The team should:
+
+- Review Sunjol's updated clustering PR.
+- Confirm the status of the database importer.
+- Review Leon's completed backend implementation.
+- Confirm successful integration between Nyx's database and Leon's backend.
+- Verify that the backend can retrieve the required database information.
+- Verify that the backend can provide the required data to the frontend.
+- Review and finalise the dashboard requirements.
+- Confirm the database hosting and deployment approach.
+- Review the results of integration testing.
+- Identify and resolve any remaining issues.
+- Review readiness for the individual video submissions.
+- Confirm readiness of the final product for the project demonstration.
+
+# Next Meeting
+
+**Date:** TBD

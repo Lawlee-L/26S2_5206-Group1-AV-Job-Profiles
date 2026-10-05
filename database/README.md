@@ -3,6 +3,22 @@
 This directory defines the relational data contract between job collection,
 classification, clustering, the backend API, and the dashboard.
 
+**Start with the [team operating guide](TEAM_GUIDE.md)** for local installation,
+who may change which data, the exact four-week import example, SQL queries,
+and every importer command. This README explains the data model and ownership;
+it is not a substitute for the runnable guide. The current importer/database
+are sufficient to **supply data to the MVP Dashboard**, but the backend API,
+frontend, cluster-name approvals and automated schedule remain separate work.
+
+For full description, extracted responsibilities and requirements in a selected
+job's detail page, see the [job detail read contract](JOB_DETAILS.md). It adds
+current and historical detail views without changing the job-list contract.
+
+For a corrected classification of the **same week**, safe version switching,
+switching back, or rebuilding a snapshot without rerunning AI, see
+[the release revision guide](RELEASE_REVISIONS.md). Candidate import leaves
+the working release visible; activation changes the exact official selection.
+
 ## 1. Database scope and choice
 
 The implementation target is **MySQL 8.0.16 or newer** because the current
@@ -24,7 +40,7 @@ All application and database timestamps must use UTC.
 
 ## 2. End-to-end data flow
 
-The 4,842 records in the 19 September 2026 collection history do not go
+The 5,139 records in the 25 September 2026 collection history do not go
 directly into one large Dashboard table.
 They pass through five stages. Each stage adds information while keeping the
 previous stage traceable.
@@ -60,13 +76,14 @@ The database update is:
 
 ```text
 collection_runs
-  -> source_run_results
+  -> weekly_versions             official week selection
+  -> source_run_results           future verified-crawl integration only
   -> companies and job_sources
   -> jobs                     latest known version
   -> job_observations         immutable per-run history
 ```
 
-All 4,842 canonical records can be loaded into `jobs`, even if classification
+All 5,139 canonical records can be loaded into `jobs`, even if classification
 has not finished. `jobs` remains the source of truth for what was actually
 advertised.
 
@@ -94,15 +111,33 @@ The job remains one row in `jobs`. Its many skills become separate relational
 links in `job_skills`; the description and URL are not copied into every skill
 row.
 
-Current classification samples cover fewer jobs than the 4,842 canonical
-records. A job without a matched analysis remains in `jobs` and is counted as
-unclassified. A classification row without an exact `source_key` match goes to
-`import_rejections`; it is never matched by row number or similar title.
+The 25 September 2026 classification output accounts for all 5,139 source
+records: 4,518 classified postings and 621 same-company duplicate links.
+Duplicates stay in `jobs`, with their run-specific decisions recorded in
+`job_deduplication_links`. A job with neither an analysis nor a duplicate
+decision remains in `jobs` and is reported as unaccounted. A classification row
+without an exact `source_key` match goes to `import_rejections`; it is never
+matched by row number or similar title.
+
+### Public Dashboard population
+
+Every public Dashboard view is AV-only. It includes a job only when it belongs
+to the published release's collection snapshot, has a successful analysis with
+`av_relevant = TRUE`, and is not marked as a duplicate in that release's
+analysis run. Skills and clusters follow the same population. Non-AV, unknown,
+failed, and duplicate records remain available for internal QA and are not
+exposed through the public Dashboard views.
+
+The sample release contains 2,902 AV-relevant analysed postings; that is a
+validation count, not a constant. New releases calculate their own count. See
+[`METRICS_CONTRACT.md`](METRICS_CONTRACT.md) for the named metrics and QA rules.
 
 ### Stage 3: place analysed jobs into clusters
 
 Clustering uses the complete analysis snapshot and extracted skills. It groups
-similar jobs and records both membership and cluster-level evidence:
+AV and non-AV jobs separately and records the population on each cluster, along
+with membership and cluster-level evidence. The public Dashboard reads only
+the AV population:
 
 ```text
 cluster_runs
@@ -167,7 +202,10 @@ Before publishing, Nyx reports these Quality Assurance (QA) counts:
 
 After the responsible owners approve their outputs, the old release changes
 from `published` to `retired`, and the validated draft becomes `published`.
-The backend views automatically expose only the published release.
+`publish-release` first copies the exact job, skill and cluster display rows
+into an immutable release snapshot, then changes statuses in one transaction.
+The backend views read only the published snapshot, not mutable `jobs` or
+current cluster labels. See [Stage 3 release/history contract](STAGE3_RELEASE_HISTORY.md).
 
 ## 3. How one job is split and linked
 
@@ -248,6 +286,7 @@ the authority for exact SQL types, nullability, indexes, and constraints.
 | --- | --- | --- | --- |
 | `import_batches` | Record and audit every file/database load so an import can be reproduced and checked. | `import_batch_id`, batch type, source filename, SHA-256 checksum, status, total/accepted/rejected counts, metadata and timestamps. | Parent of imported `jobs`, `job_analyses`, and rejection rows. Written by Nyx's importer. |
 | `import_rejections` | Keep invalid rows and explicit failure reasons instead of silently dropping or guessing data. | Rejection ID, batch ID, `source_row_number` from the input file, optional `source_key`, error code/message, and original row as JSON. | Many rejection rows belong to one `import_batches` row. Written only by the importer/validator. |
+| `import_job_undo` | Keep a before-image for every job inserted or changed by a collection import so that the latest batch can be reversed safely. | Batch ID, `source_key`, insert/update action, previous job row as JSON, and fingerprint of the imported row. | One batch has zero or more undo rows. Written by the importer and retained after rollback as audit evidence. |
 
 These tables explain where database rows came from and prevent invalid data
 from disappearing silently.
@@ -258,20 +297,23 @@ from disappearing silently.
 | --- | --- | --- | --- |
 | `companies` | Provide one canonical company identity instead of repeating inconsistent company names in every job. | Numeric `company_id`, canonical name, slug, optional website and headquarters country. | One company has many `job_sources`. Maintained by Li's source configuration/import process. |
 | `job_sources` | Describe each configured careers source from which jobs are collected. | Stable `source_id`, `company_id`, platform/ATS, region, endpoint, enabled flag and source configuration JSON. | One source belongs to one company and publishes many `jobs`; it also has one result per collection run. Written from the checked source configuration. |
-| `collection_runs` | Version one complete or partial execution of the collection pipeline. | Run ID/key, status, pipeline version, Git commit, source scope, notes, start/end timestamps. | Parent of `source_run_results` and `job_observations`. Written once per collection execution. |
-| `source_run_results` | Distinguish a genuinely removed job from a source that simply failed during collection. | Composite run/source key, success/failure/skipped status, job count, error message, snapshot path and completion time. | Joins `collection_runs` to `job_sources`. Written by Li's collection pipeline. |
-| `jobs` | Store the latest canonical state of every known source advertisement for fast backend access. | Internal `job_id`, unique `source_key`, source job ID, title, description, URL, raw/normalised location, raw/normalised salary, posting/seen/collection dates, active/new flags and content hash. | One job belongs to one source and has many observations and analysis versions. Upserted by the collection importer; classification must not overwrite it. |
-| `job_observations` | Preserve what one job looked like in each collection run for history, change detection and trend charts. | Observation ID, job/run IDs, title, description, URL, raw location/salary, posting and collection dates, active-at-run flag, content hash and optional raw payload. | Unique per `(job_id, collection_run_id)`. Appended by the collection importer and never edited as current state. |
+| `collection_runs` | Version a cumulative export or a verified crawl without confusing the two. | Run ID/key, kind, date/exact-time quality, source-report availability, operation times. | Parent of `source_run_results` and `job_observations`. The current importer records cumulative exports as partial, not complete crawls. |
+| `weekly_versions` | Select exactly one official collection file per week and, optionally, its matching analysis and exact frozen release. | `week_date`, selected collection run, nullable selected analysis run, nullable selected release ID and timestamps. | Composite foreign keys enforce that the analysis and release belong to that collection. Multiple revisions may exist, but only one is selected. Written only by the importer. |
+| `source_run_results` | Distinguish a genuinely removed job from a source that failed during collection. | Composite run/source key, success/failure/skipped status, job count, error message, snapshot path and completion time. | A future verified-crawl integration must write these; the current cumulative export has no such evidence and leaves this table empty. |
+| `jobs` | Store the latest canonical state of every known source advertisement for fast backend access. | Internal `job_id`, unique `source_key`, source job ID, title, description, URL, raw/normalised location, raw/normalised salary, posting/seen/collection dates, active/new flags, classifier `content_hash` (SHA-1), and change-detection `record_hash_sha256`. | One job belongs to one source and has many observations and analysis versions. Upserted by the collection importer; classification must not overwrite it. |
+| `job_observations` | Preserve the full job state in each supplied export, including inactive jobs. | Job/run IDs, all dashboard source fields, state date, nullable actual observation time, last source collection time, active/new flags, hashes and raw payload. | Unique per `(job_id, collection_run_id)`. Appended by the importer. Cumulative-state rows are **not** real crawl observations for trend charts. |
 
-`jobs` is optimised for current Dashboard reads. `job_observations` preserves
-history for trend charts, auditing, and detecting changed/removed jobs.
+`jobs` holds the latest internal state; public Dashboard reads are release
+snapshots. `job_observations` supports auditing and change detection, but
+cumulative exports alone do not prove comparable trend points.
 
 ### 4.3 Classification and skill tables
 
 | Table | Purpose | Main contents | Relationship and writer |
 | --- | --- | --- | --- |
-| `analysis_runs` | Make each LLM, dictionary, hybrid or manual classification reproducible and distinguishable from later versions. | Run ID/key, method, provider/model/version, prompt/taxonomy/code versions, source dataset version, parameters, status, notes and timestamps. | One run produces many `job_analyses` and may feed clustering. Created by Sunjol's classification process. |
-| `job_analyses` | Store derived interpretation of one canonical job without changing the source job. | Analysis ID, job/run IDs, result origin and reuse pointer, AV relevance/confidence/reason, responsibilities/evidence, generic title, seniority, experience, raw model response, status and import batch. | Unique per `(job_id, analysis_run_id)`; parent of `job_skills` and cluster assignments. Written by the classifier/importer. |
+| `analysis_runs` | Make each LLM, dictionary, hybrid or manual classification reproducible and distinguishable from later versions. | Run ID/key, method, provider/model/version, prompt/taxonomy/code versions, source dataset version, parameters, aggregate prompt/output tokens and cost when available, status, notes and timestamps. | One run produces many `job_analyses` and may feed clustering. Created in MySQL by Nyx's importer from Sunjol's output files. |
+| `job_analyses` | Store derived interpretation of one canonical job without changing the source job. | Analysis ID, job/run IDs, result origin and reuse pointer, AV relevance/confidence/reason, role summary, structured responsibilities/requirements, language, per-job input hash and model usage, seniority, experience, raw model response, status and import batch. | Unique per `(job_id, analysis_run_id)`; parent of `job_skills` and cluster assignments. Written by the classifier/importer. |
+| `job_deduplication_links` | Record which same-company postings the pipeline deliberately excluded as exact or near duplicates for one analysis run. | Analysis run, duplicate job, kept job, duplicate type, similarity and source row index. | Many links belong to one analysis run; both job IDs remain in `jobs`. Written by the analysis importer. |
 | `skills` | Maintain a reusable canonical vocabulary so equivalent skills can be counted consistently. | Numeric `skill_id`, canonical and normalised names, skill type, description and active flag. | Referenced by both `job_skills` and `cluster_skills`. Maintained by the classification/taxonomy process. |
 | `skill_aliases` | Map alternative text forms to one canonical skill without losing the form found in source/model output. | Alias ID, `skill_id`, original alias text, normalised alias and alias source. | Many aliases belong to one `skills` row. Maintained with the skill taxonomy. |
 | `job_skills` | Represent the many-to-many relationship between analysed jobs and skills for filtering and aggregation. | `job_analysis_id`, `skill_id`, raw extracted text, confidence, evidence and rank. | Composite key `(job_analysis_id, skill_id)`. Written when an analysis result is loaded; never stored as one semicolon string. |
@@ -286,19 +328,22 @@ snapshot without another LLM call.
 | Table | Purpose | Main contents | Relationship and writer |
 | --- | --- | --- | --- |
 | `cluster_runs` | Version the grouping operation because cluster numbers and membership can change when data or algorithms change. | Run ID/key, source analysis run, algorithm/version, requested/produced counts, noise flag, parameters, status, notes and timestamps. | One cluster run belongs to an analysis snapshot and produces many `clusters`. Written by the clustering process. |
-| `clusters` | Store one algorithmic group and cache the currently approved human-readable interpretation for Dashboard performance. | Internal `cluster_pk`, run-scoped number, current label pointer/cache, job family, specialisation, lean, noise flag, cached size, technical score, top terms/examples/companies and notes. | Unique per `(cluster_run_id, cluster_number)`; parent of assignments, cluster skills and label revisions. Algorithmic fields come from clustering; approved cache changes only through label approval. |
+| `clusters` | Store one algorithmic group and cache the currently approved human-readable interpretation for Dashboard performance. | Internal `cluster_pk`, run and population scoped number, AV/non-AV population, current label pointer/cache, job family, specialisation, lean, noise flag, cached size, technical score, top terms/examples/companies and notes. | Unique per `(cluster_run_id, population, cluster_number)`; parent of assignments, cluster skills and label revisions. Algorithmic fields come from clustering; approved cache changes only through label approval. |
 | `job_cluster_assignments` | State which cluster contains one analysed job in a particular clustering run. | Analysis ID, analysis/cluster run IDs, cluster PK, membership/distance scores and assignment time. | Unique per `(job_analysis_id, cluster_run_id)`. Written by the clustering process; manual naming must not change it. |
 | `cluster_skills` | Store the ranked skills that characterise a cluster without repeating them in the cluster row. | `cluster_pk`, `skill_id`, rank, score and number of jobs containing the skill. | Composite key `(cluster_pk, skill_id)` linking clusters to canonical skills. Written by clustering/summary generation. |
 | `cluster_label_revisions` | Preserve every LLM proposal, manual label, correction and review decision. | Revision ID/number, cluster PK, source/status, proposed name/family/specialisation, rationale, model/prompt provenance, labeler/reviewer, notes and timestamps. | Many immutable revisions belong to one cluster. LLM/manual processes append proposals; approval updates only the current-label pointer/cache in `clusters`. |
 
 `cluster_number` is not a permanent global ID. It is unique only inside one
-`cluster_run_id`. Cluster `29` in a later run may represent a different group.
+`cluster_run_id` and one `population`. AV and non-AV cluster numbering can
+overlap; cluster `29` in a later run may also represent a different group.
 
 ### 4.5 Dashboard publication table
 
 | Table | Purpose | Main contents | Relationship and writer |
 | --- | --- | --- | --- |
-| `dashboard_releases` | Select one mutually consistent collection, analysis and clustering version for public Dashboard reads. | Release ID/key, collection/analysis/cluster run IDs, data cutoff date, draft/published/retired status, publication time and notes. | References the three versioned stages. Nyx creates drafts and changes status only after QA/owner approval; backend views read the single published row. |
+| `dashboard_releases` | Record mutually consistent collection, analysis and clustering versions and their display snapshots. | Release ID/key, collection/analysis/cluster run IDs, optional parent release, data cutoff date, draft/published/retired status, first publication time and notes. | Multiple releases may reuse one analysis. Nyx creates drafts and activates after QA/owner approval; current views read the single published row and weekly views read the exact selected release. |
+| `release_operations` | Preserve workflow evidence for creation, preparation, activation and reactivation. | Operation UUID, target week/release, previous weekly/current and next current IDs, reason, actor label, UTC time, backup path/hash and details JSON. | Successful changes and their evidence commit together. Operator-only, append-only by workflow; backend has no direct read/write grant. |
+| `dashboard_release_snapshot_rows` | Freeze the exact rows displayed in a release. | Release ID, row kind (`job`, `job_skill`, `cluster`), entity key, JSON payload and SHA-256 row fingerprint. | Built transactionally at publication; public views read these rows, not mutable source tables. |
 
 Only one release can be `published`. Incomplete runs can remain stored without
 becoming visible to Dashboard users.
@@ -322,15 +367,15 @@ UNIQUE (source_id, source_job_id) when a source job ID exists
 ```
 
 Importing the same source job twice is therefore rejected or handled as an
-update rather than creating a second `jobs` row. The 19 September 2026 history
-contains 4,842 records and 4,842 unique `source_key` values.
+update rather than creating a second `jobs` row. The 25 September 2026 history
+contains 5,139 records and 5,139 unique `source_key` values.
 
 Other repeatable data is scoped by version:
 
 - one observation per `(job_id, collection_run_id)`;
 - one analysis per `(job_id, analysis_run_id)`;
 - one skill link per `(job_analysis_id, skill_id)`;
-- one cluster number per `(cluster_run_id, cluster_number)`;
+- one cluster number per `(cluster_run_id, population, cluster_number)`;
 - one cluster assignment per `(job_analysis_id, cluster_run_id)`;
 - one label revision number per `(cluster_pk, revision_number)`.
 
@@ -399,11 +444,11 @@ must transfer by role; it must not become shared direct-write access.
 
 | Role | Current owner | May write | Reads | Must not do |
 | --- | --- | --- | --- | --- |
-| Data collection owner | Li | `companies`, `job_sources`, `collection_runs`, `source_run_results`, `jobs`, `job_observations` through the collection/import process | collection tables and import reports | Write relevance, skills, clusters, labels, or release status |
-| Classification and clustering owner | Sunjol | `analysis_runs`, `job_analyses`, `skills`, `skill_aliases`, `job_skills`, `cluster_runs`, algorithmic fields in `clusters`, `job_cluster_assignments`, `cluster_skills`, LLM proposals in `cluster_label_revisions` | canonical jobs and previous analysis results | Change canonical job text/history, approve a label alone, or publish a release |
+| Data collection owner | Li | reviewed dated collection files; core collection tables are loaded by the importer | collection status and import reports | Directly edit core MySQL tables or write relevance, skills and clusters |
+| Classification and clustering owner | Sunjol | complete analysis output files and provenance; core analysis tables are loaded by the importer | matching Li input and analysis QA | Directly edit core MySQL tables, change canonical job text/history or publish a release |
 | Manual label reviewer | designated team/client-approved reviewer | new rows and review status in `cluster_label_revisions`; approved-label cache in `clusters` through one controlled transaction | terms, examples, skills, titles and previous revisions | Edit/delete an older revision, change membership, or change extracted skills while naming a cluster |
 | Database and integration owner | Nyx | schema migrations, importers, `import_batches`, `import_rejections`, validated loads, draft releases and approved publication operation | every table for validation/integration | Invent relevance, skills, membership or labels; silently repair rejected rows |
-| Backend owner | Leon | normally no analytical table writes; optionally an authorised release transaction; application-only tables belong in a separate schema | four `v_dashboard_*` views; authorised detail fields | Directly update collection, analysis, skill, cluster or label tables from public requests |
+| Backend owner | Leon | no analytical table writes; approved application-only tables belong in a separate schema | four `v_dashboard_*` views and approved `v_weekly_*` views | Directly update collection, analysis, skill, cluster, label or release tables from public requests |
 | Frontend owner | frontend team | no database tables | backend API only | Connect directly to MySQL or embed credentials |
 
 ### Nyx's database and integration scope
@@ -427,13 +472,22 @@ responsible owner and are loaded with provenance.
 
 ### 9.1 Collection-only update
 
-1. Li creates `collection_runs` and one `source_run_results` row per source.
-2. The importer upserts `jobs` and appends immutable `job_observations`.
-3. Older jobs are marked inactive only for sources that completed successfully.
-4. Analysis, skills, clusters, labels, and the published release remain unchanged.
-5. The Dashboard continues using the previous published release.
+1. Li produces one reviewed cumulative file in a dated `deliverables/` folder.
+2. Nyx's importer selects it as that week's official collection, creates
+   `collection_runs`/`weekly_versions`, upserts latest `jobs` for a new current
+   week, and appends immutable `job_observations`. An older backfill appends
+   observations **without** rewinding latest `jobs`.
+3. The current cumulative files do not include verified per-source run reports;
+   the importer does not invent `source_run_results` or mark a whole run as a
+   completed crawl. The files themselves carry active/inactive job flags.
+4. Analysis, skills, clusters, labels, and the published release remain
+   unchanged until a matching analysis is imported and approved for release.
 
 ### 9.2 LLM classification and LLM labelling
+
+This describes how versioned outputs **should** evolve. The current importer
+accepts a complete, already-produced Sunjol output folder; it does not run
+the LLM, regenerate missing results or approve labels itself.
 
 1. Create a new `analysis_runs` row with model, prompt, taxonomy, code,
    parameters, and source dataset version.
@@ -479,12 +533,25 @@ insert corrections, rerun clustering, and publish a new release.
 
 ## 10. Backend contract
 
-The backend reads the views in `views.mysql.sql`:
+The backend reads the AV-only public views in `views.mysql.sql`. They expose
+only successfully analysed, AV-relevant, non-duplicate jobs in the published
+release's collection snapshot. Non-AV and incomplete results remain internal:
 
 - `v_dashboard_jobs`: job list, filters, classification, and current cluster;
 - `v_dashboard_job_skills`: job-to-skill details;
 - `v_dashboard_skill_demand`: aggregate skill demand;
 - `v_dashboard_clusters`: cluster cards, labels, and summaries.
+- `v_dashboard_job_details`: full description and extracted sections for a selected job.
+
+For version-aware reads, use `v_weekly_versions` as the catalogue,
+`v_weekly_jobs` for raw collection states, and `v_weekly_av_jobs` /
+`v_weekly_av_job_skills` only for frozen classified weeks. Older weeks may be
+`pending` classification. The backend computes differences and must not
+misrepresent cumulative files as verified complete crawls. See
+[the operating guide](TEAM_GUIDE.md) for example SQL and access boundaries.
+Each classified week exposes only its `selected_release_id`; superseded
+revisions remain stored but do not duplicate historical query rows.
+`v_weekly_av_job_details` supplies the matching frozen historical text.
 
 The public backend is read-only. It must not update canonical jobs, model
 outputs, skills, assignments, or labels from public API handlers. If an
@@ -500,11 +567,11 @@ Suggested API mapping:
 | Endpoint | Primary database source |
 | --- | --- |
 | `GET /jobs` | `v_dashboard_jobs` |
-| `GET /jobs/{source_key}` | `v_dashboard_jobs` plus `v_dashboard_job_skills` |
+| `GET /jobs/{source_key}` | `v_dashboard_jobs` plus `v_dashboard_job_skills` and `v_dashboard_job_details`, joined by release and job |
 | `GET /skills` | `v_dashboard_skill_demand` |
 | `GET /clusters` | `v_dashboard_clusters` |
 | `GET /companies` | distinct companies from `v_dashboard_jobs` |
-| `GET /trends` | `job_observations` grouped by collection run/date |
+| `GET /trends` | Not enabled until `trend-readiness` reports two comparable verified crawls; cumulative exports are not valid trend points. |
 
 ## 11. Extending for Dashboard and new business requirements
 
@@ -515,6 +582,10 @@ New data must be placed according to ownership and source of truth.
 ### 11.1 Schema boundaries
 
 Use three logical MySQL schemas/databases:
+
+The MVP currently creates **only `av_job_profiles`**. The application and
+reporting schemas below are proposed extension boundaries, not tables the
+team can query today.
 
 | Schema | Owner | Purpose | Backend permission |
 | --- | --- | --- | --- |
@@ -591,42 +662,256 @@ reviewed core migration and assigned to the relevant data owner.
 
 ## 12. Required import order
 
-Use one transaction per batch where practical:
+This is the **internal table dependency order**, not a list of manual SQL
+commands for team members. Follow [TEAM_GUIDE.md](TEAM_GUIDE.md) to import
+files. Use one transaction per batch where practical:
 
 1. `import_batches`
 2. `companies`
 3. `job_sources`
 4. `collection_runs` and `source_run_results`
-5. `jobs` and `job_observations`
+5. `weekly_versions`, `jobs` and `job_observations`
 6. `analysis_runs` and `job_analyses`
-7. `skills`, `skill_aliases`, and `job_skills`
-8. `cluster_runs`, `clusters`, assignments, and `cluster_skills`
-9. `cluster_label_revisions`, then the approved label cache in `clusters`
-10. draft `dashboard_releases`
-11. QA validation, approval, and publication
+7. `job_deduplication_links`
+8. `skills`, `skill_aliases`, and `job_skills`
+9. `cluster_runs`, `clusters`, assignments, and `cluster_skills`
+10. `cluster_label_revisions`, then the approved label cache in `clusters`
+11. draft `dashboard_releases`
+12. QA validation, approval, and publication
 
 ## 13. Non-negotiable data rules
 
 - Join collection and analysis using `source_key`, never row number or fuzzy title.
 - Keep original source text even when normalised fields exist.
-- Keep noise cluster `-1`; do not silently discard it.
-- Treat `cluster_number` as scoped to one cluster run.
+- Keep noise assignments and original cluster numbers. `clusters.population`
+  distinguishes the AV and non-AV groups, so both can retain source noise ID
+  `-1` and regular cluster numbers without collision.
+- Treat `cluster_number` as scoped to one cluster run and one population.
 - Do not turn `High` into an invented numeric confidence.
 - Split semicolon-delimited skills before loading `job_skills`.
 - A failed source run must not deactivate every older job from that source.
 - LLM/manual labels are append-only; approval changes only current cache/pointer.
 - Publish only completed, fully validated runs.
 
-## 14. Files and deployment
+## 14. Weekly import, backup, restore, and rollback
+
+`weekly_import.py` remains the compatibility launcher and current MySQL
+operation engine. The import use cases are exposed separately through
+`database/importer/`: typed file contracts, an `ImporterService` application
+API, a backend protocol, and separate CLI/MySQL adapters. A future GUI should
+call the service rather than parse command-line arguments or issue SQL. The
+backend protocol is also the extension point for another storage engine.
+
+The importer requires Python and the MySQL client tools (`mysql` and
+`mysqldump`). Install its connector with:
+
+```text
+python -m pip install -r database/requirements-import.txt
+```
+
+Set `AVDB_HOST`, `AVDB_PORT`, `AVDB_USER`, `AVDB_PASSWORD`, and `AVDB_NAME` in
+the local environment or secret manager. Never commit credentials. The team
+has **no shared deployed database** yet. For Stage 3 development, create a
+new empty MySQL database and apply `schema.mysql.sql`, then `views.mysql.sql`.
+Reimport the saved matching Li/Sunjol files. Do not overwrite a populated
+database, and do not replay old migration scripts on a fresh schema.
+
+Migration scripts 001–005 document earlier schema changes and do **not**
+upgrade an arbitrary populated database to the Stage 3 contract. Migration
+`006_weekly_versions.sql` adds the weekly selection table to a verified Stage 3
+database only. `007_release_revisions.sql` then adds exact release selection
+and revision evidence. An existing 006 database needs only 007, applied once
+after a verified backup/test restore, followed by the current views.
+For a new empty database, use the current schema and views directly. Do not
+replay old migrations onto it.
+
+The importer checks key collations and hash lengths before writing; it refuses
+an incompatible schema instead of truncating identifiers or hash values.
+
+### Stable importer boundary
+
+The command line is only one caller of the import service. `CollectionFiles`
+and `AnalysisFiles` are immutable input descriptions; `ReleaseActivation`
+captures the target, expected old selections, reason and operator.
+`ImporterService` accepts
+those inputs and delegates each use case to the injected `ImportBackend`
+protocol. `importer/cli.py` owns argument parsing and terminal/audit output;
+`importer/mysql_backend.py` adapts the service API to the current MySQL
+operation engine. A GUI should put the service behind its controller/view-model,
+show returned summaries, and map `ImportErrorSafe` or backend errors to
+user-facing messages. It should not duplicate validation, backup, rollback, or
+SQL logic. CLI operation reports are produced by the CLI adapter; GUI audit
+presentation can be added as a separate adapter without changing import use
+cases.
+
+```python
+from pathlib import Path
+
+from database.importer import AnalysisFiles, CollectionFiles, ImporterService, MySQLImporterBackend
+
+service = ImporterService(MySQLImporterBackend())
+preview = service.plan_collection(CollectionFiles(snapshot=Path("jobs.json")))
+```
+
+The API can be called for manual tests, frequent runs, scheduled jobs, or GUI
+actions. For the MVP's official version catalogue, exactly one cumulative
+file is selected per `week_date`; a corrected same-week file requires a
+separately reviewed replacement workflow. File SHA-256 still distinguishes
+the underlying artifacts, and exact UTC `--snapshot-generated-at` can record
+an export time when known; it does not override the one-file-per-week rule.
+For cumulative exports, `job_observations.collected_at` is NULL; the separate
+`state_as_of_date` and per-job `source_last_collected_at` must not be mistaken
+for a complete crawl's exact timestamp. See
+[Stage 3 release/history contract](STAGE3_RELEASE_HISTORY.md).
+
+[Weekly collection and optional classification versions](WEEKLY_VERSIONS.md)
+documents historical backfill, explicit week selection, and the read-only
+version catalogue. Collection files can be imported before a matching
+classification exists; no placeholder analysis or Dashboard release is made.
+
+### Hash contract
+
+`source_key` remains the job identifier and the only cross-stage join key.
+Hashes are fingerprints, not IDs:
+
+| Field | Hashes | Purpose |
+| --- | --- | --- |
+| `jobs.content_hash` / `job_observations.content_hash` | Normalized job description, SHA-1, 40 hex characters | Matches classification-pipeline v2's exact-description dedupe and identifies the description seen by an analysis. |
+| `jobs.record_hash_sha256` / `job_observations.record_hash_sha256` | Title, full description, URL, raw location, raw salary, posting date, SHA-256, 64 hex characters | Detects changes in canonical source fields; this is not used for classification dedupe. |
+| `job_analyses.input_content_hash` | The same SHA-1 description hash for the input consumed by that analysis | Analysis provenance and stale-result checks. |
+
+The hashing implementation and version are in `database/importer/hashing.py`
+(`av-job-hash-v1`). The matching pipeline normalization is copied from its
+current v2 contract; any future normalization change must increment the
+contract version and be coordinated with the classifier before import.
+
+### Reconciliation with the Classification-pipeline schema
+
+The classification PR's `content_hash` is adopted as the 40-character SHA-1
+description hash. The importer's former 64-character `content_hash` meaning is
+preserved under the explicit name `record_hash_sha256`. The PR's structured
+`role_summary`, `responsibilities_json`, `requirements_json`, `language_of_posting`,
+`input_content_hash`, and model-usage columns are also part of the canonical
+schema.
+
+Two shapes remain intentionally different because they model different history:
+
+- Keep `job_deduplication_links` scoped to `analysis_run_id`. Deduplication can
+  change from one run to another, so a mutable `jobs.duplicate_of_job_id` would
+  make an old run appear to have today's duplicate decision.
+- Keep one release-scoped `cluster_run_id`, and identify each cluster's
+  population in `clusters.population`. Public views select only AV clusters;
+  non-AV results remain available for internal QA.
+
+The unified MySQL schema in this directory is the importer/backend contract;
+the classifier's local SQLite schema is a pipeline implementation detail, not a
+second competing production schema.
+
+### Check a weekly collection snapshot
+
+```text
+python database/weekly_import.py plan-collection --input data-collection/deliverables/2026-09-25/jobs_history_translated.json --previous data-collection/deliverables/2026-09-19/jobs_history_translated.json
+```
+
+This validates unique keys and compares the snapshots without connecting to
+MySQL. `import-collection` makes a compressed full backup first, then upserts
+by exact `source_key` and appends one `job_observations` row per input job.
+Unchanged jobs are left untouched. Missing keys never deactivate jobs. The
+current Li export is cumulative and does not include per-source run results, so
+the importer records a synthetic `partial` collection run and does not invent
+source success/failure records.
+
+Every parsed command—including a validation/plan command or a failed operation—
+also writes a local audit record. By default, one detailed JSON report is saved
+per run under `database/operation_logs/reports/`, and a compact JSON Lines log
+is appended to `database/operation_logs/logs/weekly_import.jsonl`. Reports
+include the operation ID, timestamps, duration, safe CLI arguments, outcome,
+counts/hashes returned by the command, and any error. Database credentials are
+not copied into these records. This local directory is Git-ignored. Use
+`--audit-dir <path>` after any command to choose another local audit directory.
+The command also prints the report and log paths. These files complement the
+database `import_batches` audit rows; they are not a replacement for backups.
+
+Release revision operations also keep transactional `release_operations`
+evidence. See [the revision guide](RELEASE_REVISIONS.md) for candidate import,
+activation, historical switching and safe reversion. A release reversion
+changes a selection; it does not delete an import batch.
+
+```text
+python database/weekly_import.py import-collection --week-date 2026-09-25 --input data-collection/deliverables/2026-09-25/jobs_history_translated.json
+```
+
+The file SHA-256 prevents accidental re-import of the same source file. A
+database advisory lock serialises import commands. Each changed/inserted job
+gets an undo record in `import_job_undo`; a failed SQL transaction makes no
+partial data visible.
+
+### Validate and import one Sunjol run
+
+Use the exact Li snapshot passed to Sunjol and all outputs from the same full
+run. The importer blocks sample/partial runs, unknown or mismatched keys,
+cross-company deduplication, cyclic duplicate links, missing outcomes, and
+cluster count mismatches. It records successful analyses, failed analyses,
+dedupe links, skills, cluster memberships, model/cost metadata, the pipeline
+commit, and a draft dashboard release. Cluster names remain blank until labels
+are proposed and reviewed; no release is published automatically.
+
+```text
+python database/weekly_import.py plan-analysis --postings path/to/postings_all.json --metadata path/to/run_metadata.json --source-input data-collection/deliverables/2026-09-25/jobs_history_translated.json --av-summary path/to/av_relevant/cluster_summary.csv --other-summary path/to/not_av_relevant/cluster_summary.csv --duplicates path/to/duplicates_removed.csv --failures path/to/llm_failures.csv
+```
+
+After the plan reconciles, run `import-analysis` with the same arguments plus
+`--week-date 2026-09-25`. It
+also creates a full backup before writing. The analysis is joined only by
+`source_key`; `row_index` is retained for traceability and never used as a key.
+Pass the exact classification pipeline Git commit as `--git-commit <sha>` so
+the analysis record identifies the code that produced the files.
+
+### Undo and restore
+
+`rollback` reverses only the latest successful/partial import batch. It makes a
+new full backup first, verifies the compressed dump is readable, records its
+SHA-256, and checks that imported jobs have not changed since the
+batch, no later analysis depends on them, and no dashboard release or approved
+cluster label depends on the batch. It preserves the batch/undo audit trail and
+does not remove pre-existing rows. Restore always targets a new database name;
+it validates the backup before loading and refuses to overwrite an existing
+database. Backups are written to `database/backups/` by default; that local-only
+directory is Git-ignored:
+
+```text
+python database/weekly_import.py rollback
+python database/weekly_import.py backup
+python database/weekly_import.py restore --file path/to/av_job_profiles_TIMESTAMP.sql.gz --target-db av_job_profiles_restore
+python database/weekly_import.py qa-release --release-key <release-key>
+python database/weekly_import.py publish-release --release-key <draft-key>
+python database/weekly_import.py trend-readiness
+```
+
+## 15. Files and deployment
 
 - `schema.mysql.sql`: tables, keys, constraints, and indexes.
+- `weekly_import.py`: current MySQL operation engine and command-line compatibility launcher.
+- `importer/`: service API, typed input contracts, backend protocol, MySQL and CLI adapters, stable errors, and hash rules.
+- `migrations/`: one-time migrations for reversible imports, analysis dedupe links, exact key comparison, the unified classifier/hash contract, and AV-only Dashboard populations.
+- `requirements-import.txt`: MySQL connector required by the importer.
 - `views.mysql.sql`: stable read contract for the backend.
-- `SOURCE_MAPPING.md`: field-level mapping from current team files.
+- `SOURCE_MAPPING.md`: collection and classification field mapping and import contract.
+- `METRICS_CONTRACT.md`: release counts, QA checks, and the AV-only public display rule.
+- `STAGE3_RELEASE_HISTORY.md`: immutable release publication and time/trend semantics.
+- `WEEKLY_VERSIONS.md`: official week selection, historical backfill and versioned read views.
+- `TEAM_GUIDE.md`: local install, role permissions, source files, import/publish commands and access checks.
+
+For a **new, empty database only**:
 
 ```bash
 mysql -u USER -p < database/schema.mysql.sql
 mysql -u USER -p < database/views.mysql.sql
 ```
+
+Do not run the fresh schema against an existing populated database. The
+development database can be rebuilt from the saved source files; any future
+deployed database would need its own reviewed migration plan.
 
 Database credentials must come from environment variables or the deployment
 platform's secret manager. They must not be committed to GitHub.
