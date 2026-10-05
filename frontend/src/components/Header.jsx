@@ -46,15 +46,23 @@ export default function Header({
           About
         </NavLink>
 
-        {/* Help page will be connected next */}
-        <a href="#insights">
+        <NavLink
+          to="/help"
+          className={({ isActive }) =>
+            isActive ? "active" : ""
+          }
+        >
           Help
-        </a>
+        </NavLink>
 
-        {/* Terms page will be connected later */}
-        <a href="#terms">
+        <NavLink
+          to="/terms"
+          className={({ isActive }) =>
+            isActive ? "active" : ""
+          }
+        >
           Terms and Conditions
-        </a>
+        </NavLink>
       </nav>
 
       {/* RIGHT BUTTON */}

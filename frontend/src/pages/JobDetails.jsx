@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import CompanyLogo from "../components/CompanyLogo";
 import { getJobById } from "../data/jobs";
 
@@ -277,7 +278,10 @@ export default function JobDetails() {
             </button>
           )}
         </section>
+            {/* FOOTER */}
+         
       </main>
+      <Footer />
     </div>
   );
 }

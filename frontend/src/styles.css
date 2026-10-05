@@ -617,12 +617,6 @@ select {
     font-size: 11px;
 }
 
-.jobs-page,
-.detail-page {
-    padding: 38px 38px 58px;
-    background: #fff;
-}
-
 .page-heading h1 {
     margin: 0;
     font-size: 31px;
@@ -1386,7 +1380,7 @@ select {
 ===================================================== */
 
 .jobs-page {
-    padding: 38px 34px 52px;
+    padding: 0px 30px 34px 52px;
     background: #ffffff;
 }
 
@@ -1748,7 +1742,7 @@ select {
 /* Make the overall page more compact */
 
 .jobs-page {
-    padding: 30px 30px 40px;
+    padding: 0px 30px 30px 40px;
 }
 
 
@@ -1923,7 +1917,7 @@ select {
 ========================================================== */
 
 .jobs-page {
-    padding: 30px 30px 42px;
+    padding: 0px 30px 30px 42px;
     background: #fff;
 }
 
@@ -2303,28 +2297,33 @@ select {
 
 .apply-job-button,
 .save-job-button {
-    width: 90px;
-    height: 34px;
-    border-radius: 5px;
-    font-size: 9px;
+    width: 96px;
+    height: 38px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
     cursor: pointer;
 }
 
 .apply-job-button {
     border: none;
-    color: white;
+    color: #ffffff;
     background: linear-gradient( 135deg, #494ee1, #272b9c);
 }
 
 .save-job-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
     border: 1px solid #e0e4eb;
     color: #303aa6;
-    background: #fff;
+    background: #ffffff;
 }
 
 
@@ -2539,8 +2538,8 @@ select {
     width: 100%;
     max-width: 1440px;
     margin: 0 auto;
-    padding: 0 32px 60px;
     color: #0b1739;
+    padding: 0 32px 60px;
 }
 
 
@@ -2579,6 +2578,7 @@ select {
     font-size: 15px;
     line-height: 1.7;
     color: #64708a;
+    padding-bottom: 26px;
 }
 
 .about-primary-button {
@@ -3089,5 +3089,937 @@ select {
     }
     .footer-content {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* =========================================================
+   HELP PAGE
+   AV Job Tracker
+========================================================= */
+
+.help-page {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 32px 60px;
+    color: #0d1838;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.help-hero {
+    width: 100%;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 38px 24px;
+    margin-bottom: 42px;
+    text-align: center;
+    background: linear-gradient( 135deg, #fafbff 0%, #f5f6ff 100%);
+    border: 1px solid #e2e6f0;
+    border-radius: 12px;
+}
+
+.help-label {
+    display: block;
+    margin-bottom: 10px;
+    color: #3d46e8;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.7px;
+    text-transform: uppercase;
+}
+
+.help-hero h1 {
+    margin: 0;
+    color: #0b1739;
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 750;
+}
+
+.help-hero p {
+    max-width: 620px;
+    margin: 12px auto 0;
+    color: #66738e;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   MAIN HELP SECTION
+========================================================= */
+
+.help-section {
+    max-width: 1280px;
+    margin: 0 auto 46px;
+}
+
+.help-heading {
+    margin-bottom: 18px;
+}
+
+.help-heading h2 {
+    margin: 0 0 5px;
+    color: #0b1739;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.help-heading p {
+    margin: 0;
+    color: #778198;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   HELP CARDS
+========================================================= */
+
+.help-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.help-card {
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e0e4ed;
+    border-radius: 9px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.help-card:hover {
+    transform: translateY(-2px);
+    border-color: #ccd2ee;
+    box-shadow: 0 7px 20px rgba(23, 35, 78, 0.06);
+}
+
+.help-card>svg {
+    width: 32px;
+    height: 32px;
+    padding: 8px;
+    margin-bottom: 14px;
+    color: #3943df;
+    background: #f0f1ff;
+    border-radius: 7px;
+}
+
+.help-card h3 {
+    margin: 0 0 7px;
+    color: #0b1739;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.help-card p {
+    margin: 0;
+    color: #69758d;
+    font-size: 11.5px;
+    line-height: 1.6;
+}
+
+.help-card a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: auto;
+    padding-top: 13px;
+    color: #343edf;
+    font-size: 11px;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.help-card a:hover {
+    color: #2028b8;
+}
+
+
+/* =========================================================
+   FAQ
+========================================================= */
+
+.help-faq {
+    max-width: 1280px;
+    margin: 0 auto 26px;
+    padding: 26px 30px;
+    background: #f9faff;
+    border: 1px solid #e1e5ef;
+    border-radius: 10px;
+}
+
+.help-faq .help-heading {
+    margin-bottom: 8px;
+}
+
+.help-faq .help-heading .help-label {
+    margin-bottom: 6px;
+}
+
+.help-faq .help-heading h2 {
+    font-size: 18px;
+}
+
+.faq-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 40px;
+    row-gap: 0;
+}
+
+.faq-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #e8ebf3;
+}
+
+.faq-item:nth-last-child(-n + 2) {
+    border-bottom: none;
+}
+
+.faq-item h3 {
+    margin: 0 0 5px;
+    color: #111c3c;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.faq-item p {
+    margin: 0;
+    color: #69758d;
+    font-size: 11.5px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   NEED MORE HELP
+========================================================= */
+
+.help-contact {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    background: #ffffff;
+    border: 1px solid #e1e5ee;
+    border-radius: 9px;
+}
+
+.help-contact>svg {
+    width: 34px;
+    height: 34px;
+    padding: 8px;
+    color: #3943df;
+    background: #f0f1ff;
+    border-radius: 7px;
+}
+
+.help-contact h2 {
+    margin: 0 0 3px;
+    color: #0b1739;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.help-contact p {
+    margin: 0;
+    color: #717c92;
+    font-size: 11px;
+}
+
+.help-contact>a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    color: #ffffff;
+    background: #3039c8;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 650;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.help-contact>a:hover {
+    background: #252da9;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+    .help-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .faq-list {
+        grid-template-columns: 1fr;
+    }
+    .faq-item:nth-last-child(-n + 2) {
+        border-bottom: 1px solid #e8ebf3;
+    }
+    .faq-item:last-child {
+        border-bottom: none;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 620px) {
+    .help-page {
+        padding: 24px 16px 45px;
+    }
+    .help-hero {
+        min-height: 190px;
+        padding: 30px 18px;
+        margin-bottom: 32px;
+    }
+    .help-hero h1 {
+        font-size: 25px;
+    }
+    .help-hero p {
+        font-size: 12px;
+    }
+    .help-grid {
+        grid-template-columns: 1fr;
+    }
+    .help-faq {
+        padding: 22px 20px;
+    }
+    .help-contact {
+        grid-template-columns: 34px 1fr;
+    }
+    .help-contact>a {
+        grid-column: 1 / -1;
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   TERMS & CONDITIONS PAGE
+   Matches AV Job Tracker UI
+========================================================= */
+
+.terms-page {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 32px 60px;
+    color: #0d1838;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.terms-hero {
+    width: 100%;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 38px 24px;
+    margin-bottom: 38px;
+    text-align: center;
+    background: linear-gradient( 135deg, #fafbff 0%, #f5f6ff 100%);
+    border: 1px solid #e2e6f0;
+    border-radius: 12px;
+}
+
+.terms-label {
+    display: block;
+    margin-bottom: 10px;
+    color: #3d46e8;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.7px;
+    text-transform: uppercase;
+}
+
+.terms-hero h1 {
+    margin: 0;
+    color: #0b1739;
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 750;
+}
+
+.terms-hero p {
+    max-width: 650px;
+    margin: 12px auto 0;
+    color: #66738e;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.terms-updated {
+    display: block;
+    margin-top: 14px;
+    color: #8a94a9;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   CONTENT WRAPPER
+========================================================= */
+
+.terms-content {
+    width: 100%;
+    max-width: none;
+    margin: 0 30px;
+}
+
+
+/* =========================================================
+   INTRO CARD
+========================================================= */
+
+.terms-intro {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 19px 21px;
+    margin-bottom: 14px;
+    background: #f8f9ff;
+    border: 1px solid #e0e4ee;
+    border-radius: 9px;
+}
+
+.terms-intro>svg {
+    width: 34px;
+    height: 34px;
+    padding: 8px;
+    color: #3943df;
+    background: #eef0ff;
+    border-radius: 7px;
+}
+
+.terms-intro h2 {
+    margin: 1px 0 5px;
+    color: #0b1739;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.terms-intro p {
+    margin: 0;
+    color: #68748c;
+    font-size: 11.5px;
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   TERM CARDS
+========================================================= */
+
+.terms-card {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 19px 21px;
+    margin-bottom: 11px;
+    background: #ffffff;
+    border: 1px solid #e0e4ed;
+    border-radius: 9px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.terms-card:hover {
+    transform: translateY(-1px);
+    border-color: #cfd5eb;
+    box-shadow: 0 6px 18px rgba(22, 35, 78, 0.05);
+}
+
+
+/* ICON */
+
+.terms-card-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3943df;
+    background: #f0f1ff;
+    border-radius: 7px;
+}
+
+.terms-card-icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+
+/* NUMBER */
+
+.terms-card span {
+    display: block;
+    margin: 0 0 3px;
+    color: #3943df;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+}
+
+
+/* HEADING */
+
+.terms-card h2 {
+    margin: 0 0 6px;
+    color: #0b1739;
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+
+/* TEXT */
+
+.terms-card p {
+    margin: 0 0 6px;
+    color: #68748c;
+    font-size: 11.5px;
+    line-height: 1.65;
+}
+
+.terms-card p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   BOTTOM HELP
+========================================================= */
+
+.terms-help {
+    max-width: 100%;
+    margin: 22px 30px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 22px;
+    background: #f8f9ff;
+    border: 1px solid #e0e4ee;
+    border-radius: 9px;
+}
+
+.terms-help h2 {
+    margin: 0 0 3px;
+    color: #0b1739;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.terms-help p {
+    margin: 0;
+    color: #707b91;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.terms-help a {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 15px;
+    color: #ffffff;
+    background: #3039c8;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 650;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.terms-help a:hover {
+    background: #252da9;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+    .terms-page {
+        padding: 28px 20px 50px;
+    }
+    .terms-hero {
+        min-height: 200px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+    .terms-page {
+        padding: 24px 16px 45px;
+    }
+    .terms-hero {
+        min-height: 190px;
+        padding: 30px 18px;
+        margin-bottom: 30px;
+    }
+    .terms-hero h1 {
+        font-size: 25px;
+    }
+    .terms-hero p {
+        font-size: 12px;
+    }
+    .terms-intro,
+    .terms-card {
+        grid-template-columns: 32px 1fr;
+        padding: 17px;
+        gap: 12px;
+    }
+    .terms-help {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .terms-help a {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   JOBS PAGE - NEW HERO
+   ========================================================= */
+
+.jobs-hero {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 34px;
+    padding: 54px 30px;
+    text-align: center;
+    background: linear-gradient( 135deg, #fafbff 0%, #f4f6ff 100%);
+    border: 1px solid #dfe4f2;
+    border-radius: 14px;
+}
+
+.jobs-hero-label {
+    display: block;
+    margin-bottom: 12px;
+    color: #3646e8;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.jobs-hero h1 {
+    margin: 0;
+    color: #071633;
+    font-size: 34px;
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: -0.8px;
+}
+
+.jobs-hero p {
+    max-width: 680px;
+    margin: 15px auto 0;
+    color: #66738f;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.7;
+}
+
+
+/* More space between filters and results */
+
+.jobs-toolbar {
+    margin-top: 18px;
+    margin-bottom: 18px;
+}
+
+
+/* No results */
+
+.jobs-no-results {
+    padding: 60px 20px;
+    text-align: center;
+    color: #66738f;
+}
+
+.jobs-no-results svg {
+    margin-bottom: 10px;
+    color: #3646e8;
+}
+
+.jobs-no-results h3 {
+    margin: 0 0 8px;
+    color: #071633;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.jobs-no-results p {
+    margin: 0;
+    color: #66738f;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .jobs-hero {
+        padding: 42px 20px;
+        margin-bottom: 25px;
+    }
+    .jobs-hero h1 {
+        font-size: 28px;
+    }
+    .jobs-hero p {
+        font-size: 13px;
+    }
+}
+
+
+/* =========================================================
+   CONSISTENT PAGE HERO SIZE
+   ========================================================= */
+
+.about-hero,
+.jobs-hero,
+.help-hero,
+.terms-hero {
+    min-height: 0;
+    padding: 48px 30px;
+    box-sizing: border-box;
+}
+
+
+/* Hero text spacing */
+
+.about-hero h1,
+.jobs-hero h1,
+.help-hero h1,
+.terms-hero h1 {
+    margin-top: 10px;
+    margin-bottom: 14px;
+}
+
+.about-hero p,
+.jobs-hero p,
+.help-hero p,
+.terms-hero p {
+    margin-top: 0;
+    margin-bottom: 22px;
+}
+
+
+/* Mobile */
+
+@media (max-width: 768px) {
+    .about-hero,
+    .jobs-hero,
+    .help-hero,
+    .terms-hero {
+        padding: 38px 20px;
+    }
+}
+
+.hero-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    background: #3543d9;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.hero-action-button:hover {
+    background: #2734bd;
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   SHARED HERO DESIGN
+   About / Jobs / Help / Terms
+   ========================================================= */
+
+.about-hero,
+.jobs-hero,
+.help-hero,
+.terms-hero {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 48px 30px;
+    box-sizing: border-box;
+    text-align: center;
+    background: linear-gradient( 135deg, #fafbff 0%, #f5f6ff 100%);
+    border: 1px solid #dfe4f2;
+    border-radius: 14px;
+}
+
+
+/* HERO LABEL */
+
+.about-label,
+.jobs-hero-label,
+.help-label,
+.terms-label {
+    display: block;
+    margin: 0 0 16px;
+    color: #3545e6;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+}
+
+
+/* HERO TITLE */
+
+.about-hero h1,
+.jobs-hero h1,
+.help-hero h1,
+.terms-hero h1 {
+    margin: 0;
+    color: #071633;
+    font-size: 38px;
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: -1px;
+}
+
+
+/* HERO DESCRIPTION */
+
+.about-hero p,
+.jobs-hero p,
+.help-hero p,
+.terms-hero p {
+    max-width: 760px;
+    margin: 18px auto 0;
+    color: #66738f;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.7;
+}
+
+
+/* HERO BUTTON */
+
+.hero-action-button,
+.about-hero .about-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 24px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #3543d9;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.hero-action-button:hover,
+.about-hero .about-cta:hover {
+    background: #2835bd;
+    transform: translateY(-1px);
+}
+
+
+/* TERMS LAST UPDATED */
+
+.terms-hero .terms-updated {
+    display: block;
+    margin-top: 16px;
+    color: #8791a8;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+
+/* SPACE AFTER HERO */
+
+.jobs-hero {
+    margin-bottom: 30px;
+}
+
+.about-hero {
+    margin-bottom: 45px;
+}
+
+.help-hero,
+.terms-hero {
+    margin-bottom: 40px;
+}
+
+
+/* =========================================================
+   RESPONSIVE HERO
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .about-hero,
+    .jobs-hero,
+    .help-hero,
+    .terms-hero {
+        padding: 38px 20px;
+    }
+    .about-hero h1,
+    .jobs-hero h1,
+    .help-hero h1,
+    .terms-hero h1 {
+        font-size: 30px;
+    }
+    .about-hero p,
+    .jobs-hero p,
+    .help-hero p,
+    .terms-hero p {
+        font-size: 14px;
     }
 }

@@ -13,6 +13,7 @@ import {
 
 import Header from "../components/Header";
 import CompanyLogo from "../components/CompanyLogo";
+import Footer from "../components/Footer";
 
 import {
   getFavorites,
@@ -246,8 +247,9 @@ export default function About() {
             company posting for the latest information before
             applying.
           </p>
-        </section>
-      </main>
+              </section>
+          </main>
+          <Footer />
     </div>
   );
 }

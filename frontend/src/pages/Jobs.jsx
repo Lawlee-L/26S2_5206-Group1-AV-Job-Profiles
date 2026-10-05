@@ -14,6 +14,7 @@ import {
 
 import Header from "../components/Header";
 import CompanyLogo from "../components/CompanyLogo";
+import Footer from "../components/Footer";
 import { jobs } from "../data/jobs";
 
 import {
@@ -66,7 +67,7 @@ export default function Jobs() {
 
     toggleFavorite(job);
 
-    // Update UI immediately
+    // Update favorites immediately
     setFavorites(getFavorites());
   };
 
@@ -75,18 +76,37 @@ export default function Jobs() {
       <Header />
 
       <main className="jobs-page">
-        {/* PAGE TITLE */}
-        <div className="page-heading">
-          <h1>All Jobs</h1>
+
+        {/* =========================================
+            JOBS HERO
+        ========================================= */}
+        <section className="jobs-hero">
+          <span className="jobs-hero-label">
+            AV CAREER OPPORTUNITIES
+          </span>
+
+          <h1>Explore AV Jobs</h1>
 
           <p>
-            Explore the latest job opportunities in the autonomous
-            vehicle industry.
+            Discover job opportunities across the autonomous
+            vehicle industry. Search by job title, company,
+            location, or technical skill.
           </p>
-        </div>
+          <Link
+  to="/about#favorites"
+  className="hero-action-button"
+>
+  View Saved Jobs
+  <ChevronRight size={15} />
+</Link>
+        </section>
 
-        {/* SEARCH + FILTER AREA */}
+        {/* =========================================
+            SEARCH + FILTER AREA
+        ========================================= */}
         <div className="jobs-filter-panel">
+
+          {/* SEARCH */}
           <div className="jobs-search">
             <Search size={15} />
 
@@ -100,7 +120,10 @@ export default function Jobs() {
             />
           </div>
 
+          {/* FILTER ROW */}
           <div className="jobs-filter-row">
+
+            {/* LOCATION */}
             <button
               type="button"
               className="jobs-filter-item"
@@ -112,6 +135,7 @@ export default function Jobs() {
               <ChevronDown size={12} />
             </button>
 
+            {/* EXPERIENCE */}
             <button
               type="button"
               className="jobs-filter-item"
@@ -123,6 +147,7 @@ export default function Jobs() {
               <ChevronDown size={12} />
             </button>
 
+            {/* EMPLOYMENT TYPE */}
             <button
               type="button"
               className="jobs-filter-item"
@@ -134,6 +159,7 @@ export default function Jobs() {
               <ChevronDown size={12} />
             </button>
 
+            {/* COMPANY */}
             <button
               type="button"
               className="jobs-filter-item"
@@ -145,21 +171,29 @@ export default function Jobs() {
               <ChevronDown size={12} />
             </button>
 
+            {/* FILTER BUTTON */}
             <button
               type="button"
               className="jobs-filter-button"
             >
               <SlidersHorizontal size={13} />
+
               Filters
             </button>
           </div>
         </div>
 
-        {/* RESULT COUNT */}
+        {/* =========================================
+            RESULT COUNT + SORT
+        ========================================= */}
         <div className="jobs-toolbar">
+
           <span>
             {filteredJobs.length}{" "}
-            {filteredJobs.length === 1 ? "job" : "jobs"} found
+            {filteredJobs.length === 1
+              ? "job"
+              : "jobs"}{" "}
+            found
           </span>
 
           <div className="jobs-sort">
@@ -167,13 +201,17 @@ export default function Jobs() {
 
             <button type="button">
               Most Recent
+
               <ChevronDown size={11} />
             </button>
           </div>
         </div>
 
-        {/* JOB LIST */}
+        {/* =========================================
+            JOB LIST
+        ========================================= */}
         <div className="jobs-list-container">
+
           {filteredJobs.map((job) => {
             const saved = isJobSaved(job.id);
 
@@ -183,39 +221,56 @@ export default function Jobs() {
                 to={`/jobs/${job.id}`}
                 className="jobs-list-item"
               >
+
                 {/* COMPANY LOGO */}
                 <div className="jobs-company-logo">
-                  <CompanyLogo company={job.company} />
+                  <CompanyLogo
+                    company={job.company}
+                  />
                 </div>
 
-                {/* JOB CONTENT */}
+                {/* JOB INFORMATION */}
                 <div className="jobs-list-content">
-                  <h3>{job.title}</h3>
 
-                  <strong>{job.company}</strong>
+                  <h3>
+                    {job.title}
+                  </h3>
 
+                  <strong>
+                    {job.company}
+                  </strong>
+
+                  {/* META INFORMATION */}
                   <div className="jobs-meta">
+
                     <span>
                       <MapPin size={10} />
                       {job.location}
                     </span>
 
-                    <span className="jobs-dot">•</span>
+                    <span className="jobs-dot">
+                      •
+                    </span>
 
                     <span>
                       <Briefcase size={10} />
                       {job.type}
                     </span>
 
-                    <span className="jobs-dot">•</span>
+                    <span className="jobs-dot">
+                      •
+                    </span>
 
                     <span>
                       <GraduationCap size={10} />
                       {job.level}
                     </span>
+
                   </div>
 
+                  {/* SKILLS */}
                   <div className="jobs-skills">
+
                     {(job.skills || [])
                       .slice(0, 4)
                       .map((skill) => (
@@ -229,15 +284,20 @@ export default function Jobs() {
                         ...
                       </span>
                     )}
+
                   </div>
                 </div>
 
                 {/* RIGHT SIDE */}
                 <div className="jobs-list-right">
+
+                  {/* POST DATE */}
                   <span>
-                    {job.date || "Date not available"}
+                    {job.date ||
+                      "Date not available"}
                   </span>
 
+                  {/* SAVE BUTTON */}
                   <button
                     type="button"
                     className={
@@ -256,7 +316,10 @@ export default function Jobs() {
                         : "Save to favorites"
                     }
                     onClick={(event) =>
-                      handleSaveJob(event, job)
+                      handleSaveJob(
+                        event,
+                        job
+                      )
                     }
                   >
                     <Bookmark
@@ -268,46 +331,75 @@ export default function Jobs() {
                       }
                     />
                   </button>
+
                 </div>
               </Link>
             );
           })}
         </div>
 
-        {/* NO RESULTS */}
+        {/* =========================================
+            NO RESULTS
+        ========================================= */}
         {filteredJobs.length === 0 && (
           <div className="jobs-no-results">
-            <h3>No jobs found</h3>
+
+            <Search size={24} />
+
+            <h3>
+              No jobs found
+            </h3>
 
             <p>
-              Try searching with a different job title,
-              company, location, or skill.
+              Try searching with a different
+              job title, company, location,
+              or skill.
             </p>
+
           </div>
         )}
 
-        {/* PAGINATION */}
-        <div className="jobs-pagination">
-          <button type="button" className="active">
-            1
-          </button>
+        {/* =========================================
+            PAGINATION
+        ========================================= */}
+        {filteredJobs.length > 0 && (
+          <div className="jobs-pagination">
 
-          <button type="button">2</button>
+            <button
+              type="button"
+              className="active"
+            >
+              1
+            </button>
 
-          <button type="button">3</button>
+            <button type="button">
+              2
+            </button>
 
-          <span>...</span>
+            <button type="button">
+              3
+            </button>
 
-          <button type="button">41</button>
+            <span>
+              ...
+            </span>
 
-          <button
-            type="button"
-            aria-label="Next page"
-          >
-            <ChevronRight size={14} />
-          </button>
-        </div>
+            <button type="button">
+              41
+            </button>
+
+            <button
+              type="button"
+              aria-label="Next page"
+            >
+              <ChevronRight size={14} />
+            </button>
+
+          </div>
+        )}
+
       </main>
+      <Footer />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import CompanyLogo from "../components/CompanyLogo";
 
 export default function Home() {
@@ -177,62 +178,10 @@ export default function Home() {
           ))}
         </div>
       </section>
+       <Footer />
 
-      {/* FOOTER */}
-      <footer className="footer" id="about">
-        <div className="footer-content">
-          <div className="footer-about">
-            <div className="footer-logo">
-              <span>
-                <Bot size={15} />
-              </span>
-
-              AV Job Tracker
-            </div>
-
-            <p>
-              Empowering the future of
-              <br />
-              Autonomous Vehicles.
-            </p>
-          </div>
-
-          <div className="footer-column">
-            <h4>Explore</h4>
-            <Link to="/jobs">Jobs</Link>
-            <a href="#companies">Companies</a>
-            <a href="#insights">Insights</a>
-            <a href="#about">About</a>
-          </div>
-
-          <div className="footer-column">
-            <h4>Resources</h4>
-            <a href="#skills">Skill Trends</a>
-            <a href="#reports">Reports</a>
-            <a href="#methodology">Methodology</a>
-            <a href="#api">API</a>
-          </div>
-
-          <div className="footer-column">
-            <h4>Contact</h4>
-
-            <a href="mailto:team@avjobtracker.com">
-              team@avjobtracker.com
-            </a>
-
-            <div className="social-icons">
-              <span>in</span>
-              <span>◎</span>
-              <span>◉</span>
-              <span>⌘</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="copyright">
-          © 2026 AV Job Tracker. All rights reserved.
-        </div>
-      </footer>
     </div>
+    
+    
   );
 }
