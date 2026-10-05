@@ -27,8 +27,58 @@ export default function About() {
     setFavorites(getFavorites());
   }, []);
 
-  const handleRemoveFavorite = (jobId) => {
+  // =========================================
+  // HELPERS
+  // =========================================
+
+  const getJobId = (job) => {
+    return job.sourceKey || job.id;
+  };
+
+  const getSkillName = (skill) => {
+    if (typeof skill === "string") {
+      return skill;
+    }
+
+    return skill?.name || "Skill";
+  };
+
+  const getEmploymentType = (job) => {
+    return (
+      job.type ||
+      job.employmentType ||
+      job.remoteType ||
+      "Not specified"
+    );
+  };
+
+  const formatDate = (dateValue) => {
+    if (!dateValue) {
+      return "Date not available";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return dateValue;
+    }
+
+    return date.toLocaleDateString("en-AU", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // =========================================
+  // REMOVE FAVORITE
+  // =========================================
+
+  const handleRemoveFavorite = (job) => {
+    const jobId = getJobId(job);
+
     removeFavorite(jobId);
+
     setFavorites(getFavorites());
   };
 
@@ -37,7 +87,11 @@ export default function About() {
       <Header />
 
       <main className="about-page">
-        {/* ABOUT HERO */}
+
+        {/* =========================================
+            ABOUT HERO
+        ========================================= */}
+
         <section className="about-hero">
           <span className="about-label">
             ABOUT THE PLATFORM
@@ -51,13 +105,19 @@ export default function About() {
             autonomous vehicle industry in one convenient place.
           </p>
 
-          <Link to="/jobs" className="about-primary-button">
+          <Link
+            to="/jobs"
+            className="about-primary-button"
+          >
             Explore Jobs
             <ArrowRight size={15} />
           </Link>
         </section>
 
-        {/* ABOUT INFORMATION */}
+        {/* =========================================
+            ABOUT INFORMATION
+        ========================================= */}
+
         <section className="about-section">
           <div className="about-section-heading">
             <h2>What is AV Job Tracker?</h2>
@@ -71,6 +131,7 @@ export default function About() {
           </div>
 
           <div className="about-feature-grid">
+
             <div className="about-feature-card">
               <Search size={24} />
 
@@ -114,12 +175,20 @@ export default function About() {
                 source link is available.
               </p>
             </div>
+
           </div>
         </section>
 
-        {/* FAVORITES */}
-        <section className="favorites-section">
+        {/* =========================================
+            FAVORITES
+        ========================================= */}
+
+        <section
+          className="favorites-section"
+          id="favorites"
+        >
           <div className="favorites-heading">
+
             <div>
               <span className="about-label">
                 SAVED OPPORTUNITIES
@@ -134,11 +203,16 @@ export default function About() {
             </div>
 
             <span className="favorites-count">
-              {favorites.length} saved
+              {favorites.length}{" "}
+              {favorites.length === 1
+                ? "saved job"
+                : "saved jobs"}
             </span>
+
           </div>
 
           {favorites.length === 0 ? (
+
             <div className="favorites-empty">
               <Bookmark size={30} />
 
@@ -158,78 +232,132 @@ export default function About() {
                 <ArrowRight size={15} />
               </Link>
             </div>
+
           ) : (
+
             <div className="favorites-list">
-              {favorites.map((job) => (
-                <div
-                  key={job.id}
-                  className="favorite-job-card"
-                >
-                  <div className="favorite-job-logo">
-                    <CompanyLogo
-                      company={job.company}
-                    />
-                  </div>
 
-                  <div className="favorite-job-content">
-                    <h3>{job.title}</h3>
+              {favorites.map((job) => {
+                const jobId = getJobId(job);
 
-                    <strong>{job.company}</strong>
+                return (
+                  <div
+                    key={jobId}
+                    className="favorite-job-card"
+                  >
 
-                    <div className="favorite-job-meta">
-                      <span>
-                        <MapPin size={12} />
-                        {job.location}
-                      </span>
+                    {/* COMPANY LOGO */}
 
-                      <span>
-                        <Briefcase size={12} />
-                        {job.type}
-                      </span>
+                    <div className="favorite-job-logo">
+                      <CompanyLogo
+                        company={
+                          job.company ||
+                          "Unknown company"
+                        }
+                      />
                     </div>
 
-                    <div className="favorite-job-skills">
-                      {(job.skills || [])
-                        .slice(0, 4)
-                        .map((skill) => (
-                          <span key={skill}>
-                            {skill}
-                          </span>
-                        ))}
+                    {/* JOB CONTENT */}
+
+                    <div className="favorite-job-content">
+
+                      <h3>
+                        {job.title ||
+                          "Job title not available"}
+                      </h3>
+
+                      <strong>
+                        {job.company ||
+                          "Company not specified"}
+                      </strong>
+
+                      <div className="favorite-job-meta">
+
+                        <span>
+                          <MapPin size={12} />
+
+                          {job.location ||
+                            "Location not specified"}
+                        </span>
+
+                        <span>
+                          <Briefcase size={12} />
+
+                          {getEmploymentType(job)}
+                        </span>
+
+                      </div>
+
+                      {/* SKILLS */}
+
+                      <div className="favorite-job-skills">
+
+                        {(job.skills || [])
+                          .slice(0, 4)
+                          .map((skill, index) => (
+                            <span
+                              key={`${getSkillName(
+                                skill
+                              )}-${index}`}
+                            >
+                              {getSkillName(skill)}
+                            </span>
+                          ))}
+
+                        {(job.skills || []).length > 4 && (
+                          <span>...</span>
+                        )}
+
+                      </div>
                     </div>
+
+                    {/* ACTIONS */}
+
+                    <div className="favorite-job-actions">
+
+                      <span className="favorite-job-date">
+                        {formatDate(
+                          job.postedDate ||
+                          job.date
+                        )}
+                      </span>
+
+                      <Link
+                        to={`/jobs/${encodeURIComponent(
+                          jobId
+                        )}`}
+                        className="favorite-view-button"
+                      >
+                        View Details
+                      </Link>
+
+                      <button
+                        type="button"
+                        className="favorite-remove-button"
+                        onClick={() =>
+                          handleRemoveFavorite(job)
+                        }
+                      >
+                        Remove
+                      </button>
+
+                    </div>
+
                   </div>
+                );
+              })}
 
-                  <div className="favorite-job-actions">
-                    <span className="favorite-job-date">
-                      {job.date ||
-                        "Date not available"}
-                    </span>
-
-                    <Link
-                      to={`/jobs/${job.id}`}
-                      className="favorite-view-button"
-                    >
-                      View Details
-                    </Link>
-
-                    <button
-                      type="button"
-                      className="favorite-remove-button"
-                      onClick={() =>
-                        handleRemoveFavorite(job.id)
-                      }
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              ))}
             </div>
+
           )}
         </section>
 
-        {/* DATA INFORMATION */}
+        {/* =========================================
+            DATA INFORMATION
+        ========================================= */}
+
         <section className="about-data-section">
+
           <h2>About the Job Information</h2>
 
           <p>
@@ -247,9 +375,12 @@ export default function About() {
             company posting for the latest information before
             applying.
           </p>
-              </section>
-          </main>
-          <Footer />
+
+        </section>
+
+      </main>
+
+      <Footer />
     </div>
   );
 }

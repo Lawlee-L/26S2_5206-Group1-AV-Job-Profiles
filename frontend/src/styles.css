@@ -47,7 +47,7 @@ select {
 }
 
 .site-header {
-    height: 72px;
+    height: 90px;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
@@ -1972,17 +1972,46 @@ select {
 }
 
 .jobs-filter-item {
+    position: relative;
     height: 33px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 0 9px;
+    gap: 7px;
+    padding: 0 10px;
     border: 1px solid #e2e6ed;
     border-radius: 5px;
-    background: #fff;
+    background: #ffffff;
+    color: #5f6a80;
+}
+
+.jobs-filter-item svg {
+    flex-shrink: 0;
+    color: #65708a;
+}
+
+.jobs-filter-item select {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
     color: #5f6a80;
     font-size: 9px;
+    font-weight: 400;
     cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.jobs-filter-item select:focus {
+    outline: none;
+}
+
+.jobs-filter-item>svg:last-child {
+    flex-shrink: 0;
+    pointer-events: none;
 }
 
 .jobs-filter-item span {
@@ -2376,9 +2405,10 @@ select {
 
 .job-details-layout {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(185px, 0.75fr);
-    gap: 13px;
-    margin-top: 19px;
+    grid-template-columns: minmax(0, 3fr) minmax(260px, 1fr);
+    gap: 14px;
+    align-items: start;
+    margin-top: 14px;
 }
 
 .job-description-card,
@@ -2393,7 +2423,12 @@ select {
 /* DESCRIPTION */
 
 .job-description-card {
-    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #dfe4f2;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 18px;
 }
 
 .job-description-card h2,
@@ -2455,7 +2490,8 @@ select {
 .job-details-sidebar {
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 14px;
+    align-self: start;
 }
 
 .job-side-card {
@@ -4022,4 +4058,41 @@ select {
     .terms-hero p {
         font-size: 14px;
     }
+}
+
+.brand-logo {
+    width: 110px;
+    height: auto;
+    object-fit: contain;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.original-job-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: fit-content;
+    margin-top: 10px;
+    margin-left: auto;
+    padding: 9px 14px;
+    border-radius: 6px;
+    background: #303aa6;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.original-job-button:hover {
+    background: #272b9c;
+    color: #ffffff;
+    text-decoration: none;
 }
