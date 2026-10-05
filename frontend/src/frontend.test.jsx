@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+
 import "@testing-library/jest-dom/vitest";
 import React from "react";
 import { describe, it, expect, afterEach } from "vitest";
@@ -24,6 +25,10 @@ const renderAt = (path) =>
       <App />
     </MemoryRouter>
   );
+
+/* =========================================================
+   JOB DATA
+   ========================================================= */
 
 describe("job data used by the UI", () => {
   it("gives every job the fields the pages and backend contract rely on", () => {
@@ -58,19 +63,31 @@ describe("job data used by the UI", () => {
   });
 });
 
+/* =========================================================
+   HOME PAGE
+   ========================================================= */
+
 describe("Home page", () => {
   it("shows the hero message and a Browse Jobs call to action linking to /jobs", () => {
     renderAt("/");
 
     expect(
-      screen.getByRole("heading", { level: 1 })
+      screen.getByRole("heading", {
+        level: 1,
+      })
     ).toHaveTextContent(/Discover Autonomous/i);
 
     expect(
-      screen.getByRole("link", { name: /Browse Jobs/i })
+      screen.getByRole("link", {
+        name: /Browse Jobs/i,
+      })
     ).toHaveAttribute("href", "/jobs");
   });
 });
+
+/* =========================================================
+   JOBS PAGE
+   ========================================================= */
 
 describe("Jobs page", () => {
   it("lists every job with its title, company and posted date", () => {
@@ -90,10 +107,14 @@ describe("Jobs page", () => {
       })
       .closest("a");
 
+    expect(first).not.toBeNull();
+
     expect(
       within(first).getByText(
         jobs[0].company,
-        { selector: "strong" }
+        {
+          selector: "strong",
+        }
       )
     ).toBeInTheDocument();
 
@@ -110,6 +131,8 @@ describe("Jobs page", () => {
         name: jobs[0].title,
       })
       .closest("a");
+
+    expect(card).not.toBeNull();
 
     expect(card).toHaveAttribute(
       "href",
@@ -142,15 +165,36 @@ describe("Jobs page", () => {
     );
 
     expect(expected.length).toBeGreaterThan(0);
+
     expect(expected.length).toBeLessThan(
       jobs.length
     );
 
-    expect(
-      screen.getAllByRole("heading", {
-        level: 3,
-      })
-    ).toHaveLength(expected.length);
+    /* Check that matching jobs are displayed */
+    expected.forEach((job) => {
+      expect(
+        screen.getByRole("heading", {
+          name: job.title,
+        })
+      ).toBeInTheDocument();
+    });
+
+    /* Check that non-matching jobs are removed */
+    const notExpected = jobs.filter(
+      (job) =>
+        !expected.some(
+          (expectedJob) =>
+            expectedJob.id === job.id
+        )
+    );
+
+    notExpected.forEach((job) => {
+      expect(
+        screen.queryByRole("heading", {
+          name: job.title,
+        })
+      ).not.toBeInTheDocument();
+    });
   });
 
   it("shows no job cards when nothing matches the search", async () => {
@@ -165,13 +209,26 @@ describe("Jobs page", () => {
       "zzzz-no-match"
     );
 
-    expect(
-      screen.queryAllByRole("heading", {
-        level: 3,
-      })
-    ).toHaveLength(0);
+    /*
+      Check specifically for job titles instead of
+      checking every h3 on the page.
+
+      The shared Footer may also contain headings,
+      so counting all h3 elements is unreliable.
+    */
+    jobs.forEach((job) => {
+      expect(
+        screen.queryByRole("heading", {
+          name: job.title,
+        })
+      ).not.toBeInTheDocument();
+    });
   });
 });
+
+/* =========================================================
+   JOB DETAILS PAGE
+   ========================================================= */
 
 describe("Job Details page", () => {
   it("renders the selected job and a Back to Jobs link", () => {
@@ -188,8 +245,6 @@ describe("Job Details page", () => {
     ).toHaveAttribute("href", "/jobs");
   });
 
-  // Checks that JobDetails uses job.date
-  // for the selected job's posting date.
   it("shows the selected job posting date", () => {
     const selectedJob = jobs[1];
 
