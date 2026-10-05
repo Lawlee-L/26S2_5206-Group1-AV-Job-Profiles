@@ -4096,3 +4096,18 @@ select {
     color: #ffffff;
     text-decoration: none;
 }
+
+.company-logo-image {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    display: block;
+}
+
+.company-logo-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
