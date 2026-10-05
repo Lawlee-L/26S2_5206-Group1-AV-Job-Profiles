@@ -16,9 +16,20 @@ import Header from "../components/Header";
 import CompanyLogo from "../components/CompanyLogo";
 import { jobs } from "../data/jobs";
 
+import {
+  getFavorites,
+  toggleFavorite,
+} from "../utils/favorites";
+
 export default function Jobs() {
   const [search, setSearch] = useState("");
 
+  // Load saved jobs from localStorage
+  const [favorites, setFavorites] = useState(
+    () => getFavorites()
+  );
+
+  // Search jobs
   const filteredJobs = useMemo(() => {
     const value = search.trim().toLowerCase();
 
@@ -39,6 +50,25 @@ export default function Jobs() {
       return searchableText.includes(value);
     });
   }, [search]);
+
+  // Check whether a job is saved
+  const isJobSaved = (jobId) => {
+    return favorites.some(
+      (item) => String(item.id) === String(jobId)
+    );
+  };
+
+  // Save or remove a job
+  const handleSaveJob = (event, job) => {
+    // Prevent opening the Job Details page
+    event.preventDefault();
+    event.stopPropagation();
+
+    toggleFavorite(job);
+
+    // Update UI immediately
+    setFavorites(getFavorites());
+  };
 
   return (
     <div className="app-shell">
@@ -64,12 +94,17 @@ export default function Jobs() {
               type="text"
               placeholder="Search by job title, skills, or company"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
             />
           </div>
 
           <div className="jobs-filter-row">
-            <button className="jobs-filter-item">
+            <button
+              type="button"
+              className="jobs-filter-item"
+            >
               <MapPin size={13} />
 
               <span>Location</span>
@@ -77,7 +112,10 @@ export default function Jobs() {
               <ChevronDown size={12} />
             </button>
 
-            <button className="jobs-filter-item">
+            <button
+              type="button"
+              className="jobs-filter-item"
+            >
               <GraduationCap size={13} />
 
               <span>Experience Level</span>
@@ -85,7 +123,10 @@ export default function Jobs() {
               <ChevronDown size={12} />
             </button>
 
-            <button className="jobs-filter-item">
+            <button
+              type="button"
+              className="jobs-filter-item"
+            >
               <Briefcase size={13} />
 
               <span>Employment Type</span>
@@ -93,7 +134,10 @@ export default function Jobs() {
               <ChevronDown size={12} />
             </button>
 
-            <button className="jobs-filter-item">
+            <button
+              type="button"
+              className="jobs-filter-item"
+            >
               <Briefcase size={13} />
 
               <span>Company</span>
@@ -101,7 +145,10 @@ export default function Jobs() {
               <ChevronDown size={12} />
             </button>
 
-            <button className="jobs-filter-button">
+            <button
+              type="button"
+              className="jobs-filter-button"
+            >
               <SlidersHorizontal size={13} />
               Filters
             </button>
@@ -110,12 +157,15 @@ export default function Jobs() {
 
         {/* RESULT COUNT */}
         <div className="jobs-toolbar">
-          <span>1,234 jobs found</span>
+          <span>
+            {filteredJobs.length}{" "}
+            {filteredJobs.length === 1 ? "job" : "jobs"} found
+          </span>
 
           <div className="jobs-sort">
             <span>Sort by:</span>
 
-            <button>
+            <button type="button">
               Most Recent
               <ChevronDown size={11} />
             </button>
@@ -124,86 +174,136 @@ export default function Jobs() {
 
         {/* JOB LIST */}
         <div className="jobs-list-container">
-          {filteredJobs.map((job) => (
-            <Link
-              key={job.id}
-              to={`/jobs/${job.id}`}
-              className="jobs-list-item"
-            >
-              {/* COMPANY LOGO */}
-              <div className="jobs-company-logo">
-                <CompanyLogo company={job.company} />
-              </div>
+          {filteredJobs.map((job) => {
+            const saved = isJobSaved(job.id);
 
-              {/* JOB CONTENT */}
-              <div className="jobs-list-content">
-                <h3>{job.title}</h3>
-
-                <strong>{job.company}</strong>
-
-                <div className="jobs-meta">
-                  <span>
-                    <MapPin size={10} />
-                    {job.location}
-                  </span>
-
-                  <span className="jobs-dot">•</span>
-
-                  <span>
-                    <Briefcase size={10} />
-                    {job.type}
-                  </span>
-
-                  <span className="jobs-dot">•</span>
-
-                  <span>
-                    <GraduationCap size={10} />
-                    {job.level}
-                  </span>
+            return (
+              <Link
+                key={job.id}
+                to={`/jobs/${job.id}`}
+                className="jobs-list-item"
+              >
+                {/* COMPANY LOGO */}
+                <div className="jobs-company-logo">
+                  <CompanyLogo company={job.company} />
                 </div>
 
-                <div className="jobs-skills">
-                  {job.skills.slice(0, 4).map((skill) => (
-                    <span key={skill}>{skill}</span>
-                  ))}
+                {/* JOB CONTENT */}
+                <div className="jobs-list-content">
+                  <h3>{job.title}</h3>
 
-                  {job.skills.length > 4 && (
-                    <span className="jobs-more">...</span>
-                  )}
+                  <strong>{job.company}</strong>
+
+                  <div className="jobs-meta">
+                    <span>
+                      <MapPin size={10} />
+                      {job.location}
+                    </span>
+
+                    <span className="jobs-dot">•</span>
+
+                    <span>
+                      <Briefcase size={10} />
+                      {job.type}
+                    </span>
+
+                    <span className="jobs-dot">•</span>
+
+                    <span>
+                      <GraduationCap size={10} />
+                      {job.level}
+                    </span>
+                  </div>
+
+                  <div className="jobs-skills">
+                    {(job.skills || [])
+                      .slice(0, 4)
+                      .map((skill) => (
+                        <span key={skill}>
+                          {skill}
+                        </span>
+                      ))}
+
+                    {(job.skills || []).length > 4 && (
+                      <span className="jobs-more">
+                        ...
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* RIGHT */}
-              <div className="jobs-list-right">
-                <span>{job.date}</span>
+                {/* RIGHT SIDE */}
+                <div className="jobs-list-right">
+                  <span>
+                    {job.date || "Date not available"}
+                  </span>
 
-                <button
-                  type="button"
-                  aria-label="Save job"
-                  onClick={(event) => {
-                    event.preventDefault();
-                  }}
-                >
-                  <Bookmark size={14} />
-                </button>
-              </div>
-            </Link>
-          ))}
+                  <button
+                    type="button"
+                    className={
+                      saved
+                        ? "job-bookmark-button saved"
+                        : "job-bookmark-button"
+                    }
+                    aria-label={
+                      saved
+                        ? "Remove saved job"
+                        : "Save job"
+                    }
+                    title={
+                      saved
+                        ? "Remove from favorites"
+                        : "Save to favorites"
+                    }
+                    onClick={(event) =>
+                      handleSaveJob(event, job)
+                    }
+                  >
+                    <Bookmark
+                      size={14}
+                      fill={
+                        saved
+                          ? "currentColor"
+                          : "none"
+                      }
+                    />
+                  </button>
+                </div>
+              </Link>
+            );
+          })}
         </div>
+
+        {/* NO RESULTS */}
+        {filteredJobs.length === 0 && (
+          <div className="jobs-no-results">
+            <h3>No jobs found</h3>
+
+            <p>
+              Try searching with a different job title,
+              company, location, or skill.
+            </p>
+          </div>
+        )}
 
         {/* PAGINATION */}
         <div className="jobs-pagination">
-          <button className="active">1</button>
+          <button type="button" className="active">
+            1
+          </button>
 
-          <button>2</button>
+          <button type="button">2</button>
 
-          <button>3</button>
+          <button type="button">3</button>
 
           <span>...</span>
 
-          <button>41</button>
+          <button type="button">41</button>
 
-          <button>
+          <button
+            type="button"
+            aria-label="Next page"
+          >
             <ChevronRight size={14} />
           </button>
         </div>
