@@ -357,6 +357,8 @@ The project currently has 36 `In Scope` sources across Greenhouse, Lever,
 Ashby, Workable, Comeet, Moka, SmartRecruiters, Jobylon, HotJob, HERP,
 AImotive, GM, and Tensor collectors.
 
+Wayve UK now uses Ashby (previously Greenhouse).
+
 The nine sources added after the original 27 are:
 
 | Source | Collector or source method |
