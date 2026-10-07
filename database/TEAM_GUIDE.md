@@ -35,7 +35,7 @@ published views.
 | Add details to a saved release without changing the classification | `create-release` → `qa-release` → `activate-release` | [Revision guide, section 5](RELEASE_REVISIONS.md#5-same-analysis-new-dashboard-snapshot-no-ai-rerun) |
 | Switch back after a bad release | `list-releases` → `activate-release` with the old frozen key | [Revision guide, section 7](RELEASE_REVISIONS.md#7-switch-back-retain-both-versions) |
 | Use the Dashboard data | Read the public views; do not run import commands | Section 7 |
-| Populate location on a legacy published snapshot | Refresh views on a tested target → `create-release` → location QA → `activate-release` | [Location guide, sections 3–4](LOCATION_INTEGRATION.md#3-install-or-refresh-views-on-an-explicit-target) |
+| Populate location on a legacy published snapshot | Back up existing DB → refresh its views directly → `create-release` → location QA → `activate-release` | [Location guide, sections 3–4](LOCATION_INTEGRATION.md#3-install-or-refresh-views-on-an-explicit-target); [macOS commands](LOCATION_INTEGRATION.md#48-macos-update-the-existing-database-zsh--bash) |
 
 The classification example sets the file paths once in `$files`, so reuse
 that variable for validation and import. Copy the returned release key; do

@@ -80,7 +80,7 @@ and a hash of the relevant contract files. Keep logs, backups and credentials
 local, not in GitHub.
 
 See [real-data validation and known QA timing](LOCATION_VALIDATION.md).
-Full administrative QA may take minutes on a restored DB; await the command's
+Full administrative QA may take minutes; await the command's
 result instead of assuming silence means failure or starting another writer.
 
 ## 3. Install or refresh views on an explicit target
@@ -93,14 +93,9 @@ Python parser or fill the NULL fields in an old frozen release.** Complete
 section 4 to create and select a location-enriched release.
 
 For an empty DB, follow TEAM_GUIDE section 3 with the new code. For an existing
-DB: verify its name → stop other import/schema writers → `backup` → `restore`
-into a **new test DB** → refresh/test views there → review before updating the
-intended DB. Do not reinstall the fresh schema over populated tables.
-
-```powershell
-python database/weekly_import.py backup
-python database/weekly_import.py restore --file 'PASTE_BACKUP_PATH.sql.gz' --target-db av_job_profiles_location_test
-```
+DB: verify its name → stop other import/schema writers → `backup` → refresh
+views in that same DB → create/QA/activate a new release. Do not reinstall the
+fresh schema over populated tables. No test-copy restore is required.
 
 With connection variables/tool paths from TEAM_GUIDE, run in PowerShell 7 from
 the repository root. `--database` alone does not override the SQL file's `USE
@@ -130,15 +125,14 @@ function Update-LocationViews {
 }
 ```
 
-View DDL is not a rollback-able data transaction; preserve the backup. A dump
-can retain source-database names inside qualified view definitions. **Reapply
-target-bound views in the restored DB before using it for QA/application
-reads.** Check `SHOW CREATE VIEW v_dashboard_jobs` references the restored
-target, then compare frozen hashes/counts. Do not delete the original DB.
+View DDL is not a rollback-able data transaction; preserve the backup and the
+previous code revision. Switching releases back does not undo view definitions.
+If view installation fails, stop and inspect the error before activating data;
+restore the previous reviewed view definitions if needed. Do not delete the DB.
 
 For a schema predating weekly versions/revisions, use the existing
 [006/007 decision table](RELEASE_REVISIONS.md#2-install-before-using-the-new-commands)
-on a restored copy first. This feature is not a generic old-schema upgrade;
+for that schema. This feature is not a generic old-schema upgrade;
 never rerun an already-applied migration.
 
 ## 4. Enhance an old published week without rerunning AI
@@ -158,8 +152,10 @@ Back up the existing database
 
 **Two separate operations:** views expose fields; new snapshot creation fills
 the fields. Doing only the first operation leaves the old frozen data unchanged.
-Test the full sequence on a restored copy before repeating it on the intended
-database. Commands below run from the repository root in PowerShell 7.
+Run this sequence directly on your existing local database after backing it up.
+Sections 4.1–4.7 use **Windows PowerShell 7**; section 4.8 provides the complete
+**macOS zsh / Bash** equivalent. Run commands from the repository root. Neither
+route requires a separate test database.
 
 ### 4.1 Get the new code and configure the original target
 
@@ -181,7 +177,6 @@ original database name explicitly, not the example name blindly:
 
 ```powershell
 $originalDb = 'REPLACE_WITH_YOUR_EXISTING_DATABASE'
-$testDb = 'av_location_upgrade_check'  # must not already exist
 $weekDate = '2026-09-25'               # target the week actually classified
 $env:AVDB_NAME = $originalDb
 $env:MYSQL_PWD = $env:AVDB_PASSWORD
@@ -194,10 +189,10 @@ or schema writers. `REPLACE_WITH_YOUR_EXISTING_DATABASE` is a placeholder, not
 a DB to create. A much older schema must follow the migration decision table
 in section 3 first.
 
-### 4.2 Back up, restore a new test copy, then refresh its views
+### 4.2 Back up the existing database, then refresh its views directly
 
 The CLI prints JSON; these commands capture the returned backup path without
-guessing a filename. Restore refuses an existing target. Define
+guessing a filename. Save this path for recovery. Define
 `Update-LocationViews` from section 3 before calling it here.
 
 ```powershell
@@ -205,14 +200,12 @@ $backupResult = python database/weekly_import.py backup | ConvertFrom-Json
 if ($LASTEXITCODE -ne 0) { throw 'Backup failed; do not continue' }
 $backupFile = $backupResult.result.backup
 if (-not $backupFile) { throw 'Missing backup path' }
-python database/weekly_import.py restore --file $backupFile --target-db $testDb
-if ($LASTEXITCODE -ne 0) { throw 'Restore failed; inspect the test target' }
-$env:AVDB_NAME = $testDb
 Update-LocationViews -DatabaseName $env:AVDB_NAME
 ```
 
-Confirm `SHOW CREATE VIEW` refers to `$testDb`, not `$originalDb`. Continue
-4.3–4.6 on the test copy; **the original is still unchanged**.
+Confirm `SHOW CREATE VIEW` refers to `$originalDb`. Continue 4.3–4.6 in this
+same database. The views are now updated, but the old frozen release data and
+official selection remain unchanged until activation.
 
 ### 4.3 Identify the selected week release and create a new draft
 
@@ -230,7 +223,7 @@ $oldWeek = $weekSelection[0].release_key
 $current = $currentSelection[0].release_key
 $historicalArgs = @()
 if ([datetime]$weekDate -lt [datetime]$currentSelection[0].week_date) { $historicalArgs = @('--historical') }
-$draftResult = python database/weekly_import.py create-release --from-release-key $oldWeek --reason 'Populate structured location and work mode' --actor Nyx | ConvertFrom-Json
+$draftResult = python database/weekly_import.py create-release --from-release-key $oldWeek --reason 'Populate structured location and work mode' | ConvertFrom-Json
 if ($LASTEXITCODE -ne 0) { throw 'Draft creation failed' }
 $new = $draftResult.result.release_key
 if (-not $new) { throw 'Missing new release key' }
@@ -260,7 +253,7 @@ updating its intended DB. Full QA may take minutes; wait for its exit status.
 ### 4.5 Freeze and activate the reviewed snapshot
 
 ```powershell
-python database/weekly_import.py activate-release --release-key $new --expected-week-release $oldWeek --expected-current-release $current @historicalArgs --reason 'Reviewed location-enriched release' --actor Nyx
+python database/weekly_import.py activate-release --release-key $new --expected-week-release $oldWeek --expected-current-release $current @historicalArgs --reason 'Reviewed location-enriched release'
 if ($LASTEXITCODE -ne 0) { throw 'Activation did not complete normally; inspect its report and selections before retrying' }
 ```
 
@@ -296,23 +289,7 @@ This does **not** rewrite old `jobs` / `job_observations`. Their historical
 `v_weekly_jobs` values can remain NULL; see section 5 if all raw historical
 collection fields must be rebuilt. Refreshing a view alone cannot fill them.
 
-### 4.7 Repeat on the intended original DB after the test passes
-
-Keep the test DB, backup and reports as evidence. Explicitly select the original
-again, take a fresh backup, and refresh its target-bound views:
-
-```powershell
-$env:AVDB_NAME = $originalDb
-python database/weekly_import.py backup
-if ($LASTEXITCODE -ne 0) { throw 'Fresh original-DB backup failed' }
-Update-LocationViews -DatabaseName $env:AVDB_NAME
-```
-
-Now repeat **4.3–4.6**. They recalculate the original DB's keys and create its
-own draft. **Do not reuse `$new` from the test DB** or change backend connections
-to the test copy by accident. The importer does not edit teammates' `.env` files.
-
-### 4.8 Switch back if needed; keep both versions
+### 4.7 Switch back if needed; keep both versions
 
 Reinspect `list-releases`. The following assumes no intervening switch: `$new`
 is still the target week's selection. For a current-week upgrade the expected
@@ -321,7 +298,7 @@ current key is `$new`; for an older-week upgrade it remains `$current`.
 ```powershell
 python database/weekly_import.py list-releases
 $expectedCurrentAfter = if ($historicalArgs.Count -gt 0) { $current } else { $new }
-python database/weekly_import.py activate-release --release-key $oldWeek --expected-week-release $new --expected-current-release $expectedCurrentAfter @historicalArgs --reason 'Revert location enhancement after review' --actor Nyx
+python database/weekly_import.py activate-release --release-key $oldWeek --expected-week-release $new --expected-current-release $expectedCurrentAfter @historicalArgs --reason 'Revert location enhancement after review'
 if ($LASTEXITCODE -ne 0) { throw 'Reversion stopped; recheck actual selections' }
 ```
 
@@ -329,6 +306,143 @@ Switching back reuses the exact old frozen data; it does not rebuild it, delete
 the new release or undo the view definitions. If selections changed, stop and
 follow the [reversion guide](RELEASE_REVISIONS.md#7-switch-back-retain-both-versions)
 with reviewed current keys. Do not directly UPDATE snapshots or observations.
+
+### 4.8 macOS: update the existing database (zsh / Bash)
+
+Use Python 3 and an installed MySQL server with `mysql` and `mysqldump` on
+your PATH. The commands detect their paths rather than assuming an Apple
+Silicon or Intel Homebrew directory. If either `command -v` fails, fix your
+MySQL installation/PATH before continuing. MySQL server must already be
+running. Do not paste Windows `$env:` assignments into a macOS terminal.
+
+**Setup:** preserve your own work before switching branches. Use `main` only
+after this PR is merged; before merge use the reviewed
+`nyx/location-importer-integration` branch instead.
+
+```bash
+git status --short
+git fetch origin
+git switch main
+git pull --ff-only origin main
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r database/requirements-import.txt
+
+export AVDB_HOST='127.0.0.1'
+export AVDB_PORT='3306'
+export AVDB_USER='REPLACE_WITH_YOUR_DATABASE_USER'
+export AVDB_NAME='REPLACE_WITH_YOUR_EXISTING_DATABASE'
+export AVDB_MYSQL="$(command -v mysql)"
+export AVDB_MYSQLDUMP="$(command -v mysqldump)"
+# Hidden password entry: works in both zsh and Bash.
+printf 'MySQL password: '
+read -r -s AVDB_PASSWORD
+printf '\n'
+export AVDB_PASSWORD
+export MYSQL_PWD="$AVDB_PASSWORD"
+week_date='2026-09-25'  # replace with the week actually classified
+
+mysql_target() {
+  "$AVDB_MYSQL" --host "$AVDB_HOST" --port "$AVDB_PORT" \
+    --user "$AVDB_USER" --default-character-set=utf8mb4 \
+    --database "$AVDB_NAME" "$@"
+}
+mysql_target -e 'SELECT DATABASE(); SELECT week_date,classification_status,release_key FROM v_weekly_versions ORDER BY week_date;'
+```
+
+Check the displayed database and week before writing. **Stop after any failed
+command**; these blocks are step-by-step commands, not an unattended script.
+Do not proceed with unset tool paths or unedited placeholders. No credentials
+or virtual environment should be committed.
+
+**Back up, then refresh views in the same database.** Keep the backup path
+printed in the JSON result. Stop other import/schema writers first. This uses
+a temporary SQL file, validates the target name, and replaces only the one
+`USE` header; `--database` alone would not override that header.
+
+```bash
+python database/weekly_import.py backup
+# Continue only after backup succeeds and its path is saved.
+refresh_location_views() {
+  local views_file
+  views_file="$(mktemp)" || return 1
+  python - "$AVDB_NAME" "$views_file" <<'PY'
+import re
+import sys
+from pathlib import Path
+name, output = sys.argv[1:]
+if not re.fullmatch(r"[A-Za-z0-9_]{1,64}", name):
+    raise SystemExit("Invalid database name")
+sql = Path("database/views.mysql.sql").read_text(encoding="utf-8")
+if sql.count("USE av_job_profiles;") != 1:
+    raise SystemExit("Unexpected SQL target header")
+Path(output).write_text(sql.replace("USE av_job_profiles;", f"USE `{name}`;"), encoding="utf-8")
+PY
+  if [ "$?" -ne 0 ]; then rm -f -- "$views_file"; return 1; fi
+  mysql_target < "$views_file"
+  local view_status=$?
+  rm -f -- "$views_file"
+  return "$view_status"
+}
+refresh_location_views
+# Continue only if the refresh succeeds.
+mysql_target -e 'SHOW COLUMNS FROM v_weekly_jobs; SHOW COLUMNS FROM v_weekly_av_jobs; SHOW CREATE VIEW v_dashboard_jobs;'
+```
+
+**Inspect and create:** from `list-releases`, copy the target week's
+`selected_for_week` frozen release key and the global `current_dashboard`
+release key. They may belong to different weeks. Do not use guessed keys.
+
+```bash
+python database/weekly_import.py list-releases
+old_week='PASTE_TARGET_WEEK_SELECTED_RELEASE_KEY'
+current='PASTE_CURRENT_DASHBOARD_RELEASE_KEY'
+historical_args=()
+# ONLY if week_date is older than the current dashboard's week:
+# historical_args=(--historical)
+python database/weekly_import.py create-release --from-release-key "$old_week" \
+  --reason 'Populate structured location and work mode'
+# Copy result.release_key from this successful command:
+new_release='PASTE_NEW_DRAFT_RELEASE_KEY'
+python database/weekly_import.py qa-release --release-key "$new_release"
+```
+
+Review `status: passed`, warnings and `location_quality` for all/active AV
+jobs. Passing QA is not perfect-geocoding certification. Obtain approval for
+the release before activation. If QA fails, stop; do not run the next block.
+
+**Activate and verify:** for an older target week set the historical array
+above; for the current week leave it empty. The empty-array syntax below
+works in zsh and Bash.
+
+```bash
+python database/weekly_import.py activate-release --release-key "$new_release" \
+  --expected-week-release "$old_week" --expected-current-release "$current" \
+  "${historical_args[@]}" --reason 'Reviewed location-enriched release'
+# Continue only after successful activation.
+python database/weekly_import.py qa-release --release-key "$new_release"
+python database/weekly_import.py list-releases --week-date "$week_date"
+mysql_target -e 'SELECT release_key,COUNT(*) AS active_av_jobs,COUNT(country_code) AS country_known,COUNT(city) AS city_known,COUNT(state_region) AS region_known,COUNT(remote_type) AS work_mode_known FROM v_dashboard_jobs WHERE is_active=TRUE GROUP BY release_key;'
+mysql_target -e 'SELECT week_date,release_key,COUNT(*) AS av_jobs,COUNT(country_code) AS country_known FROM v_weekly_av_jobs GROUP BY week_date,release_key ORDER BY week_date;'
+```
+
+**Optional switchback:** first inspect selections again. The following only
+applies if no intervening switch occurred. It restores old frozen data, not
+old view definitions; keep the backup for structural recovery.
+
+```bash
+python database/weekly_import.py list-releases
+expected_current_after="$new_release"
+if [ "${#historical_args[@]}" -gt 0 ]; then expected_current_after="$current"; fi
+python database/weekly_import.py activate-release --release-key "$old_week" \
+  --expected-week-release "$new_release" \
+  --expected-current-release "$expected_current_after" \
+  "${historical_args[@]}" --reason 'Revert location enhancement after review'
+```
+
+The actor label defaults to the local operating-system user on both platforms.
+Keep the same terminal open to retain variables. Neither route changes backend
+or frontend `.env` files; consumers keep their existing database connection.
 
 ## 5. Structured location for all raw historical collections
 
