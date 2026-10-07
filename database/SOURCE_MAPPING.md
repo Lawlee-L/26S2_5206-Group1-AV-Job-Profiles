@@ -30,7 +30,7 @@ approved cross-stage join key.
 | `data.advertised_job_title` | `jobs.advertised_job_title` | Preserve NULL; flag missing values for dashboard QA. |
 | `data.job_description` | `jobs.job_description` | Preserve full text. |
 | `data.job_url` | `jobs.job_url` | Preserve NULL; `source_key` remains the stable identifier. |
-| `data.location` | `jobs.location_raw` | Normalised location fields remain nullable. |
+| `data.location` | `jobs.location_raw` | Preserved unchanged; pure rules derive nullable city/region/country/work mode. See [location contract](LOCATION_INTEGRATION.md). |
 | `data.salary` | `jobs.salary_raw` | Do not guess currency or interval. |
 | `data.date_posted` | `jobs.date_posted` | Parse when valid; otherwise NULL. |
 
@@ -41,7 +41,7 @@ different fingerprints and stores both in `jobs` and each
 | Database field | What is hashed | Algorithm and purpose |
 | --- | --- | --- |
 | `content_hash` | The job description after the same Unicode, punctuation, bullet, and whitespace normalization used by classification-pipeline `clean.py` v2. | 40-character SHA-1. Matches the pipeline's exact-description deduplication/cache key and proves which description version an analysis read. |
-| `record_hash_sha256` | Canonical title, full description, job URL, raw location, raw salary, and posting date. | 64-character SHA-256. Detects any change to those collected fields; it is not a job ID and is not used for classifier deduplication. |
+| `record_hash_sha256` | Canonical title, full description, job URL, raw location, raw salary, and posting date. | 64-character SHA-256. Detects any change to those collected fields; it is not a job ID and is not used for classifier deduplication. Derived location fields are excluded. |
 
 `job_analyses.input_content_hash` stores the 40-character description hash for
 the exact description version consumed by that analysis. The same `source_key`

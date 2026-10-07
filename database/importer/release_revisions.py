@@ -15,6 +15,7 @@ from typing import Any
 
 from .contracts import ReleaseActivation
 from .errors import ImportErrorSafe
+from .location_parser import LOCATION_PARSER_VERSION
 from .publication import _materialize
 from .release_metrics import release_qa_report
 from .snapshot_integrity import verify_frozen_snapshot
@@ -123,6 +124,8 @@ def _contract_hash() -> str:
         "views.mysql.sql",
         "importer/publication.py",
         "importer/job_details.py",
+        "importer/location_parser.py",
+        "importer/location_enrichment.py",
     ):
         digest.update(name.encode("utf-8") + b"\0" + (root / name).read_bytes())
     return digest.hexdigest()
@@ -234,6 +237,7 @@ def create_release(
                 details={
                     "source_release_key": source_key,
                     "snapshot_contract_sha256": _contract_hash(),
+                    "location_parser_version": LOCATION_PARSER_VERSION,
                 },
             )
         connection.commit()
@@ -314,6 +318,7 @@ def activate_release(
                     details={
                         "snapshot_rows": counts,
                         "snapshot_contract_sha256": _contract_hash(),
+                        "location_parser_version": LOCATION_PARSER_VERSION,
                     },
                 )
             connection.commit()
@@ -408,6 +413,7 @@ def activate_release(
             "snapshot_rows": counts,
             "qa_status": qa["status"],
             "qa_warnings": qa["warnings"],
+            "location_quality": qa["location_quality"],
             "database_operation_id": op,
             "freeze_operation_id": freeze_operation_id,
             "backup": str(backup),

@@ -118,6 +118,8 @@ class ReleaseViewQATests(unittest.TestCase):
             dict(visible_skilled_job_count=skilled_count if published else 0),
             dict(violations=0), dict(violations=0),
             dict(visible_cluster_count=1 if published else 0, visible_non_av_cluster_count=0),
+            [dict(payload_json=dict(source_key="test", location_raw="Berlin, Germany", is_active=True))]
+            if published else [dict(source_key="test", location_raw="Berlin, Germany", is_active=True)],
         ])
 
         class Cursor:
