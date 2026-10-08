@@ -19,6 +19,12 @@ switching back, or rebuilding a snapshot without rerunning AI, see
 [the release revision guide](RELEASE_REVISIONS.md). Candidate import leaves
 the working release visible; activation changes the exact official selection.
 
+For country/region/city and remote/hybrid/onsite data, existing-database upgrade
+methods and the API/UI/report hand-off, see [location integration](LOCATION_INTEGRATION.md).
+This enriches preserved source text without changing classifier inputs or job identity.
+The [validation report](LOCATION_VALIDATION.md) records real MySQL, restore,
+release-reversion and existing-backend results, with coverage limitations.
+
 ## 1. Database scope and choice
 
 The implementation target is **MySQL 8.0.16 or newer** because the current
@@ -901,6 +907,8 @@ python database/weekly_import.py trend-readiness
 - `STAGE3_RELEASE_HISTORY.md`: immutable release publication and time/trend semantics.
 - `WEEKLY_VERSIONS.md`: official week selection, historical backfill and versioned read views.
 - `TEAM_GUIDE.md`: local install, role permissions, source files, import/publish commands and access checks.
+- `LOCATION_INTEGRATION.md`: field/rule contract, safe old-release enhancement, view refresh and API/UI/report tasks.
+- `importer/location_parser.py` and `location_enrichment.py`: pure parsing/enrichment and coverage reports; no SQL or model calls.
 
 For a **new, empty database only**:
 

@@ -28,7 +28,8 @@ from database.importer.contracts import (
 from database.importer.errors import ImportErrorSafe
 from database.importer.mysql_backend import MySQLImporterBackend
 from database.importer.service import ImporterService
-from database.importer import release_revisions
+from database.importer import publication, release_revisions
+from database.importer.location_parser import LOCATION_PARSER_VERSION
 from database.tests import test_weekly_import as fixtures
 from database.tests.test_weekly_import import source_record, analysis_row, summary_row
 
@@ -418,6 +419,70 @@ class MySQLReleaseRevisionTests(unittest.TestCase):
         finally:
             connection.close()
             print("Isolated migration-selection test database retained:", target)
+
+    def test_location_upgrade_reuses_analysis_preserves_history_and_reverts(self):
+        week = date(2026, 9, 25)
+        source = [source_record("greenhouse|wayve|id:1", "AV Engineer", "1"),
+                  source_record("greenhouse|wayve|id:2", "Accountant", "2")]
+        source[0]["data"]["location"] = "San Francisco, California, United States (Hybrid)"
+        source[1]["data"]["location"] = "Berlin, DE"
+        files, _ = self.files(week, "A", source)
+        empty = {field: None for field in ("city", "state_region", "country_code", "remote_type")}
+        # Emulate the old importer and its already-frozen, null-location release.
+        with patch.object(engine, "location_fields", return_value=empty):
+            imported = self.service.import_collection(
+                CollectionFiles(files.source_snapshot, week_date=week), self.backups)
+        old = self.service.import_analysis(files, self.backups, "abcdef0")["release_key"]
+        with patch.object(publication, "enrich_snapshot_job", side_effect=dict):
+            self.service.publish_release(old, self.backups)
+        self.assertIsNone(self.query("SELECT country_code FROM v_dashboard_jobs")[0]["country_code"])
+        old_hashes = self.hashes(old)
+        old_jobs = self.query("SELECT * FROM jobs ORDER BY job_id")
+        old_observations = self.query("SELECT * FROM job_observations ORDER BY job_id")
+        self.assertEqual(self.service.qa_release(old)["location_quality"]["all_av_jobs"]
+                         ["counts"]["country_code_populated"], 0)
+
+        new = self.service.create_release(old, "Location enrichment", "test-operator", self.backups)["release_key"]
+        preview = self.service.qa_release(new)["location_quality"]
+        self.assertEqual(preview["active_av_jobs"]["country_counts"], {"US": 1})
+        self.service.activate_release(self.activation(new, old, old), self.backups)
+        visible = self.query("SELECT * FROM v_dashboard_jobs")[0]
+        self.assertEqual((visible["city"], visible["state_region"], visible["country_code"], visible["remote_type"]),
+                         ("San Francisco", "CA", "US", "hybrid"))
+        self.assertEqual(visible["location_parser_version"], LOCATION_PARSER_VERSION)
+        self.assertEqual(visible["location_raw"], source[0]["data"]["location"])
+        self.assertEqual(self.hashes(old), old_hashes)
+        self.assertEqual(self.query("SELECT * FROM jobs ORDER BY job_id"), old_jobs)
+        self.assertEqual(self.query("SELECT * FROM job_observations ORDER BY job_id"), old_observations)
+        runs = self.query("SELECT analysis_run_id,collection_run_id FROM dashboard_releases WHERE release_key IN (%s,%s)", (old,new))
+        self.assertEqual(runs[0], runs[1])
+        self.assertEqual(self.query("SELECT country_code FROM v_weekly_av_jobs WHERE week_date=%s", (week,))[0]["country_code"], "US")
+        self.assertIsNone(self.query("SELECT country_code FROM v_weekly_jobs WHERE week_date=%s", (week,))[0]["country_code"])
+        final_qa = self.service.qa_release(new)
+        self.assertEqual(final_qa["status"], "passed")
+        self.assertEqual(final_qa["location_quality"]["representation"], "frozen snapshot")
+
+        new_hashes = self.hashes(new)
+        self.service.activate_release(self.activation(old, new, new), self.backups)
+        self.assertIsNone(self.query("SELECT country_code FROM v_dashboard_jobs")[0]["country_code"])
+        self.service.activate_release(self.activation(new, old, old), self.backups)
+        self.assertEqual(self.hashes(new), new_hashes)
+        self.assertEqual(self.hashes(old), old_hashes)
+
+        # A new collection writes both latest and observed fields; rollback
+        # must restore every previous field rather than keep the new geography.
+        later = date(2026, 10, 2)
+        later_files, _ = self.files(later, "D")
+        changed = self.service.import_collection(
+            CollectionFiles(later_files.source_snapshot, week_date=later), self.backups)
+        self.assertEqual(changed["location_quality"]["country_counts"], {"GB": 2})
+        self.assertEqual(self.query("SELECT country_code FROM v_weekly_jobs WHERE week_date=%s", (later,))[0]["country_code"], "GB")
+        self.assertEqual(self.query("SELECT country_code FROM jobs LIMIT 1")[0]["country_code"], "GB")
+        self.service.rollback(changed["import_batch_id"], self.backups)
+        self.assertEqual(self.query("SELECT * FROM jobs ORDER BY job_id"), old_jobs)
+        self.assertEqual(self.query("SELECT * FROM job_observations ORDER BY job_id"), old_observations)
+        metadata = self.query("SELECT metadata_json FROM import_batches WHERE import_batch_id=%s", (imported["import_batch_id"],))[0]["metadata_json"]
+        self.assertIn("location_quality", json.loads(metadata))
 
 
 if __name__ == "__main__":

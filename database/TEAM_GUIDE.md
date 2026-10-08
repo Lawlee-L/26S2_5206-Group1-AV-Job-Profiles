@@ -16,6 +16,10 @@ most cluster names still await human approval.
 snapshot?** Follow [safe release revisions](RELEASE_REVISIONS.md): stage a
 candidate, review it, then switch. Old versions remain available for reversion.
 
+**Need countries, regions, cities or remote/hybrid/onsite filtering?** See
+[location integration](LOCATION_INTEGRATION.md). New imports populate existing
+columns; old frozen releases need an explicit new release, not direct SQL edits.
+
 ## Quick route: choose your task
 
 You do not need every command for every update. Only the database operator
@@ -31,6 +35,7 @@ published views.
 | Add details to a saved release without changing the classification | `create-release` → `qa-release` → `activate-release` | [Revision guide, section 5](RELEASE_REVISIONS.md#5-same-analysis-new-dashboard-snapshot-no-ai-rerun) |
 | Switch back after a bad release | `list-releases` → `activate-release` with the old frozen key | [Revision guide, section 7](RELEASE_REVISIONS.md#7-switch-back-retain-both-versions) |
 | Use the Dashboard data | Read the public views; do not run import commands | Section 7 |
+| Populate location on a legacy published snapshot | Back up existing DB → refresh its views directly → `create-release` → location QA → `activate-release` | [Location guide, sections 3–4](LOCATION_INTEGRATION.md#3-install-or-refresh-views-on-an-explicit-target); [macOS commands](LOCATION_INTEGRATION.md#48-macos-update-the-existing-database-zsh--bash) |
 
 The classification example sets the file paths once in `$files`, so reuse
 that variable for validation and import. Copy the returned release key; do
@@ -302,11 +307,11 @@ Run `python database/weekly_import.py <command> --help` for exact flags.
 
 | Command | What it does / key arguments | Database effect |
 | --- | --- | --- |
-| `plan-collection --input FILE [--previous FILE]` | Validate/count a Li file and optionally compare it with an earlier one | None |
+| `plan-collection --input FILE [--previous FILE]` | Validate/count a Li file, report location/work-mode coverage, optionally compare with an earlier one | None |
 | `import-collection --input FILE --week-date YYYY-MM-DD [--historical]` | Select one official Li file for that week; use `--historical` only to backfill an older week | Backup, collection run, observations; normal import also updates latest jobs |
 | `plan-analysis --source-input FILE --postings FILE --metadata FILE --av-summary FILE --other-summary FILE --duplicates FILE --failures FILE` | Reconcile one complete Sunjol run against the Li file | None |
 | `import-analysis` with the same seven file flags, `--week-date`, `--git-commit` and optional `--candidate` | Check exact weekly pairing and load derived results; candidate mode never changes the formal selection | Backup, analysis/skills/clusters and draft release |
-| `qa-release --release-key KEY` | Check counts, AV-only scope, skill/cluster gaps and release consistency | None; writes only local operation log |
+| `qa-release --release-key KEY` | Check AV-only counts, skill/cluster gaps, location coverage for all/active AV jobs and release consistency | None; writes only local operation log |
 | `publish-release --release-key KEY [--historical]` | First publication of a normally imported, selected analysis; revisions require explicit activation | Backup, frozen snapshot and exact weekly release selection |
 | `list-releases [--week-date YYYY-MM-DD]` | Show drafts, frozen revisions, selected weekly releases and current Dashboard | None; local operation log |
 | `create-release --from-release-key KEY --reason TEXT [--actor NAME]` | New draft reusing existing collection/analysis/clusters; no AI rerun | Backup, draft with parent provenance and creation evidence |
