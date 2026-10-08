@@ -8,6 +8,7 @@ from app.routes.companies import bp as companies_bp
 from app.routes.health import bp as health_bp
 from app.routes.jobs import bp as jobs_bp
 from app.routes.skills import bp as skills_bp
+from app.routes.locations import bp as locations_bp
 
 
 def create_app(config_overrides=None, job_repository=None):
@@ -30,6 +31,7 @@ def create_app(config_overrides=None, job_repository=None):
     app.register_blueprint(companies_bp, url_prefix="/api")
     app.register_blueprint(skills_bp, url_prefix="/api")
     app.register_blueprint(clusters_bp, url_prefix="/api")
+    app.register_blueprint(locations_bp, url_prefix="/api")
 
     @app.errorhandler(500)
     def internal_error(_error):

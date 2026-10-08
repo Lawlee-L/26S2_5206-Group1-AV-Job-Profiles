@@ -71,16 +71,20 @@ class JobRepository:
         search=None,
         company=None,
         country=None,
+        state_region=None,
+        city=None,
         remote_type=None,
         seniority=None,
     ):
 
         jobs_view = self.views["jobs"]
-        
+
         join_sql, where_sql, params = self._build_filters(
             search=search,
             company=company,
             country=country,
+            state_region=state_region,
+            city=city,
             remote_type=remote_type,
             seniority=seniority,
         )
@@ -112,7 +116,10 @@ class JobRepository:
         )
 
         skills_by_job = self._skills_for_job_ids([row["job_id"] for row in rows])
-        items = [self._job_to_api(row, skills_by_job.get(row["job_id"], [])) for row in rows]
+        items = [
+            self._job_to_api(row, skills_by_job.get(row["job_id"], []))
+            for row in rows
+        ]
 
         return {
             "items": items,
@@ -325,9 +332,24 @@ class JobRepository:
 
 
 
-    def _build_filters(self, *, search, company, country, remote_type, seniority):
+    def _build_filters(
+        self,
+        *,
+        search,
+        company,
+        country,
+        state_region,
+        city,
+        remote_type,
+        seniority,
+    ):
         join_sql = ""
-        clauses = ["j.is_active = TRUE", "j.av_relevant = TRUE"]
+
+        clauses = [
+            "j.is_active = TRUE",
+            "j.av_relevant = TRUE",
+        ]
+
         params = []
 
         query = (search or "").strip()
@@ -345,9 +367,9 @@ class JobRepository:
                     FROM {skills_view}
                     WHERE skill_name LIKE %s
                 ) AS skill_matches
-                  ON skill_matches.dashboard_release_id =
+                ON skill_matches.dashboard_release_id =
                         j.dashboard_release_id
-                  AND skill_matches.job_id = j.job_id
+                AND skill_matches.job_id = j.job_id
             """
 
             # JOIN parameter appears first in the SQL.
@@ -368,25 +390,51 @@ class JobRepository:
             params.extend([pattern] * 4)
 
         if company:
-            clauses.append("j.company_name = %s")
+            clauses.append(
+                "j.company_name = %s"
+            )
             params.append(company)
 
         if country:
-            clauses.append("j.country_code = %s")
+            clauses.append(
+                "j.country_code = %s"
+            )
             params.append(country.upper())
 
+        if state_region:
+            clauses.append(
+                "j.state_region = %s"
+            )
+            params.append(state_region)
+
+        if city:
+            clauses.append(
+                "j.city = %s"
+            )
+            params.append(city)
+
         if remote_type:
-            clauses.append("j.remote_type = %s")
+            clauses.append(
+                "j.remote_type = %s"
+            )
             params.append(remote_type.lower())
 
         if seniority:
-            clauses.append("j.seniority_code = %s")
+            clauses.append(
+                "j.seniority_code = %s"
+            )
             params.append(seniority)
 
-        where_sql = "WHERE " + " AND ".join(clauses)
+        where_sql = (
+            "WHERE "
+            + " AND ".join(clauses)
+        )
 
-        return join_sql, where_sql, params
-
+        return (
+            join_sql,
+            where_sql,
+            params,
+        )
 
     def _skills_for_job_ids(self, job_ids):
         if not job_ids:
@@ -467,6 +515,99 @@ class JobRepository:
                 "isNoise": bool(row["is_noise"]) if row["is_noise"] is not None else None,
             },
             "skills": skills,
+        }
+
+    def list_locations(self):
+        jobs_view = self.views["jobs"]
+
+        release_rows = fetch_all(
+            f"""
+            SELECT DISTINCT
+                dashboard_release_id,
+                release_key
+            FROM {jobs_view}
+            WHERE is_active = TRUE
+              AND av_relevant = TRUE
+            ORDER BY dashboard_release_id
+            LIMIT 2
+            """
+        )
+
+        if not release_rows:
+            return {
+                "releaseId": None,
+                "releaseKey": None,
+                "locations": [],
+                "workArrangements": [],
+            }
+
+        if len(release_rows) != 1:
+            raise RuntimeError(
+                "Location options span multiple dashboard releases"
+            )
+
+        release_id = release_rows[0]["dashboard_release_id"]
+        release_key = release_rows[0]["release_key"]
+
+        location_rows = fetch_all(
+            f"""
+            SELECT
+                country_code,
+                state_region,
+                city,
+                COUNT(*) AS job_count
+            FROM {jobs_view}
+            WHERE dashboard_release_id = %s
+              AND is_active = TRUE
+              AND av_relevant = TRUE
+              AND country_code IS NOT NULL
+            GROUP BY
+                country_code,
+                state_region,
+                city
+            ORDER BY
+                country_code,
+                state_region,
+                city
+            """,
+            (release_id,),
+        )
+
+        work_mode_rows = fetch_all(
+            f"""
+            SELECT
+                remote_type,
+                COUNT(*) AS job_count
+            FROM {jobs_view}
+            WHERE dashboard_release_id = %s
+              AND is_active = TRUE
+              AND av_relevant = TRUE
+              AND remote_type IS NOT NULL
+            GROUP BY remote_type
+            ORDER BY remote_type
+            """,
+            (release_id,),
+        )
+
+        return {
+            "releaseId": release_id,
+            "releaseKey": release_key,
+            "locations": [
+                {
+                    "countryCode": row["country_code"],
+                    "stateRegion": row["state_region"],
+                    "city": row["city"],
+                    "jobCount": int(row["job_count"]),
+                }
+                for row in location_rows
+            ],
+            "workArrangements": [
+                {
+                    "value": row["remote_type"],
+                    "jobCount": int(row["job_count"]),
+                }
+                for row in work_mode_rows
+            ],
         }
 
 
