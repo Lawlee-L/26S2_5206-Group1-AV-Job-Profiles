@@ -9,7 +9,10 @@ record. No posting is dropped: each lands in one group or the other.
     python run_pipeline_v2.py --dry-run              # cost estimate, no API calls
     python run_pipeline_v2.py --limit 50             # paid sample run
     python run_pipeline_v2.py --sweep                # cluster-parameter grid, then exit
-    python run_pipeline_v2.py --min-cluster-size 15  # full run
+    python run_pipeline_v2.py --db                   # full run, stored in SQLite
+
+Cluster settings per group live in config.CLUSTER_PARAMS; how they were chosen is
+documented in notebooks/clustering_decisions.ipynb.
 """
 
 from __future__ import annotations
@@ -58,8 +61,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--output-dir", default=str(cfg.OUTPUT_DIR))
     p.add_argument("--model", default=cfg.LLM_MODEL, help="OpenRouter model id")
     p.add_argument("--limit", type=int, help="random sample of N postings (after dedupe)")
-    p.add_argument("--min-cluster-size", type=int, default=cfg.MIN_CLUSTER_SIZE)
-    p.add_argument("--min-samples", type=int, default=cfg.MIN_SAMPLES)
+    p.add_argument("--min-cluster-size", type=int,
+                   help="override config.CLUSTER_PARAMS for both groups")
+    p.add_argument("--min-samples", type=int,
+                   help="override config.CLUSTER_PARAMS for both groups")
     p.add_argument("--sweep", action="store_true",
                    help="sweep min_cluster_size x min_samples per group, print the grid, and exit")
     p.add_argument("--no-cache", action="store_true",
@@ -126,15 +131,26 @@ def group_stats(labels: np.ndarray) -> dict:
             "n_noise": int((labels == -1).sum())}
 
 
-def cluster_group(part: pd.DataFrame, embeddings: np.ndarray, args,
+def cluster_params(group: str, args) -> dict:
+    """One group's tuned settings (config.CLUSTER_PARAMS), with any command-line overrides."""
+    params = dict(cfg.CLUSTER_PARAMS[group])
+    if args.min_cluster_size is not None:
+        params["min_cluster_size"] = args.min_cluster_size
+    if args.min_samples is not None:
+        params["min_samples"] = args.min_samples
+    return params
+
+
+def cluster_group(part: pd.DataFrame, embeddings: np.ndarray, params: dict,
                   first_id: int) -> tuple[np.ndarray, pd.DataFrame]:
     """UMAP + HDBSCAN + summary for one relevance group.
 
     Cluster ids start at first_id so they stay unique across both groups; noise stays -1.
     """
-    reduced = cluster.reduce_dimensions(embeddings)
+    reduced = cluster.reduce_dimensions(embeddings, params["umap_n_neighbors"],
+                                        params["umap_components"])
     labels = cluster.run_hdbscan(cluster.distance_matrix(reduced),
-                                 args.min_cluster_size, args.min_samples)
+                                 params["min_cluster_size"], params["min_samples"])
     labels = np.where(labels >= 0, labels + first_id, -1)
     stats = group_stats(labels)
     print(f"  {stats['n_clusters']} clusters, {stats['n_noise']} noise "
@@ -241,23 +257,24 @@ def main() -> int:
           f"${usage['cost_usd']:.4f} for {usage['n_api_postings']} postings")
 
     print("\n[3/5] Embedding role_summary + responsibilities + skills")
-    # Titles are not embedded: some are not English, and MiniLM is English-only.
+    # Titles are not embedded: the check that clusters mean something relies on them.
     embeddings = embed.embed_postings(df["cluster_text"], use_cache=not args.no_cache)
 
-    print(f"\n[4/5] Clustering each relevance group separately (HDBSCAN, "
-          f"min_cluster_size={args.min_cluster_size}, min_samples={args.min_samples})")
+    print("\n[4/5] Clustering each relevance group separately (UMAP + HDBSCAN)")
     df["cluster_id"] = -1
     summaries, next_id = {}, 0
+    params = {name: cluster_params(name, args) for name in GROUPS.values()}
     for relevant, name in GROUPS.items():
         mask = (df["av_relevant"] == relevant).to_numpy()
-        print(f"  {name}: {mask.sum()} postings")
+        print(f"  {name}: {mask.sum()} postings, {params[name]}")
         if args.sweep:
-            table = cluster.sweep_min_cluster_size(cluster.reduce_dimensions(embeddings[mask]))
+            table = cluster.sweep_min_cluster_size(cluster.reduce_dimensions(
+                embeddings[mask], params[name]["umap_n_neighbors"], params[name]["umap_components"]))
             print(table.to_string(index=False))
             (out_dir / name).mkdir(exist_ok=True)
             table.to_csv(out_dir / name / "cluster_sweep.csv", index=False)
             continue
-        labels, summaries[name] = cluster_group(df[mask], embeddings[mask], args, next_id)
+        labels, summaries[name] = cluster_group(df[mask], embeddings[mask], params[name], next_id)
         df.loc[mask, "cluster_id"] = labels
         next_id = max(next_id, labels.max() + 1)
     if args.sweep:
@@ -289,8 +306,8 @@ def main() -> int:
         "n_records": len(df), "n_llm_failures": len(failed),
         "model": args.model, "prompt_version": llm.PROMPT_ID,
         "temperature": cfg.LLM_TEMPERATURE, **usage,
-        "embedding_model": cfg.EMBED_MODEL, "embedded_text": "role_summary+responsibilities+skills",
-        "min_cluster_size": args.min_cluster_size, "min_samples": args.min_samples,
+        "embedding_model": cfg.EMBED_MODEL, "chunk_words": cfg.CHUNK_WORDS,
+        "embedded_text": "role_summary+responsibilities+skills", "cluster_params": params,
         "groups": {name: group_stats(df.loc[df["av_relevant"] == relevant, "cluster_id"].to_numpy())
                    for relevant, name in GROUPS.items()},
         "languages": df["language_of_posting"].value_counts().to_dict(),

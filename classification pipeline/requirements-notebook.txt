@@ -1,0 +1,6 @@
+# Extra packages for notebooks/clustering_decisions.ipynb (on top of requirements.txt).
+#   pip install -r requirements.txt -r requirements-notebook.txt
+ipykernel>=6.29
+nbformat>=5.10
+nbconvert>=7.16
+matplotlib>=3.8
