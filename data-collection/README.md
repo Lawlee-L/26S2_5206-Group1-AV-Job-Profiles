@@ -136,8 +136,10 @@ a warning, continues with the other sources, and keeps that source's previous
 history records unchanged. This prevents a temporary website problem from
 being treated as a job removal.
 
-Connection, TLS handshake, timeout, or server errors may be temporary. Retry a
-failed source later:
+Connection, TLS handshake, timeout, or server errors may be temporary. The
+collector automatically attempts each request up to three times for these
+temporary failures; permanent responses such as HTTP 404 are not retried. If a
+source still fails, retry it later:
 
 ```bash
 av-jobs collect --source-id SOURCE_ID --run-date YYYY-MM-DD
@@ -357,6 +359,8 @@ The project currently has 36 `In Scope` sources across Greenhouse, Lever,
 Ashby, Workable, Comeet, Moka, SmartRecruiters, Jobylon, HotJob, HERP,
 AImotive, GM, and Tensor collectors.
 
+Wayve UK now uses Ashby (previously Greenhouse).
+
 The nine sources added after the original 27 are:
 
 | Source | Collector or source method |
@@ -382,7 +386,7 @@ Run the test suite with:
 pytest
 ```
 
-The current suite contains 67 passing tests covering:
+The current suite contains 71 passing tests covering:
 
 - source configuration and the standard job structure;
 - collector mappings, URLs, descriptions, locations, salaries, and pagination;
