@@ -13,6 +13,7 @@ from typing import Any
 
 from .errors import ImportErrorSafe
 from .job_details import job_detail_payload
+from .location_enrichment import enrich_snapshot_job
 from .release_metrics import release_qa_report
 
 
@@ -47,6 +48,7 @@ def _materialize(engine: Any, connection: Any, release_id: int) -> dict[str, int
                            if key not in {"dashboard_release_id", "release_key"}}
                 if kind == "job":
                     payload = job_detail_payload(payload)
+                    payload = enrich_snapshot_job(payload)
                 key = ":".join(str(payload[field]) for field in key_fields)
                 encoded = engine.stable_json(payload)
                 row_hash = hashlib.sha256(encoded.encode("utf-8")).hexdigest()

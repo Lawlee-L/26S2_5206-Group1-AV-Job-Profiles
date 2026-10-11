@@ -193,6 +193,7 @@ JOIN JSON_TABLE(r.payload_json, '$' COLUMNS (
   job_url VARCHAR(2048) PATH '$.job_url', location_raw VARCHAR(1024) PATH '$.location_raw',
   city VARCHAR(191) PATH '$.city', state_region VARCHAR(191) PATH '$.state_region',
   country_code CHAR(2) PATH '$.country_code', remote_type VARCHAR(24) PATH '$.remote_type',
+  location_parser_version VARCHAR(40) PATH '$.location_parser_version',
   salary_raw VARCHAR(1024) PATH '$.salary_raw', salary_min DECIMAL(18,2) PATH '$.salary_min',
   salary_max DECIMAL(18,2) PATH '$.salary_max', salary_currency CHAR(3) PATH '$.salary_currency',
   salary_period VARCHAR(24) PATH '$.salary_period', date_posted VARCHAR(40) PATH '$.date_posted',
@@ -339,6 +340,7 @@ SELECT
   wv.week_date, wv.collection_run_id, j.job_id, j.source_key, j.source_id,
   c.company_id, c.company_name,
   jo.advertised_job_title, jo.job_url, jo.location_raw, jo.date_posted,
+  jo.city, jo.state_region, jo.country_code, jo.remote_type,
   jo.first_seen_date, jo.last_seen_date, jo.state_as_of_date,
   jo.source_last_collected_at, jo.is_active_at_run AS is_active,
   jo.is_new_at_run AS is_new_in_run
@@ -354,6 +356,8 @@ SELECT
   snap.job_id, snap.source_key, snap.company_id, snap.company_name,
   snap.advertised_job_title, snap.display_title, snap.job_url,
   snap.location_raw, snap.date_posted, snap.is_active, snap.seniority_code,
+  snap.city, snap.state_region, snap.country_code, snap.remote_type,
+  snap.location_parser_version,
   snap.cluster_number, snap.cluster_name, snap.is_noise
 FROM weekly_versions AS wv
 JOIN dashboard_releases AS dr
@@ -369,6 +373,9 @@ JOIN JSON_TABLE(r.payload_json, '$' COLUMNS (
   display_title VARCHAR(512) PATH '$.display_title',
   job_url VARCHAR(2048) PATH '$.job_url', location_raw VARCHAR(1024) PATH '$.location_raw',
   date_posted VARCHAR(40) PATH '$.date_posted', is_active TINYINT PATH '$.is_active',
+  city VARCHAR(191) PATH '$.city', state_region VARCHAR(191) PATH '$.state_region',
+  country_code CHAR(2) PATH '$.country_code', remote_type VARCHAR(24) PATH '$.remote_type',
+  location_parser_version VARCHAR(40) PATH '$.location_parser_version',
   seniority_code VARCHAR(32) PATH '$.seniority_code',
   cluster_number INT PATH '$.cluster_number', cluster_name VARCHAR(255) PATH '$.cluster_name',
   is_noise TINYINT PATH '$.is_noise'

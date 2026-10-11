@@ -159,6 +159,11 @@ read contract. Old frozen text and labels remain unchanged.
 Do **not** use this command to pretend that new classification output was
 imported: use section 4 for actual classification changes.
 
+The same route enhances geography/work arrangement on a legacy snapshot:
+the new freeze parses its preserved raw location with versioned rules. Code
+updates alone do not change old frozen rows. See [location integration](LOCATION_INTEGRATION.md#4-enhance-an-old-published-week-without-rerunning-ai)
+for view installation, location QA/reversion and unchanged legacy observations.
+
 ## 6. Activate the reviewed candidate
 
 For the target current/newest week:
