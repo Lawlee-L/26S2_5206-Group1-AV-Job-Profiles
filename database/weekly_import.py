@@ -32,6 +32,8 @@ if __package__:
         classifier_description_sha1,
     )
     from .importer.weekly_versions import ensure_unselected_week, file_week_date, selected_collection
+    from .importer.location_enrichment import location_fields, location_quality
+    from .importer.location_parser import LOCATION_PARSER_VERSION
 else:  # Support the documented ``python database/weekly_import.py`` entry point.
     from importer import ImportErrorSafe
     from importer.hashing import (
@@ -40,6 +42,8 @@ else:  # Support the documented ``python database/weekly_import.py`` entry point
         classifier_description_sha1,
     )
     from importer.weekly_versions import ensure_unselected_week, file_week_date, selected_collection
+    from importer.location_enrichment import location_fields, location_quality
+    from importer.location_parser import LOCATION_PARSER_VERSION
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -205,6 +209,7 @@ def load_collection(path: Path) -> tuple[list[dict[str, Any]], str]:
         for field, limit in max_lengths.items():
             if values.get(field) is not None and len(str(values[field])) > limit:
                 raise ImportErrorSafe(f"Row {index}: {field} exceeds the MySQL schema length {limit}")
+        values.update(location_fields(values["location_raw"]))
         values["content_hash"] = classifier_description_sha1(values["job_description"])
         values["record_hash_sha256"] = canonical_record_sha256(values)
         rows.append(values)
@@ -227,6 +232,7 @@ def collection_plan(rows: list[dict[str, Any]], digest: str,
         "snapshot_date": file_week_date(snapshot_path, latest_source_date, None).isoformat()
         if snapshot_path else latest_source_date.isoformat(),
         "latest_source_collection_date": latest_source_date.isoformat(),
+        "location_quality": location_quality(rows),
     }
     if previous_path:
         old, _ = load_collection(previous_path)
@@ -560,6 +566,7 @@ def apply_collection(path: Path, backup_dir: Path,
                      snapshot_generated_at: datetime | None = None, *,
                      week_date: date | None = None, historical: bool = False) -> dict[str, Any]:
     rows, digest = load_collection(path)
+    location_report = location_quality(rows)
     conn = db_connect()
     try:
         acquire_import_lock(conn)
@@ -620,7 +627,9 @@ def apply_collection(path: Path, backup_dir: Path,
                     "snapshot_generated_at": snapshot_generated_at.isoformat() if snapshot_generated_at else None,
                     "historical_backfill": historical,
                     "latest_collected_at": latest_collected.isoformat(),
-                    "source_ids": source_ids, "synthetic_snapshot": True})),
+                    "source_ids": source_ids, "synthetic_snapshot": True,
+                    "location_parser_version": LOCATION_PARSER_VERSION,
+                    "location_quality": location_report})),
             )
             batch_id = cur.lastrowid
             cur.execute(
@@ -722,6 +731,8 @@ def apply_collection(path: Path, backup_dir: Path,
                         "snapshot_generated_at": snapshot_generated_at.isoformat() if snapshot_generated_at else None,
                         "historical_backfill": historical,
                         "hash_contract_version": HASH_CONTRACT_VERSION,
+                        "location_parser_version": LOCATION_PARSER_VERSION,
+                        "location_quality": location_report,
                         "snapshot_sha256": digest, "source_ids": source_ids,
                         "created_company_ids": created_company_ids, "created_source_ids": created_source_ids,
                         "inserted": stats["inserted"], "updated": stats["updated"],
@@ -732,6 +743,7 @@ def apply_collection(path: Path, backup_dir: Path,
         conn.commit()
         return {"status": "completed", "import_batch_id": batch_id, "collection_run_id": collection_run_id,
                 "run_key": run_key, "week_date": run_date.isoformat(), "rows": len(rows), **dict(stats),
+                "location_quality": location_report,
                 "backup": str(backup_path),
                 "backup_sha256": backup_digest}
     except Exception:

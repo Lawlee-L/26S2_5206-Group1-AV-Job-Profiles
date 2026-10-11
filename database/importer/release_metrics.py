@@ -11,6 +11,7 @@ from collections import Counter
 from typing import Any
 
 from .errors import ImportErrorSafe
+from .release_locations import release_location_report
 
 
 def _relevance(value: Any) -> bool | None:
@@ -429,6 +430,7 @@ def release_qa_report(connection: Any, release_key: str) -> dict[str, Any]:
             "cluster_run_status": release["cluster_run_status"],
         },
         "metrics": metrics,
+        "location_quality": release_location_report(connection, release),
         "public_dashboard": {
             "population": "successful av_relevant=true, non-duplicate jobs in the published release snapshot",
             "expected_visible_av_postings": expected_public_jobs,

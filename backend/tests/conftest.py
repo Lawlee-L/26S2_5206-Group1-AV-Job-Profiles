@@ -87,6 +87,36 @@ class FakeJobRepository:
             }
         return None
 
+    def list_locations(self):
+        return {
+            "releaseId": 7,
+            "releaseKey": "test-release",
+            "locations": [
+                {
+                    "countryCode": "AU",
+                    "stateRegion": "WA",
+                    "city": "Perth",
+                    "jobCount": 3,
+                },
+                {
+                    "countryCode": "US",
+                    "stateRegion": "CA",
+                    "city": "San Francisco",
+                    "jobCount": 2,
+                },
+            ],
+            "workArrangements": [
+                {
+                    "value": "hybrid",
+                    "jobCount": 2,
+                },
+                {
+                    "value": "remote",
+                    "jobCount": 1,
+                },
+            ],
+        }
+
 
 @pytest.fixture()
 def client():
