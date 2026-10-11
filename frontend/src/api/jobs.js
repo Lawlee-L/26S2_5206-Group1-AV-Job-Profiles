@@ -2,12 +2,26 @@ const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ||
     "http://127.0.0.1:5000";
 
+/**
+ * Get jobs from the backend.
+ *
+ * Supported filters:
+ * - search
+ * - company
+ * - country
+ * - state / region
+ * - city
+ * - work arrangement
+ * - seniority
+ */
 export async function getJobs({
     page = 1,
     pageSize = 20,
     q = "",
     company = "",
     country = "",
+    stateRegion = "",
+    city = "",
     remoteType = "",
     seniority = "",
 } = {}) {
@@ -28,6 +42,17 @@ export async function getJobs({
         params.set("country", country);
     }
 
+    // Structured location filters
+    if (stateRegion) {
+        params.set("state_region", stateRegion);
+    }
+
+    if (city) {
+        params.set("city", city);
+    }
+
+    // Work arrangement:
+    // remote | hybrid | onsite
     if (remoteType) {
         params.set("remote_type", remoteType);
     }
@@ -47,6 +72,9 @@ export async function getJobs({
     return response.json();
 }
 
+/**
+ * Get one job using its source key.
+ */
 export async function getJob(sourceKey) {
     const response = await fetch(
         `${API_BASE_URL}/api/jobs/${encodeURIComponent(
@@ -61,6 +89,9 @@ export async function getJob(sourceKey) {
     return response.json();
 }
 
+/**
+ * Get companies for the company filter.
+ */
 export async function getCompanies() {
     const response = await fetch(
         `${API_BASE_URL}/api/companies`
@@ -75,6 +106,9 @@ export async function getCompanies() {
     return result.data || [];
 }
 
+/**
+ * Get skills.
+ */
 export async function getSkills() {
     const response = await fetch(
         `${API_BASE_URL}/api/skills`

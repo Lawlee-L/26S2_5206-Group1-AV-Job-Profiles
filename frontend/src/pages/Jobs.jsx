@@ -29,6 +29,10 @@ import {
 export default function Jobs() {
   const [search, setSearch] = useState("");
 
+  // =========================================
+  // FILTERS
+  // =========================================
+
   const [country, setCountry] = useState("");
   const [seniority, setSeniority] = useState("");
   const [remoteType, setRemoteType] = useState("");
@@ -36,12 +40,24 @@ export default function Jobs() {
 
   const [companies, setCompanies] = useState([]);
 
+  // =========================================
+  // JOB DATA
+  // =========================================
+
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // =========================================
+  // PAGINATION
+  // =========================================
+
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
+
+  // =========================================
+  // FAVORITES
+  // =========================================
 
   const [favorites, setFavorites] = useState(
     () => getFavorites()
@@ -100,6 +116,7 @@ export default function Jobs() {
 
         if (!cancelled) {
           setJobs(result.data || []);
+
           setPagination(
             result.pagination || null
           );
@@ -281,11 +298,59 @@ export default function Jobs() {
     return "Not specified";
   };
 
+  // Work arrangement display
   const getRemoteType = (job) => {
-    return (
+    const value =
       job.remoteType ||
       job.type ||
-      "Not specified"
+      "";
+
+    if (!value) {
+      return "Not specified";
+    }
+
+    const normalized =
+      String(value).toLowerCase();
+
+    if (normalized === "remote") {
+      return "Remote";
+    }
+
+    if (normalized === "hybrid") {
+      return "Hybrid";
+    }
+
+    if (
+      normalized === "onsite" ||
+      normalized === "on-site"
+    ) {
+      return "On-site";
+    }
+
+    return value;
+  };
+
+  // Structured location support.
+  // If the backend provides city/state/country,
+  // use them. Otherwise use the original location.
+  const getLocationText = (job) => {
+    const structuredLocation = [
+      job.city,
+      job.stateRegion,
+      job.countryCode,
+    ]
+      .filter(
+        (value) =>
+          value !== null &&
+          value !== undefined &&
+          String(value).trim() !== ""
+      )
+      .join(", ");
+
+    return (
+      structuredLocation ||
+      job.location ||
+      "Location not specified"
     );
   };
 
@@ -378,7 +443,9 @@ export default function Jobs() {
 
       <main className="jobs-page">
 
-        {/* HERO */}
+        {/* =========================================
+            HERO
+        ========================================= */}
 
         <section className="jobs-hero">
           <span className="jobs-hero-label">
@@ -388,11 +455,10 @@ export default function Jobs() {
           <h1>Explore AV Jobs</h1>
 
           <p>
-            Discover job opportunities
-            across the autonomous vehicle
-            industry. Search by job title,
-            company, location, or technical
-            skill.
+            Discover job opportunities across the
+            autonomous vehicle industry. Search by
+            job title, company, location, or
+            technical skill.
           </p>
 
           <Link
@@ -410,6 +476,8 @@ export default function Jobs() {
 
         <div className="jobs-filter-panel">
 
+          {/* SEARCH */}
+
           <div className="jobs-search">
             <Search size={15} />
 
@@ -423,9 +491,11 @@ export default function Jobs() {
             />
           </div>
 
+          {/* FILTER ROW */}
+
           <div className="jobs-filter-row">
 
-            {/* COUNTRY */}
+            {/* LOCATION */}
 
             <div className="jobs-filter-item">
               <MapPin size={13} />
@@ -523,7 +593,7 @@ export default function Jobs() {
               </select>
             </div>
 
-            {/* REMOTE TYPE */}
+            {/* WORK ARRANGEMENT */}
 
             <div className="jobs-filter-item">
               <Briefcase size={13} />
@@ -533,10 +603,10 @@ export default function Jobs() {
                 onChange={
                   handleRemoteTypeChange
                 }
-                aria-label="Filter by work type"
+                aria-label="Filter by work arrangement"
               >
                 <option value="">
-                  Work Type
+                  Work Arrangement
                 </option>
 
                 <option value="remote">
@@ -586,11 +656,10 @@ export default function Jobs() {
                     </option>
                   )
                 )}
-
               </select>
             </div>
 
-            {/* CLEAR FILTERS */}
+            {/* CLEAR */}
 
             <button
               type="button"
@@ -637,6 +706,7 @@ export default function Jobs() {
 
         {loading && (
           <div className="jobs-no-results">
+
             <Briefcase size={24} />
 
             <h3>Loading jobs...</h3>
@@ -645,6 +715,7 @@ export default function Jobs() {
               Getting the latest AV job
               opportunities.
             </p>
+
           </div>
         )}
 
@@ -654,6 +725,7 @@ export default function Jobs() {
 
         {!loading && error && (
           <div className="jobs-no-results">
+
             <Briefcase size={24} />
 
             <h3>
@@ -661,6 +733,7 @@ export default function Jobs() {
             </h3>
 
             <p>{error}</p>
+
           </div>
         )}
 
@@ -671,6 +744,7 @@ export default function Jobs() {
         {!loading &&
           !error &&
           jobs.length > 0 && (
+
             <div className="jobs-list-container">
 
               {jobs.map((job) => {
@@ -690,18 +764,20 @@ export default function Jobs() {
                     className="jobs-list-item"
                   >
 
-                    {/* LOGO */}
+                    {/* COMPANY LOGO */}
 
                     <div className="jobs-company-logo">
+
                       <CompanyLogo
                         company={
                           job.company ||
                           "Unknown company"
                         }
                       />
+
                     </div>
 
-                    {/* CONTENT */}
+                    {/* JOB CONTENT */}
 
                     <div className="jobs-list-content">
 
@@ -717,18 +793,23 @@ export default function Jobs() {
 
                       <div className="jobs-meta">
 
+                        {/* LOCATION */}
+
                         <span>
                           <MapPin
                             size={10}
                           />
 
-                          {job.location ||
-                            "Location not specified"}
+                          {getLocationText(
+                            job
+                          )}
                         </span>
 
                         <span className="jobs-dot">
                           •
                         </span>
+
+                        {/* WORK ARRANGEMENT */}
 
                         <span>
                           <Briefcase
@@ -743,6 +824,8 @@ export default function Jobs() {
                         <span className="jobs-dot">
                           •
                         </span>
+
+                        {/* EXPERIENCE */}
 
                         <span>
                           <GraduationCap
@@ -767,6 +850,7 @@ export default function Jobs() {
                               skill,
                               index
                             ) => (
+
                               <span
                                 key={`${getSkillName(
                                   skill
@@ -776,26 +860,31 @@ export default function Jobs() {
                                   skill
                                 )}
                               </span>
+
                             )
                           )}
 
                         {(job.skills || [])
                           .length > 4 && (
+
                           <span className="jobs-more">
                             ...
                           </span>
+
                         )}
 
                       </div>
+
                     </div>
 
-                    {/* RIGHT */}
+                    {/* RIGHT SIDE */}
 
                     <div className="jobs-list-right">
 
                       <span>
                         {formatDate(
-                          job.postedDate
+                          job.postedDate ||
+                          job.date
                         )}
                       </span>
 
@@ -825,6 +914,7 @@ export default function Jobs() {
                           )
                         }
                       >
+
                         <Bookmark
                           size={14}
                           fill={
@@ -833,6 +923,7 @@ export default function Jobs() {
                               : "none"
                           }
                         />
+
                       </button>
 
                     </div>
@@ -842,6 +933,7 @@ export default function Jobs() {
               })}
 
             </div>
+
           )}
 
         {/* =========================================
@@ -851,6 +943,7 @@ export default function Jobs() {
         {!loading &&
           !error &&
           jobs.length === 0 && (
+
             <div className="jobs-no-results">
 
               <Search size={24} />
@@ -865,6 +958,7 @@ export default function Jobs() {
               </p>
 
               {hasActiveFilters && (
+
                 <button
                   type="button"
                   className="jobs-filter-button"
@@ -875,11 +969,14 @@ export default function Jobs() {
                   <RotateCcw
                     size={13}
                   />
+
                   Clear Filters
                 </button>
+
               )}
 
             </div>
+
           )}
 
         {/* =========================================
@@ -890,6 +987,7 @@ export default function Jobs() {
           !error &&
           jobs.length > 0 &&
           totalPages > 1 && (
+
             <div className="jobs-pagination">
 
               <button
@@ -914,6 +1012,7 @@ export default function Jobs() {
                   pageNumber,
                   index
                 ) => {
+
                   if (
                     pageNumber === "..."
                   ) {
@@ -967,6 +1066,7 @@ export default function Jobs() {
               </button>
 
             </div>
+
           )}
 
       </main>
