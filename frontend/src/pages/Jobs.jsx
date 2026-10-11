@@ -1,6 +1,6 @@
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
 import {
   Search,
   MapPin,
@@ -15,57 +15,102 @@ import {
 import Header from "../components/Header";
 import CompanyLogo from "../components/CompanyLogo";
 import Footer from "../components/Footer";
+import { getJobs, getCompanies } from "../api/jobs";
+import { getFavorites, toggleFavorite } from "../utils/favorites";
 
-import {
-  getJobs,
-  getCompanies,
-} from "../api/jobs";
+const PAGE_SIZE = 20;
 
-import {
-  getFavorites,
-  toggleFavorite,
-} from "../utils/favorites";
+const LOCATIONS = [
+  { code: "US", name: "United States" },
+  { code: "AU", name: "Australia" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "DE", name: "Germany" },
+  { code: "SG", name: "Singapore" },
+  { code: "CN", name: "China" },
+  { code: "JP", name: "Japan" },
+  { code: "KR", name: "South Korea" },
+  { code: "CA", name: "Canada" },
+];
+
+const getSkillName = (skill) =>
+  typeof skill === "string" ? skill : skill?.name || "Skill";
+
+const formatDate = (value) => {
+  if (!value) return "Date not available";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+
+  return date.toLocaleDateString("en-AU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const getExperienceText = (job) => {
+  if (job.level || job.seniority) {
+    return job.level || job.seniority;
+  }
+
+  const min = job.experienceMinYears ?? job.experience_min_years;
+  const max = job.experienceMaxYears ?? job.experience_max_years;
+
+  if (min != null && max != null) return `${min}–${max} years`;
+  if (min != null) return `${min}+ years`;
+
+  return "Not specified";
+};
+
+const getRemoteType = (job) => {
+  const value = job.remoteType ?? job.remote_type;
+
+  if (!value) return "Not specified";
+
+  const normalized = String(value).trim().toLowerCase();
+
+  if (normalized === "remote") return "Remote";
+  if (normalized === "hybrid") return "Hybrid";
+  if (normalized === "onsite" || normalized === "on-site") {
+    return "On-site";
+  }
+
+  return "Not specified";
+};
+
+const getLocationText = (job) => {
+  const city = job.city;
+  const region = job.stateRegion ?? job.state_region;
+  const countryCode = job.countryCode ?? job.country_code;
+
+  const countryName =
+    LOCATIONS.find(
+      (item) => item.code === String(countryCode || "").toUpperCase()
+    )?.name || countryCode;
+
+  const structured = [city, region, countryName]
+    .filter((value) => value != null && String(value).trim() !== "")
+    .join(", ");
+
+  return structured || job.location || "Location not specified";
+};
 
 export default function Jobs() {
   const [search, setSearch] = useState("");
-
-  // =========================================
-  // FILTERS
-  // =========================================
-
   const [country, setCountry] = useState("");
   const [seniority, setSeniority] = useState("");
   const [remoteType, setRemoteType] = useState("");
   const [company, setCompany] = useState("");
 
   const [companies, setCompanies] = useState([]);
-
-  // =========================================
-  // JOB DATA
-  // =========================================
-
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // =========================================
-  // PAGINATION
-  // =========================================
-
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
 
-  // =========================================
-  // FAVORITES
-  // =========================================
-
-  const [favorites, setFavorites] = useState(
-    () => getFavorites()
-  );
-
-  // =========================================
-  // LOAD COMPANIES
-  // =========================================
+  const [favorites, setFavorites] = useState(() => getFavorites());
 
   useEffect(() => {
     let cancelled = false;
@@ -73,123 +118,68 @@ export default function Jobs() {
     async function loadCompanies() {
       try {
         const result = await getCompanies();
-
         if (!cancelled) {
-          setCompanies(result);
+          setCompanies(Array.isArray(result) ? result : []);
         }
       } catch (err) {
-        console.error(
-          "Failed to load companies:",
-          err
-        );
+        console.error("Failed to load companies:", err);
       }
     }
 
     loadCompanies();
-
     return () => {
       cancelled = true;
     };
   }, []);
 
-  // =========================================
-  // LOAD JOBS
-  // =========================================
-
   useEffect(() => {
     let cancelled = false;
 
     async function loadJobs() {
-      try {
-        setLoading(true);
-        setError("");
+      setLoading(true);
+      setError("");
 
+      try {
         const result = await getJobs({
           page,
-          pageSize: 20,
-          q: search,
+          pageSize: PAGE_SIZE,
+          q: search.trim(),
           company,
           country,
           remoteType,
           seniority,
         });
 
-        if (!cancelled) {
-          setJobs(result.data || []);
+        if (cancelled) return;
 
-          setPagination(
-            result.pagination || null
-          );
-        }
+        setJobs(Array.isArray(result?.data) ? result.data : []);
+        setPagination(result?.pagination || null);
       } catch (err) {
-        console.error(
-          "Failed to load jobs:",
-          err
-        );
+        console.error("Failed to load jobs:", err);
 
         if (!cancelled) {
           setJobs([]);
           setPagination(null);
-
           setError(
-            "Unable to load jobs. Please make sure the backend is running."
+            err?.message ||
+              "Unable to load jobs. Please check that the backend is running."
           );
         }
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     }
 
-    const timer = setTimeout(
-      loadJobs,
-      search ? 300 : 0
-    );
+    const timer = setTimeout(loadJobs, search ? 300 : 0);
 
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [
-    search,
-    page,
-    company,
-    country,
-    remoteType,
-    seniority,
-  ]);
+  }, [search, page, company, country, remoteType, seniority]);
 
-  // =========================================
-  // SEARCH
-  // =========================================
-
-  const handleSearchChange = (event) => {
-    setSearch(event.target.value);
-    setPage(1);
-  };
-
-  // =========================================
-  // FILTERS
-  // =========================================
-
-  const handleCountryChange = (event) => {
-    setCountry(event.target.value);
-    setPage(1);
-  };
-
-  const handleSeniorityChange = (event) => {
-    setSeniority(event.target.value);
-    setPage(1);
-  };
-
-  const handleRemoteTypeChange = (event) => {
-    setRemoteType(event.target.value);
-    setPage(1);
-  };
-
-  const handleCompanyChange = (event) => {
-    setCompany(event.target.value);
+  const updateFilter = (setter) => (event) => {
+    setter(event.target.value);
     setPage(1);
   };
 
@@ -202,161 +192,30 @@ export default function Jobs() {
     setPage(1);
   };
 
-  const hasActiveFilters =
-    search ||
-    country ||
-    seniority ||
-    remoteType ||
-    company;
+  const hasActiveFilters = Boolean(
+    search || country || seniority || remoteType || company
+  );
 
-  // =========================================
-  // FAVORITES
-  // =========================================
-
-  const getFavoriteId = (job) =>
-    job.sourceKey || job.id;
+  const getFavoriteId = (job) => job.sourceKey || job.id;
 
   const isJobSaved = (job) => {
-    const jobId = getFavoriteId(job);
-
+    const id = getFavoriteId(job);
     return favorites.some(
-      (item) =>
-        String(
-          item.sourceKey || item.id
-        ) === String(jobId)
+      (item) => String(item.sourceKey || item.id) === String(id)
     );
   };
 
-  const handleSaveJob = (
-    event,
-    job
-  ) => {
+  const handleSaveJob = (event, job) => {
     event.preventDefault();
     event.stopPropagation();
 
-    const favoriteJob = {
+    toggleFavorite({
       ...job,
-      id: job.sourceKey || job.id,
-    };
-
-    toggleFavorite(favoriteJob);
+      id: getFavoriteId(job),
+    });
 
     setFavorites(getFavorites());
   };
-
-  // =========================================
-  // HELPERS
-  // =========================================
-
-  const getSkillName = (skill) => {
-    if (typeof skill === "string") {
-      return skill;
-    }
-
-    return skill?.name || "Skill";
-  };
-
-  const formatDate = (dateValue) => {
-    if (!dateValue) {
-      return "Date not available";
-    }
-
-    const date = new Date(dateValue);
-
-    if (Number.isNaN(date.getTime())) {
-      return dateValue;
-    }
-
-    return date.toLocaleDateString(
-      "en-AU",
-      {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }
-    );
-  };
-
-  const getExperienceText = (job) => {
-    if (job.level) {
-      return job.level;
-    }
-
-    if (
-      job.experienceMinYears != null &&
-      job.experienceMaxYears != null
-    ) {
-      return `${job.experienceMinYears}–${job.experienceMaxYears} years`;
-    }
-
-    if (
-      job.experienceMinYears != null
-    ) {
-      return `${job.experienceMinYears}+ years`;
-    }
-
-    return "Not specified";
-  };
-
-  // Work arrangement display
-  const getRemoteType = (job) => {
-    const value =
-      job.remoteType ||
-      job.type ||
-      "";
-
-    if (!value) {
-      return "Not specified";
-    }
-
-    const normalized =
-      String(value).toLowerCase();
-
-    if (normalized === "remote") {
-      return "Remote";
-    }
-
-    if (normalized === "hybrid") {
-      return "Hybrid";
-    }
-
-    if (
-      normalized === "onsite" ||
-      normalized === "on-site"
-    ) {
-      return "On-site";
-    }
-
-    return value;
-  };
-
-  // Structured location support.
-  // If the backend provides city/state/country,
-  // use them. Otherwise use the original location.
-  const getLocationText = (job) => {
-    const structuredLocation = [
-      job.city,
-      job.stateRegion,
-      job.countryCode,
-    ]
-      .filter(
-        (value) =>
-          value !== null &&
-          value !== undefined &&
-          String(value).trim() !== ""
-      )
-      .join(", ");
-
-    return (
-      structuredLocation ||
-      job.location ||
-      "Location not specified"
-    );
-  };
-
-  // =========================================
-  // PAGINATION
-  // =========================================
 
   const totalJobs =
     pagination?.total ??
@@ -368,13 +227,9 @@ export default function Jobs() {
     pagination?.totalPages ??
     pagination?.pages ??
     pagination?.total_pages ??
-    Math.max(
-      1,
-      Math.ceil(totalJobs / 20)
-    );
+    Math.max(1, Math.ceil(totalJobs / PAGE_SIZE));
 
-  const currentPage =
-    pagination?.page ?? page;
+  const currentPage = pagination?.page ?? page;
 
   const goToPage = (newPage) => {
     if (
@@ -386,36 +241,19 @@ export default function Jobs() {
     }
 
     setPage(newPage);
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const getPageNumbers = () => {
     if (totalPages <= 5) {
-      return Array.from(
-        { length: totalPages },
-        (_, index) => index + 1
-      );
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
     if (currentPage <= 3) {
-      return [
-        1,
-        2,
-        3,
-        4,
-        "...",
-        totalPages,
-      ];
+      return [1, 2, 3, 4, "...", totalPages];
     }
 
-    if (
-      currentPage >=
-      totalPages - 2
-    ) {
+    if (currentPage >= totalPages - 2) {
       return [
         1,
         "...",
@@ -442,11 +280,6 @@ export default function Jobs() {
       <Header />
 
       <main className="jobs-page">
-
-        {/* =========================================
-            HERO
-        ========================================= */}
-
         <section className="jobs-hero">
           <span className="jobs-hero-label">
             AV CAREER OPPORTUNITIES
@@ -455,9 +288,8 @@ export default function Jobs() {
           <h1>Explore AV Jobs</h1>
 
           <p>
-            Discover job opportunities across the
-            autonomous vehicle industry. Search by
-            job title, company, location, or
+            Discover job opportunities across the autonomous vehicle
+            industry. Search by job title, company, location, or
             technical skill.
           </p>
 
@@ -470,605 +302,299 @@ export default function Jobs() {
           </Link>
         </section>
 
-        {/* =========================================
-            SEARCH + FILTERS
-        ========================================= */}
-
         <div className="jobs-filter-panel">
-
-          {/* SEARCH */}
-
           <div className="jobs-search">
             <Search size={15} />
-
             <input
               type="text"
               placeholder="Search by job title, skills, or company"
               value={search}
-              onChange={
-                handleSearchChange
-              }
+              onChange={updateFilter(setSearch)}
             />
           </div>
 
-          {/* FILTER ROW */}
-
           <div className="jobs-filter-row">
-
             {/* LOCATION */}
-
             <div className="jobs-filter-item">
               <MapPin size={13} />
-
               <select
                 value={country}
-                onChange={
-                  handleCountryChange
-                }
+                onChange={updateFilter(setCountry)}
                 aria-label="Filter by location"
               >
-                <option value="">
-                  Location
-                </option>
-
-                <option value="United States">
-                  United States
-                </option>
-
-                <option value="Germany">
-                  Germany
-                </option>
-
-                <option value="Singapore">
-                  Singapore
-                </option>
-
-                <option value="United Kingdom">
-                  United Kingdom
-                </option>
-
-                <option value="China">
-                  China
-                </option>
-
-                <option value="Japan">
-                  Japan
-                </option>
-
-                <option value="South Korea">
-                  South Korea
-                </option>
-
-                <option value="Canada">
-                  Canada
-                </option>
+                <option value="">Location</option>
+                {LOCATIONS.map((location) => (
+                  <option
+                    key={location.code}
+                    value={location.code}
+                  >
+                    {location.name}
+                  </option>
+                ))}
               </select>
             </div>
 
             {/* EXPERIENCE LEVEL */}
-
             <div className="jobs-filter-item">
-              <GraduationCap
-                size={13}
-              />
-
+              <GraduationCap size={13} />
               <select
                 value={seniority}
-                onChange={
-                  handleSeniorityChange
-                }
+                onChange={updateFilter(setSeniority)}
                 aria-label="Filter by experience level"
               >
-                <option value="">
-                  Experience Level
-                </option>
-
-                <option value="intern">
-                  Intern
-                </option>
-
-                <option value="entry">
-                  Entry
-                </option>
-
-                <option value="junior">
-                  Junior
-                </option>
-
-                <option value="mid">
-                  Mid
-                </option>
-
-                <option value="senior">
-                  Senior
-                </option>
-
-                <option value="lead">
-                  Lead
-                </option>
-
-                <option value="manager">
-                  Manager
-                </option>
+                <option value="">Experience Level</option>
+                <option value="intern">Intern</option>
+                <option value="entry">Entry</option>
+                <option value="junior">Junior</option>
+                <option value="mid">Mid</option>
+                <option value="senior">Senior</option>
+                <option value="lead">Lead</option>
+                <option value="manager">Manager</option>
               </select>
             </div>
 
             {/* WORK ARRANGEMENT */}
-
             <div className="jobs-filter-item">
               <Briefcase size={13} />
-
               <select
                 value={remoteType}
-                onChange={
-                  handleRemoteTypeChange
-                }
+                onChange={updateFilter(setRemoteType)}
                 aria-label="Filter by work arrangement"
               >
-                <option value="">
-                  Work Arrangement
-                </option>
-
-                <option value="remote">
-                  Remote
-                </option>
-
-                <option value="hybrid">
-                  Hybrid
-                </option>
-
-                <option value="onsite">
-                  On-site
-                </option>
+                <option value="">Work Arrangement</option>
+                <option value="remote">Remote</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="onsite">On-site</option>
               </select>
             </div>
 
             {/* COMPANY */}
-
             <div className="jobs-filter-item">
               <Briefcase size={13} />
-
               <select
                 value={company}
-                onChange={
-                  handleCompanyChange
-                }
+                onChange={updateFilter(setCompany)}
                 aria-label="Filter by company"
               >
-                <option value="">
-                  Company
-                </option>
+                <option value="">Company</option>
+                {companies.map((item) => {
+                  const name =
+                    typeof item === "string" ? item : item.name;
+                  const count =
+                    typeof item === "string" ? null : item.jobCount;
 
-                {companies.map(
-                  (companyItem) => (
-                    <option
-                      key={
-                        companyItem.name
-                      }
-                      value={
-                        companyItem.name
-                      }
-                    >
-                      {companyItem.name} (
-                      {
-                        companyItem.jobCount
-                      })
+                  if (!name) return null;
+
+                  return (
+                    <option key={name} value={name}>
+                      {name}
+                      {count != null ? ` (${count})` : ""}
                     </option>
-                  )
-                )}
+                  );
+                })}
               </select>
             </div>
-
-            {/* CLEAR */}
 
             <button
               type="button"
               className="jobs-filter-button"
               onClick={clearFilters}
-              disabled={
-                !hasActiveFilters
-              }
+              disabled={!hasActiveFilters}
             >
               <RotateCcw size={13} />
               Clear
             </button>
-
           </div>
         </div>
 
-        {/* =========================================
-            RESULT COUNT
-        ========================================= */}
-
         <div className="jobs-toolbar">
-
           <span>
             {loading
               ? "Loading jobs..."
-              : `${totalJobs} ${
-                  totalJobs === 1
-                    ? "job"
-                    : "jobs"
-                } found`}
+              : `${totalJobs} ${totalJobs === 1 ? "job" : "jobs"} found`}
           </span>
 
           <div className="jobs-sort">
-            <span>
-              Showing latest published jobs
-            </span>
+            <span>Showing latest published jobs</span>
           </div>
-
         </div>
-
-        {/* =========================================
-            LOADING
-        ========================================= */}
 
         {loading && (
           <div className="jobs-no-results">
-
             <Briefcase size={24} />
-
             <h3>Loading jobs...</h3>
-
-            <p>
-              Getting the latest AV job
-              opportunities.
-            </p>
-
+            <p>Getting the latest AV job opportunities.</p>
           </div>
         )}
-
-        {/* =========================================
-            ERROR
-        ========================================= */}
 
         {!loading && error && (
           <div className="jobs-no-results">
-
             <Briefcase size={24} />
-
-            <h3>
-              Unable to load jobs
-            </h3>
-
+            <h3>Unable to load jobs</h3>
             <p>{error}</p>
-
           </div>
         )}
 
-        {/* =========================================
-            JOB LIST
-        ========================================= */}
+        {!loading && !error && jobs.length > 0 && (
+          <div className="jobs-list-container">
+            {jobs.map((job) => {
+              const saved = isJobSaved(job);
+              const sourceKey = getFavoriteId(job);
 
-        {!loading &&
-          !error &&
-          jobs.length > 0 && (
+              return (
+                <Link
+                  key={sourceKey}
+                  to={`/jobs/${encodeURIComponent(sourceKey)}`}
+                  className="jobs-list-item"
+                >
+                  <div className="jobs-company-logo">
+                    <CompanyLogo
+                      company={job.company || "Unknown company"}
+                    />
+                  </div>
 
-            <div className="jobs-list-container">
+                  <div className="jobs-list-content">
+                    <h3>
+                      {job.title || "Job title not available"}
+                    </h3>
 
-              {jobs.map((job) => {
-                const saved =
-                  isJobSaved(job);
+                    <strong>
+                      {job.company || "Company not specified"}
+                    </strong>
 
-                const sourceKey =
-                  job.sourceKey ||
-                  job.id;
-
-                return (
-                  <Link
-                    key={sourceKey}
-                    to={`/jobs/${encodeURIComponent(
-                      sourceKey
-                    )}`}
-                    className="jobs-list-item"
-                  >
-
-                    {/* COMPANY LOGO */}
-
-                    <div className="jobs-company-logo">
-
-                      <CompanyLogo
-                        company={
-                          job.company ||
-                          "Unknown company"
-                        }
-                      />
-
-                    </div>
-
-                    {/* JOB CONTENT */}
-
-                    <div className="jobs-list-content">
-
-                      <h3>
-                        {job.title ||
-                          "Job title not available"}
-                      </h3>
-
-                      <strong>
-                        {job.company ||
-                          "Company not specified"}
-                      </strong>
-
-                      <div className="jobs-meta">
-
-                        {/* LOCATION */}
-
-                        <span>
-                          <MapPin
-                            size={10}
-                          />
-
-                          {getLocationText(
-                            job
-                          )}
-                        </span>
-
-                        <span className="jobs-dot">
-                          •
-                        </span>
-
-                        {/* WORK ARRANGEMENT */}
-
-                        <span>
-                          <Briefcase
-                            size={10}
-                          />
-
-                          {getRemoteType(
-                            job
-                          )}
-                        </span>
-
-                        <span className="jobs-dot">
-                          •
-                        </span>
-
-                        {/* EXPERIENCE */}
-
-                        <span>
-                          <GraduationCap
-                            size={10}
-                          />
-
-                          {getExperienceText(
-                            job
-                          )}
-                        </span>
-
-                      </div>
-
-                      {/* SKILLS */}
-
-                      <div className="jobs-skills">
-
-                        {(job.skills || [])
-                          .slice(0, 4)
-                          .map(
-                            (
-                              skill,
-                              index
-                            ) => (
-
-                              <span
-                                key={`${getSkillName(
-                                  skill
-                                )}-${index}`}
-                              >
-                                {getSkillName(
-                                  skill
-                                )}
-                              </span>
-
-                            )
-                          )}
-
-                        {(job.skills || [])
-                          .length > 4 && (
-
-                          <span className="jobs-more">
-                            ...
-                          </span>
-
-                        )}
-
-                      </div>
-
-                    </div>
-
-                    {/* RIGHT SIDE */}
-
-                    <div className="jobs-list-right">
-
+                    <div className="jobs-meta">
                       <span>
-                        {formatDate(
-                          job.postedDate ||
-                          job.date
-                        )}
+                        <MapPin size={10} />
+                        {getLocationText(job)}
                       </span>
 
-                      <button
-                        type="button"
-                        className={
-                          saved
-                            ? "job-bookmark-button saved"
-                            : "job-bookmark-button"
-                        }
-                        aria-label={
-                          saved
-                            ? "Remove saved job"
-                            : "Save job"
-                        }
-                        title={
-                          saved
-                            ? "Remove from favorites"
-                            : "Save to favorites"
-                        }
-                        onClick={(
-                          event
-                        ) =>
-                          handleSaveJob(
-                            event,
-                            job
-                          )
-                        }
-                      >
+                      <span className="jobs-dot">•</span>
 
-                        <Bookmark
-                          size={14}
-                          fill={
-                            saved
-                              ? "currentColor"
-                              : "none"
-                          }
-                        />
+                      <span>
+                        <Briefcase size={10} />
+                        {getRemoteType(job)}
+                      </span>
 
-                      </button>
+                      <span className="jobs-dot">•</span>
 
+                      <span>
+                        <GraduationCap size={10} />
+                        {getExperienceText(job)}
+                      </span>
                     </div>
 
-                  </Link>
-                );
-              })}
+                    <div className="jobs-skills">
+                      {(Array.isArray(job.skills) ? job.skills : [])
+                        .slice(0, 4)
+                        .map((skill, index) => (
+                          <span key={`${getSkillName(skill)}-${index}`}>
+                            {getSkillName(skill)}
+                          </span>
+                        ))}
 
-            </div>
+                      {Array.isArray(job.skills) &&
+                        job.skills.length > 4 && (
+                          <span className="jobs-more">...</span>
+                        )}
+                    </div>
+                  </div>
 
-          )}
+                  <div className="jobs-list-right">
+                    <span>
+                      {formatDate(job.postedDate || job.date)}
+                    </span>
 
-        {/* =========================================
-            NO RESULTS
-        ========================================= */}
+                    <button
+                      type="button"
+                      className={
+                        saved
+                          ? "job-bookmark-button saved"
+                          : "job-bookmark-button"
+                      }
+                      aria-label={
+                        saved ? "Remove saved job" : "Save job"
+                      }
+                      title={
+                        saved
+                          ? "Remove from favorites"
+                          : "Save to favorites"
+                      }
+                      onClick={(event) =>
+                        handleSaveJob(event, job)
+                      }
+                    >
+                      <Bookmark
+                        size={14}
+                        fill={saved ? "currentColor" : "none"}
+                      />
+                    </button>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
 
-        {!loading &&
-          !error &&
-          jobs.length === 0 && (
+        {!loading && !error && jobs.length === 0 && (
+          <div className="jobs-no-results">
+            <Search size={24} />
+            <h3>No jobs found</h3>
+            <p>Try changing your search or filter options.</p>
 
-            <div className="jobs-no-results">
-
-              <Search size={24} />
-
-              <h3>
-                No jobs found
-              </h3>
-
-              <p>
-                Try changing your search
-                or filter options.
-              </p>
-
-              {hasActiveFilters && (
-
-                <button
-                  type="button"
-                  className="jobs-filter-button"
-                  onClick={
-                    clearFilters
-                  }
-                >
-                  <RotateCcw
-                    size={13}
-                  />
-
-                  Clear Filters
-                </button>
-
-              )}
-
-            </div>
-
-          )}
-
-        {/* =========================================
-            PAGINATION
-        ========================================= */}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                className="jobs-filter-button"
+                onClick={clearFilters}
+              >
+                <RotateCcw size={13} />
+                Clear Filters
+              </button>
+            )}
+          </div>
+        )}
 
         {!loading &&
           !error &&
           jobs.length > 0 &&
           totalPages > 1 && (
-
             <div className="jobs-pagination">
-
               <button
                 type="button"
                 aria-label="Previous page"
-                disabled={
-                  currentPage <= 1
-                }
-                onClick={() =>
-                  goToPage(
-                    currentPage - 1
-                  )
-                }
+                disabled={currentPage <= 1}
+                onClick={() => goToPage(currentPage - 1)}
               >
-                <ChevronLeft
-                  size={14}
-                />
+                <ChevronLeft size={14} />
               </button>
 
-              {getPageNumbers().map(
-                (
-                  pageNumber,
-                  index
-                ) => {
-
-                  if (
-                    pageNumber === "..."
-                  ) {
-                    return (
-                      <span
-                        key={`ellipsis-${index}`}
-                      >
-                        ...
-                      </span>
-                    );
-                  }
-
-                  return (
-                    <button
-                      key={pageNumber}
-                      type="button"
-                      className={
-                        currentPage ===
-                        pageNumber
-                          ? "active"
-                          : ""
-                      }
-                      onClick={() =>
-                        goToPage(
-                          pageNumber
-                        )
-                      }
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                }
+              {getPageNumbers().map((pageNumber, index) =>
+                pageNumber === "..." ? (
+                  <span key={`ellipsis-${index}`}>...</span>
+                ) : (
+                  <button
+                    key={pageNumber}
+                    type="button"
+                    className={
+                      currentPage === pageNumber ? "active" : ""
+                    }
+                    onClick={() => goToPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </button>
+                )
               )}
 
               <button
                 type="button"
                 aria-label="Next page"
-                disabled={
-                  currentPage >=
-                  totalPages
-                }
-                onClick={() =>
-                  goToPage(
-                    currentPage + 1
-                  )
-                }
+                disabled={currentPage >= totalPages}
+                onClick={() => goToPage(currentPage + 1)}
               >
-                <ChevronRight
-                  size={14}
-                />
+                <ChevronRight size={14} />
               </button>
-
             </div>
-
           )}
-
       </main>
 
       <Footer />
