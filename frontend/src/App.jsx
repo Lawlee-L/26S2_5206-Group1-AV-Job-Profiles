@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -7,10 +7,16 @@ import JobDetails from "./pages/JobDetails";
 import About from "./pages/About";
 import Help from "./pages/Help";
 import Terms from "./pages/Terms";
+import SavedJobs from "./pages/SavedJobs";
+const Clusters = lazy(() => import("./pages/Clusters"));
+const Trends = lazy(() => import("./pages/Trends"));
 
 export default function App() {
   return (
-    <Routes>
+    <Suspense fallback={<div className="container py-5" role="status">Loading page…</div>}><Routes>
+      <Route path="/clusters" element={<Clusters />} />
+      <Route path="/trends" element={<Trends />} />
+      <Route path="/saved" element={<SavedJobs />} />
       {/* HOME */}
       <Route
         path="/"
@@ -46,6 +52,6 @@ export default function App() {
         path="/terms"
         element={<Terms />}
       />
-    </Routes>
+    </Routes></Suspense>
   );
 }

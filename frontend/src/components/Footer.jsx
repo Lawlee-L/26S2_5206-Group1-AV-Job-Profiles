@@ -1,69 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Bot } from "lucide-react";
+import { Github, ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
-  return (
-    <footer className="footer">
-      <div className="footer-content">
-
-        {/* BRAND */}
-        <div className="footer-about">
-          <div className="footer-logo">
-            <span>
-              <Bot size={15} />
-            </span>
-
-            AV Job Tracker
-          </div>
-
-          <p>
-            Empowering the future of
-            <br />
-            Autonomous Vehicles.
-          </p>
-        </div>
-
-        {/* EXPLORE */}
-        <div className="footer-column">
-          <h4>Explore</h4>
-
-          <Link to="/jobs">Jobs</Link>
-          <Link to="/about">About</Link>
-          <Link to="/help">Help</Link>
-          <Link to="/terms">Terms & Conditions</Link>
-        </div>
-
-        {/* RESOURCES */}
-        <div className="footer-column">
-          <h4>Resources</h4>
-
-          <Link to="/jobs">Job Opportunities</Link>
-          <Link to="/about">About the Platform</Link>
-          <Link to="/help">Help Centre</Link>
-        </div>
-
-        {/* CONTACT */}
-        <div className="footer-column">
-          <h4>Contact</h4>
-
-          <a href="mailto:team@avjobtracker.com">
-            team@avjobtracker.com
-          </a>
-
-          <div className="social-icons">
-            <span>in</span>
-            <span>◎</span>
-            <span>◉</span>
-            <span>⌘</span>
-          </div>
-        </div>
-
-      </div>
-
-      <div className="copyright">
-        © 2026 AV Job Tracker. All rights reserved.
-      </div>
-    </footer>
-  );
+  return <footer className="footer product-footer"><div className="footer-inner">
+    <span>UWA CITS5206 · Group 1 · AV Job Profiles</span>
+    <nav aria-label="Project information"><Link to="/about">About</Link><Link to="/help">Help</Link><Link to="/terms">Terms & Conditions</Link>
+      <a href="https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles" target="_blank" rel="noopener noreferrer"><Github size={16} />Project on GitHub<ArrowUpRight size={13} /></a>
+    </nav>
+  </div></footer>;
 }

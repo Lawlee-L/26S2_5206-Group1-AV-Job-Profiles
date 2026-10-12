@@ -4,6 +4,10 @@ from app import create_app
 
 
 class FakeJobRepository:
+    def list_facets(self, **_kwargs):
+        return {"total": 1, "company": [{"value": "Example AV", "count": 1}],
+                "country": [{"value": "US", "count": 1}]}
+
     def list_jobs(self, **_kwargs):
         return {
             "items": [
@@ -116,6 +120,10 @@ class FakeJobRepository:
                 },
             ],
         }
+
+    def list_salary_options(self):
+        return {"options": [{"currency": "JPY", "period": "month", "jobCount": 1}],
+                "numericJobCount": 1, "comparableJobCount": 1}
 
 
 @pytest.fixture()

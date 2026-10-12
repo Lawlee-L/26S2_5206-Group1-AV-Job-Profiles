@@ -5,7 +5,8 @@ export function getFavorites() {
     try {
         const savedJobs = localStorage.getItem(FAVORITES_KEY);
 
-        return savedJobs ? JSON.parse(savedJobs) : [];
+        const values = savedJobs ? JSON.parse(savedJobs) : [];
+        return Array.isArray(values) ? values.filter(job => job && (job.sourceKey || job.id)) : [];
     } catch (error) {
         console.error("Could not load favorites:", error);
         return [];
@@ -17,7 +18,7 @@ export function isFavorite(jobId) {
     const favorites = getFavorites();
 
     return favorites.some(
-        (job) => String(job.id) === String(jobId)
+        (job) => String(job.sourceKey || job.id) === String(jobId)
     );
 }
 
@@ -26,7 +27,7 @@ export function saveFavorite(job) {
     const favorites = getFavorites();
 
     const alreadySaved = favorites.some(
-        (item) => String(item.id) === String(job.id)
+        (item) => String(item.sourceKey || item.id) === String(job.sourceKey || job.id)
     );
 
     if (!alreadySaved) {
@@ -44,7 +45,7 @@ export function removeFavorite(jobId) {
     const favorites = getFavorites();
 
     const updatedFavorites = favorites.filter(
-        (job) => String(job.id) !== String(jobId)
+        (job) => String(job.sourceKey || job.id) !== String(jobId)
     );
 
     localStorage.setItem(

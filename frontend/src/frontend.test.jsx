@@ -30,6 +30,9 @@ import {
   getJob,
   getCompanies,
   getSkills,
+  getLocations,
+  getSalaryOptions,
+  getFacets,
 } from "./api/jobs";
 
 /* =========================================================
@@ -38,9 +41,12 @@ import {
 
 vi.mock("./api/jobs", () => ({
   getJobs: vi.fn(),
+  getFacets: vi.fn(),
   getJob: vi.fn(),
   getCompanies: vi.fn(),
   getSkills: vi.fn(),
+  getLocations: vi.fn(),
+  getSalaryOptions: vi.fn().mockResolvedValue({ options: [] }),
 }));
 
 /* =========================================================
@@ -255,6 +261,16 @@ function formatTestDate(date) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  getFacets.mockResolvedValue({
+    company: mockCompanies.map(item => ({ value: item.name, count: item.jobCount || 3 })),
+    country: [{ value: "US", count: 3 }],
+    remote_type: [{ value: "onsite", count: 3 }],
+    skill: mockSkills.map(item => ({ value: item.name, count: 3 })),
+  });
+  getLocations.mockResolvedValue({ locations: [
+    { countryCode: "US", stateRegion: "CA", city: "San Francisco", jobCount: 2 },
+    { countryCode: "DE", stateRegion: "Berlin", city: "Berlin", jobCount: 1 },
+  ], workArrangements: [] });
 
   getJobs.mockResolvedValue(
     createJobsResponse()
@@ -402,7 +418,7 @@ describe("Jobs page", () => {
       .getByRole("heading", {
         name: mockJobs[0].title,
       })
-      .closest("a");
+      .closest("article");
 
     expect(first).not.toBeNull();
 
@@ -410,7 +426,7 @@ describe("Jobs page", () => {
       within(first).getByText(
         mockJobs[0].company,
         {
-          selector: "strong",
+          selector: ".job-company-name",
         }
       )
     ).toBeInTheDocument();
@@ -436,7 +452,7 @@ describe("Jobs page", () => {
       );
 
     const card =
-      heading.closest("a");
+      heading.querySelector("a");
 
     expect(card).not.toBeNull();
 
@@ -497,8 +513,8 @@ describe("Jobs page", () => {
     );
 
     const searchBox =
-      screen.getByPlaceholderText(
-        /Search by job title/i
+      screen.getByLabelText(
+        "Search by job title, skills, or company"
       );
 
     await user.type(
@@ -513,7 +529,7 @@ describe("Jobs page", () => {
         ).toHaveBeenCalledWith(
           expect.objectContaining({
             q: "nvidia",
-          })
+          }), expect.any(Object)
         );
       },
       {
@@ -578,8 +594,8 @@ describe("Jobs page", () => {
     );
 
     await user.type(
-      screen.getByPlaceholderText(
-        /Search by job title/i
+      screen.getByLabelText(
+        "Search by job title, skills, or company"
       ),
       "zzzz-no-match"
     );
@@ -591,7 +607,7 @@ describe("Jobs page", () => {
         ).toHaveBeenCalledWith(
           expect.objectContaining({
             q: "zzzz-no-match",
-          })
+          }), expect.any(Object)
         );
       },
       {

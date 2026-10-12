@@ -8,7 +8,7 @@ const companyDomains = {
   "Zoox": "zoox.com",
   "Wayve": "wayve.ai",
   "Mobileye": "mobileye.com",
-  "Tensor (AutoX)": "autox.ai",
+  "Tensor (AutoX)": "tensor.auto",
   "Woven": "woven.toyota",
   "42dot": "42dot.ai",
   "Inceptio.ai": "inceptio.ai",
@@ -19,7 +19,7 @@ const companyDomains = {
   "Aurora": "aurora.tech",
   "Kodiak": "kodiak.ai",
   "Gatik": "gatik.ai",
-  "Tier IV": "tier4.jp",
+  "Tier IV": "tier4.co.jp",
   "Torc AI": "torc.ai",
   "May Mobility": "maymobility.com",
   "GM": "gm.com",
@@ -32,9 +32,26 @@ const companyDomains = {
   "Pony.AI": "pony.ai",
   "Vay": "vay.io",
   "Stack AV": "stackav.com",
-  "AutoBrains": "autobrains.com",
+  "AutoBrains": "autobrains.ai",
   "AImotive": "aimotive.com",
 };
+
+const normalise = (name) => name.toLowerCase().replace(/[^a-z0-9]/g, "");
+const domains = Object.fromEntries(Object.entries(companyDomains).map(([name, domain]) => [normalise(name), domain]));
+domains.avride = "avride.ai";
+domains.latitude = "lat.ai";
+domains.inceptio = "inceptio.ai";
+domains.tensor = "tensor.auto";
+domains.tier4 = "tier4.co.jp";
+
+export function logoSources(company, token = "") {
+  const domain = domains[normalise(company || "")];
+  if (!domain) return [];
+  return [
+    ...(token.startsWith("pk_") ? [`https://img.logo.dev/${domain}?token=${encodeURIComponent(token)}&size=128&format=png`] : []),
+    `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`,
+  ];
+}
 
 export default function CompanyLogo({
   company,
@@ -42,7 +59,13 @@ export default function CompanyLogo({
 }) {
   const companyName = company?.trim() || "Unknown";
 
-  const [imageError, setImageError] = useState(false);
+  // Key the loader by company: a failed image must not poison the next job card.
+  return <LogoImage key={companyName} companyName={companyName} large={large} />;
+}
+
+function LogoImage({ companyName, large }) {
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const [loaded, setLoaded] = useState(false);
 
   const shortName = companyName
     .charAt(0)
@@ -53,15 +76,8 @@ export default function CompanyLogo({
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-  const domain = companyDomains[companyName];
-
-  const token =
-    import.meta.env.VITE_LOGO_DEV_TOKEN;
-
-  const logoUrl =
-    domain && token
-      ? `https://img.logo.dev/${domain}?token=${token}&size=128&format=png`
-      : null;
+  const sources = logoSources(companyName, import.meta.env.VITE_LOGO_DEV_TOKEN || "");
+  const logoUrl = sources[sourceIndex];
 
   return (
     <div
@@ -69,16 +85,22 @@ export default function CompanyLogo({
         large ? "large" : ""
       }`}
       title={companyName}
-      aria-label={`${companyName} logo`}
+      aria-label={logoUrl ? `${companyName} company icon` : `${companyName} initials`}
+      aria-busy={Boolean(logoUrl && !loaded)}
     >
-      {logoUrl && !imageError ? (
+      {logoUrl && (
         <img
           src={logoUrl}
-          alt={`${companyName} logo`}
+          alt={`${companyName} company icon`}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          onLoad={(event) => { if (event.currentTarget.naturalWidth < 32) { setLoaded(false); setSourceIndex(index => index + 1); } else setLoaded(true); }}
+          style={{ opacity: loaded ? 1 : 0 }}
           className="company-logo-image"
-          onError={() => setImageError(true)}
+          onError={() => { setLoaded(false); setSourceIndex(index => index + 1); }}
         />
-      ) : (
+      )}
+      {(!logoUrl || !loaded) && (
         <span className="company-logo-fallback">
           {shortName}
         </span>
