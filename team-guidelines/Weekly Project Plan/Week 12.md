@@ -1,9 +1,13 @@
 # Week 12 Weekly Project Plan
 
-**Week:** 12  
-**Date:** 12–18 October 2026  
-**Team Lead / PM:** Nyx Chen  
-**Time zone:** UTC+8  
+**Week:** 12
+
+**Date:** 12–18 October 2026
+
+**Team Lead / PM:** Nyx Chen
+
+**Time zone:** UTC+8
+
 **Status:** Updated plan for report submission and project handover. Proposed internal checkpoints require team confirmation.
 
 This week prioritises the final report, a reviewed and reproducible software delivery, container packaging and client handover. Avoid major redesigns and new untested features. A working local application is not evidence that scheduled weekly automation or client acceptance is complete.
