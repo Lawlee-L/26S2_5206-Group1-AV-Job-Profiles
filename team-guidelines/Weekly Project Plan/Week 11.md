@@ -21,7 +21,7 @@ The priority is to get a small, real-data workflow working by **Wednesday, 7 Oct
 | Project Pitch Video — individual | **6 October, 11:59 PM** | Each member checks the LMS instructions and submits their own video. This is separate from Thursday's team presentation. |
 | Final facilitator meeting | **7 October, 11:30 AM–12:00 PM**, online | Li sends the link and agenda on **6 October**; Nyx coordinates the agenda and progress summary. Sumayyah confirmed the meeting in her 4 October email. **Minutes: Sunjol Singh Paul.** |
 | Client / UWA Robot Club demonstration | **8 October, 12:00–1:00 PM**, Building 106, G.58, ARTS Murdoch Lecture Theatre | Sunjol confirms attendance and presentation arrangements with Adrian; Nyx coordinates readiness and presenter handover. Around **five minutes per team**, plus any discussion directed by the organiser. |
-| Group meeting | **10 October, 12:00 PM — proposed regular slot** | Review demo feedback, remaining defects and the final report. **Minutes: Leon Nel Nel.** Confirm the time in Teams. |
+| Group meeting | **10 October — cancelled** | Four members were unavailable, as confirmed by Nyx on 12 October. Leon's planned minutes duty was not completed; no minutes are required. |
 | Week 11 accountability document | **11 October, 8:00 PM** course upload deadline | Nyx creates/shares the new weekly document in Teams; everyone fills in actual contributions by the **7:00 PM internal target**. Nyx checks completion and uploads it. |
 | Final Project Report — group | **13 October**, as listed in the LMS timetable | Nyx coordinates report allocation and checks the live assessment brief for the exact submission time, required attachments and software expectations. All members supply their own section/evidence. |
 
@@ -85,7 +85,7 @@ The priority is to get a small, real-data workflow working by **Wednesday, 7 Oct
 - [ ] Verify jobs, job details, search and displayed counts against the actual demo database, including browser-origin configuration and useful error responses.
 - [ ] Provide backend startup/configuration instructions and help the presenter run the service locally.
 - [ ] Keep aggregate/trend calculations and HTTP API behaviour in the backend. Ask Nyx for an explicit read-contract change if required; do not change importer-owned tables or invent data mappings independently.
-- [ ] Record the **10 October group meeting** and share draft minutes by **11 October**.
+- The **10 October group meeting was cancelled**; no minutes are required. Leon is proposed for the next needed group-meeting recording turn, subject to availability.
 
 ### Database / importer and team coordination — Nyx Chen
 
@@ -143,14 +143,14 @@ The priority is to get a small, real-data workflow working by **Wednesday, 7 Oct
 
 ## 5. Week 11 Summary
 
-To complete after the Saturday meeting: record the actual demo outcome, client feedback, remaining blockers, tested code/data versions, report owners and final handover tasks. Do not mark integration complete because separate module tests pass.
+**Update confirmed by Nyx on 12 October:** the planned **10 October group meeting was cancelled because four members were unavailable**. No minutes are required for this cancelled meeting, and Leon's planned recording turn does not count as a completed duty. The final facilitator meeting took place on 7 October and its minutes are published. Report completion and handover tasks continue in the [Week 12 plan](Week%2012.md). Record actual outcomes and evidence; do not mark integration complete because separate module tests pass.
 
 ### Meeting Minutes Rotation
 
 | Week | Meeting | Minutes Owner | Status |
 | --- | --- | --- | --- |
-| Week 11 | Facilitator meeting, 7 October | Sunjol Singh Paul | Assigned; confirm availability or swap |
-| Week 11 | Group meeting, 10 October, proposed 12:00 PM | Leon Nel Nel | Assigned; confirm time/availability or swap |
+| Week 11 | Facilitator meeting, 7 October | Sunjol Singh Paul | Completed; recorded minutes published |
+| Week 11 | Group meeting, 10 October, proposed 12:00 PM | Leon Nel Nel | Cancelled; four members unavailable; no minutes required |
 
 Assignments use the actual `Recorded by` entries in all **18** published minutes files through 3 October: Sunjol **2**, Leon **2**, Nyx **3**, Li **3**, Thushamini **3**, Seonjeong **5**. Sunjol takes Wednesday because his last recorded meeting was 12 September; Leon takes Saturday after recording the 30 September facilitator meeting. If both complete these assignments, everyone except Seonjeong will have recorded three meetings. This balances frequency without assigning Seonjeong another turn.
 
