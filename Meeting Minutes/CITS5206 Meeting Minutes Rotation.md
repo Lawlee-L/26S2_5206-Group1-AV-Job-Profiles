@@ -24,8 +24,25 @@ This table is used to manage the rotation of meeting minutes responsibilities wi
 | Week 9 | Group Meeting | 26/09/2026 | Seonjeong Jeong | Completed |
 | Week 10 | Facilitator Meeting | 30/09/2026 | Leon Nel Nel | Completed; recorded minutes published |
 | Week 10 | Group Meeting | 03/10/2026 | Thushamini Chathusika Hewa Pathegamage | Completed; recorded minutes published |
-| Week 11 | Facilitator Meeting | 07/10/2026 | Sunjol Singh Paul | Assigned; confirm availability or arrange a swap |
-| Week 11 | Group Meeting (proposed 12:00 PM) | 10/10/2026 | Leon Nel Nel | Assigned; confirm meeting time and availability or arrange a swap |
+| Week 11 | Facilitator Meeting | 07/10/2026 | Sunjol Singh Paul | Completed; recorded minutes published |
+| Week 11 | Group Meeting (proposed 12:00 PM) | 10/10/2026 | Leon Nel Nel | Cancelled; four members unavailable; confirmed by Nyx on 12 October; no minutes required |
+
+## Update — 12 October 2026
+
+The 7 October facilitator minutes are published with Sunjol as recorder. This
+brings his completed count to **3**. The 10 October group meeting did not take
+place because four members were unavailable, so Leon remains at **2** completed
+recorded meetings; a cancelled assignment is not a recorded meeting.
+
+Updated counts for the **19** published meeting records through 7 October:
+Sunjol **3**, Leon **2**, Nyx **3**, Li **3**, Thushamini **3**, Seonjeong **5**.
+The original 5 October assignment basis below is retained as historical context.
+
+If another group meeting is needed for final handover, **Leon is the proposed
+next recorder**, subject to availability or an agreed swap. No new meeting date
+or recorder assignment is confirmed by this proposal. Use the
+[Week 12 plan](../team-guidelines/Weekly%20Project%20Plan/Week%2012.md) for current
+delivery and report responsibilities.
 
 ## Assignment Basis — Updated 5 October 2026
 
