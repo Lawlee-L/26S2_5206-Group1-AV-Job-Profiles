@@ -1,0 +1,10 @@
+.env
+.venv/
+.cache/
+__pycache__/
+*.pyc
+*.sqlite
+*.db
+output*/
+tests/
+docker-compose.yml

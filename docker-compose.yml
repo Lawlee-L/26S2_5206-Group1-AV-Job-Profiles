@@ -1,0 +1,165 @@
+# AV Job Profiles — whole project in containers
+#
+#   Always-on:  db (MySQL), backend (Flask API), frontend (React + nginx),
+#               watchtower (auto-update, optional)
+#   Jobs:       collector, classifier, importer (run on demand)
+#
+#   Website, auto-updating:   docker compose pull
+#                             docker compose --profile autoupdate up -d
+#   Website, local build:     docker compose up -d --build
+#   A pipeline job:           docker compose run --rm collector weekly-update --region australiaeast
+#
+# Settings and passwords come from .env (copy .env.docker.example to .env).
+# See DOCKER.md for the full guide.
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: av_job_profiles
+      MYSQL_USER: ${MYSQL_USER:-avjobs}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env}
+      BACKEND_DB_USER: ${BACKEND_DB_USER:-av_backend}
+      BACKEND_DB_PASSWORD: ${BACKEND_DB_PASSWORD:?set BACKEND_DB_PASSWORD in .env}
+    command: --default-time-zone=+00:00
+    ports:
+      - "127.0.0.1:${DB_HOST_PORT:-3306}:3306"   # host-only, for the importer / MySQL Workbench
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # Loaded only on the first start (empty volume), in name order
+      - ./database/schema.mysql.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/views.mysql.sql:/docker-entrypoint-initdb.d/02-views.sql:ro
+      - ./database/docker-init/03-backend-user.sh:/docker-entrypoint-initdb.d/03-backend-user.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"   # never auto-replace the database
+
+  backend:
+    image: ${IMAGE_PREFIX:-ghcr.io/lawlee-l/26s2_5206-group1-av-job-profiles}-backend:${IMAGE_TAG:-latest}
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: av_job_profiles
+      DB_USER: ${BACKEND_DB_USER:-av_backend}
+      DB_PASSWORD: ${BACKEND_DB_PASSWORD}
+      FLASK_DEBUG: "false"
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+
+  frontend:
+    image: ${IMAGE_PREFIX:-ghcr.io/lawlee-l/26s2_5206-group1-av-job-profiles}-frontend:${IMAGE_TAG:-latest}
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - backend
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+
+  # ---------------------------------------------------------------------------
+  # Pipeline jobs. These do not run all the time: start one with
+  #   docker compose run --rm <collector|classifier|importer> <arguments>
+  # pull_policy "always" fetches the newest image from GitHub before every run,
+  # so a job always uses the latest code on main. Set JOB_PULL_POLICY=build in
+  # .env to build from your local files instead.
+  # ---------------------------------------------------------------------------
+
+  # 1. Collect jobs from the careers sites and translate them (av-jobs CLI)
+  collector:
+    image: ${IMAGE_PREFIX:-ghcr.io/lawlee-l/26s2_5206-group1-av-job-profiles}-collector:${IMAGE_TAG:-latest}
+    build: ./data-collection
+    pull_policy: ${JOB_PULL_POLICY:-always}
+    profiles: ["jobs"]
+    environment:
+      AZURE_TRANSLATOR_KEY: ${AZURE_TRANSLATOR_KEY:-}   # empty = ask interactively
+    volumes:
+      - ./data-collection/data:/app/data
+      - ./data-collection/deliverables:/app/deliverables
+
+  # 2. Classify + cluster a collected dataset (run_pipeline_v2.py)
+  classifier:
+    image: ${IMAGE_PREFIX:-ghcr.io/lawlee-l/26s2_5206-group1-av-job-profiles}-classifier:${IMAGE_TAG:-latest}
+    build: ./classification pipeline
+    pull_policy: ${JOB_PULL_POLICY:-always}
+    profiles: ["jobs"]
+    environment:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      # Reuse matching classifications already imported into MySQL. The
+      # classifier only reads these tables; it never writes to the database.
+      AVDB_HOST: db
+      AVDB_PORT: 3306
+      AVDB_NAME: av_job_profiles
+      AVDB_USER: ${MYSQL_USER:-avjobs}
+      AVDB_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./data-collection/deliverables:/app/input:ro
+      - ./classification pipeline/output:/app/output
+      - classifier-cache:/app/.cache          # local cache; --db also reuses imported answers
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # 3. Load collection + classification results into MySQL, QA and publish
+  importer:
+    image: ${IMAGE_PREFIX:-ghcr.io/lawlee-l/26s2_5206-group1-av-job-profiles}-importer:${IMAGE_TAG:-latest}
+    build: ./database
+    pull_policy: ${JOB_PULL_POLICY:-always}
+    profiles: ["jobs"]
+    environment:
+      AVDB_HOST: db
+      AVDB_PORT: 3306
+      AVDB_NAME: av_job_profiles
+      AVDB_USER: root            # needs write + backup rights; the website uses the read-only user
+      AVDB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./data-collection/deliverables:/repo/data-collection/deliverables:ro
+      - ./classification pipeline/output:/repo/classification pipeline/output:ro
+      - ./classification pipeline/output_full:/repo/classification pipeline/output_full:ro
+      - ./database/backups:/repo/database/backups
+      - ./database/operation_logs:/repo/database/operation_logs
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # First-time website data setup, built from this checkout so the script and
+  # tracked snapshots match. No collector/classifier or AI keys are needed.
+  bootstrap:
+    extends:
+      service: importer
+    image: avjobs-website-bootstrap:local
+    pull_policy: build
+    entrypoint: ["python3.12", "database/bootstrap_website.py"]
+
+  # Polls the registry and restarts backend/frontend when GitHub Actions
+  # publishes a new image. Only started with:  --profile autoupdate
+  watchtower:
+    image: nickfedor/watchtower:latest
+    profiles: ["autoupdate"]
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Uncomment if the GHCR packages are private (after `docker login ghcr.io` on the host):
+      # - ~/.docker/config.json:/config.json:ro
+    environment:
+      WATCHTOWER_LABEL_ENABLE: "true"        # only touch containers labelled enable=true
+      WATCHTOWER_POLL_INTERVAL: ${WATCHTOWER_POLL_INTERVAL:-300}   # seconds
+      WATCHTOWER_CLEANUP: "true"             # delete old images after updating
+      WATCHTOWER_INCLUDE_RESTARTING: "true"
+
+volumes:
+  mysql-data:
+  classifier-cache:

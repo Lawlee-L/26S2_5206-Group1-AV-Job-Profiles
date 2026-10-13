@@ -95,6 +95,40 @@ class WeeklyImportTests(unittest.TestCase):
             with self.assertRaisesRegex(ImportErrorSafe, "Duplicate source_key"):
                 load_collection(path)
 
+    def test_load_collection_allows_source_platform_migration(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "collection.json"
+            old = source_record("greenhouse|wayve|id:1", "Old role", "1")
+            old["metadata"].update({
+                "platform": "greenhouse", "collected_at": "2026-09-25T10:00:00Z",
+                "first_seen_date": "2026-09-20", "last_seen_date": "2026-09-25",
+                "is_active": False,
+            })
+            new = source_record("ashby|wayve|id:2", "Current role", "2")
+            new["metadata"].update({
+                "platform": "ashby", "collected_at": "2026-10-13T10:00:00Z",
+                "first_seen_date": "2026-10-07", "last_seen_date": "2026-10-13",
+                "is_active": True,
+            })
+            self.write_json(path, [old, new])
+
+            rows, _ = load_collection(path)
+
+            self.assertEqual({row["platform"] for row in rows}, {"greenhouse", "ashby"})
+            self.assertEqual({row["current_source_platform"] for row in rows}, {"ashby"})
+            self.assertEqual(rows[0]["raw_record"]["metadata"]["platform"], "greenhouse")
+
+    def test_load_collection_rejects_source_company_or_region_change(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "collection.json"
+            first = source_record("greenhouse|wayve|id:1", "One", "1")
+            second = source_record("greenhouse|wayve|id:2", "Two", "2")
+            second["metadata"]["region"] = "US"
+            self.write_json(path, [first, second])
+
+            with self.assertRaisesRegex(ImportErrorSafe, "inconsistent company/region"):
+                load_collection(path)
+
     def test_analysis_validates_exact_join_and_cluster_sizes(self):
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)

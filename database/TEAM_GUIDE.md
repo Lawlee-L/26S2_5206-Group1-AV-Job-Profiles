@@ -30,7 +30,7 @@ published views.
 | --- | --- | --- |
 | Set up an empty local database | Install tables/views, then import the available files | Sections 3–6 below |
 | Add Li's new weekly file | `plan-collection` → `import-collection` | Section 4; change the file and date |
-| Add that week's first classification | `plan-analysis` → `import-analysis` → `qa-release` → `publish-release` | Sections 5–6; keep the input/output pairing exact |
+| Add that week's first classification | `plan-analysis` → `import-analysis --publish` | Sections 5–6; QA must pass before automatic publication |
 | Correct a classification already published for that week | `plan-analysis` → `import-analysis --candidate` → `qa-release` → `activate-release` | [Revision guide, sections 3–6](RELEASE_REVISIONS.md#3-inspect-the-actual-selections-first) |
 | Add details to a saved release without changing the classification | `create-release` → `qa-release` → `activate-release` | [Revision guide, section 5](RELEASE_REVISIONS.md#5-same-analysis-new-dashboard-snapshot-no-ai-rerun) |
 | Switch back after a bad release | `list-releases` → `activate-release` with the old frozen key | [Revision guide, section 7](RELEASE_REVISIONS.md#7-switch-back-retain-both-versions) |
@@ -203,37 +203,39 @@ $files = @(
   '--failures', "$out/llm_failures.csv"
 )
 python database/weekly_import.py plan-analysis @files
-python database/weekly_import.py import-analysis @files --week-date 2026-09-25 --git-commit e4f1b77cc56f048c06196e7a27865d98084c2e2a
+python database/weekly_import.py import-analysis @files --week-date 2026-09-25 --git-commit e4f1b77cc56f048c06196e7a27865d98084c2e2a --publish
 ```
 
 The importer checks the selected Li file's SHA-256, the complete `source_key`
 set, each job's content fingerprints, duplicate decisions and cluster counts.
 For this example, 5,139 inputs reconcile to 4,518 analysed postings and 621
 duplicate links; 2,902 analysed, non-duplicate jobs are AV-related. The
-command returns a `release_key` starting with `draft-`. **Draft does not mean
+command returns the imported and published release details. Without `--publish`,
+it returns a `release_key` starting with `draft-`; **draft does not mean
 published.** A different week's classification requires its own output folder,
 the matching dated Li file, that date in `--week-date`, and the Git commit
 that actually produced that output. Do not reuse the example commit blindly.
 
 ## 6. QA, approval and publication
 
-Set `$releaseKey` to the `release_key` printed by `import-analysis`:
+Normally, `import-analysis --publish` performs QA and publication in one safe
+operation. If an analysis was previously imported without that option, set
+`$releaseKey` to its printed `release_key` and finalize the existing draft:
 
 ```powershell
 $releaseKey = 'draft-REPLACE_WITH_THE_PRINTED_KEY'
-python database/weekly_import.py qa-release --release-key $releaseKey
-python database/weekly_import.py publish-release --release-key $releaseKey
+python database/weekly_import.py finalize-release --release-key $releaseKey
 ```
 
-Check that QA reports `passed` **and** read any warnings before publishing.
+Publication occurs only if QA reports `passed`; also read any warnings.
 In the 25 September example, one displayed AV job has no extractable skills
 and many clusters lack approved names. The database preserves those gaps; it
 does not guess missing skills or treat keywords as approved labels. Obtain
 the team's release decision before changing the public Dashboard version.
 
 `publish-release` freezes the candidate rows and makes that release current.
-If an older week's classification is added later, QA it and use
-`publish-release --release-key <older-draft-key> --historical`: it freezes an
+If an older week's classification is added later, use
+`finalize-release --release-key <older-draft-key> --historical`: it checks and freezes an
 older version for `v_weekly_av_*` but **does not** replace the current
 Dashboard. A frozen release cannot be edited or rolled back as a normal draft.
 Same-week replacements use `import-analysis --candidate` and `activate-release`,
@@ -310,9 +312,10 @@ Run `python database/weekly_import.py <command> --help` for exact flags.
 | `plan-collection --input FILE [--previous FILE]` | Validate/count a Li file, report location/work-mode coverage, optionally compare with an earlier one | None |
 | `import-collection --input FILE --week-date YYYY-MM-DD [--historical]` | Select one official Li file for that week; use `--historical` only to backfill an older week | Backup, collection run, observations; normal import also updates latest jobs |
 | `plan-analysis --source-input FILE --postings FILE --metadata FILE --av-summary FILE --other-summary FILE --duplicates FILE --failures FILE` | Reconcile one complete Sunjol run against the Li file | None |
-| `import-analysis` with the same seven file flags, `--week-date`, `--git-commit` and optional `--candidate` | Check exact weekly pairing and load derived results; candidate mode never changes the formal selection | Backup, analysis/skills/clusters and draft release |
+| `import-analysis` with the same seven file flags, `--week-date`, `--git-commit` and optional `--publish` or `--candidate` | Check exact weekly pairing and load derived results; `--publish` performs blocking QA before publication; candidate mode never changes the formal selection | Backup, analysis/skills/clusters and draft; optional frozen publication |
 | `qa-release --release-key KEY` | Check AV-only counts, skill/cluster gaps, location coverage for all/active AV jobs and release consistency | None; writes only local operation log |
 | `publish-release --release-key KEY [--historical]` | First publication of a normally imported, selected analysis; revisions require explicit activation | Backup, frozen snapshot and exact weekly release selection |
+| `finalize-release --release-key KEY [--historical]` | Run QA and publish an existing draft only when all blocking checks pass | Backup and frozen publication; failed QA keeps the draft |
 | `list-releases [--week-date YYYY-MM-DD]` | Show drafts, frozen revisions, selected weekly releases and current Dashboard | None; local operation log |
 | `create-release --from-release-key KEY --reason TEXT [--actor NAME]` | New draft reusing existing collection/analysis/clusters; no AI rerun | Backup, draft with parent provenance and creation evidence |
 | `activate-release --release-key KEY --expected-week-release OLD --expected-current-release CURRENT --reason TEXT [--historical] [--actor NAME]` | Activate a reviewed draft or reactivate an intact old snapshot; use `none` for an absent selection | Backup, optional preparation, atomic pointer/status switch and operation evidence |

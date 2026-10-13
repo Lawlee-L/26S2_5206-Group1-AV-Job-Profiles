@@ -5,6 +5,7 @@ from datetime import date
 from typing import Any
 
 from .contracts import AnalysisFiles, CollectionFiles, ReleaseActivation
+from .errors import ImportErrorSafe
 from .ports import ImportBackend
 
 
@@ -44,6 +45,25 @@ class ImporterService:
     def publish_release(self, release_key: str, backup_dir: Path,
                         *, freeze_existing: bool = False, historical: bool = False) -> dict[str, Any]:
         return self._backend.publish_release(release_key, backup_dir, freeze_existing, historical)
+
+    def finalize_release(self, release_key: str, backup_dir: Path,
+                         *, historical: bool = False) -> dict[str, Any]:
+        """Run release QA and publish only when every blocking check passes."""
+        qa = self.qa_release(release_key)
+        if qa.get("status") != "passed":
+            errors = qa.get("errors") or ["unknown QA failure"]
+            raise ImportErrorSafe(
+                "Release QA checks failed; the release remains a draft: "
+                + ", ".join(str(error) for error in errors)
+            )
+        publication = self.publish_release(
+            release_key, backup_dir, historical=historical
+        )
+        return {
+            "release_key": release_key,
+            "qa": qa,
+            "publication": publication,
+        }
 
     def trend_readiness(self) -> dict[str, Any]:
         return self._backend.trend_readiness()

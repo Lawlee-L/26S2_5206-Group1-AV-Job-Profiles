@@ -61,7 +61,9 @@ Detailed setup, usage, and testing instructions are maintained in each component
 - [Classification and clustering](classification%20pipeline/README.md)
 - [Database and import workflow](database/README.md)
 - [Database team operating guide](database/TEAM_GUIDE.md)
+- [Docker setup and weekly workflow](DOCKER.md)
 - [Backend API](backend/README.md)
+- [Frontend website](frontend/README.md)
 - [Dashboard](dashboard/README.md)
 
 ## Latest Reviewed Dataset
@@ -69,10 +71,10 @@ Detailed setup, usage, and testing instructions are maintained in each component
 The latest reviewed English job-history dataset is:
 
 ```text
-data-collection/deliverables/2026-10-10/jobs_history_translated.json
+data-collection/deliverables/2026-10-13/jobs_history_translated.json
 ```
 
-It contains **5,916 unique job records**. Validation found:
+It contains **6,044 unique job records**. Validation found:
 
 - no missing `source_key` values;
 - no duplicate `source_key` values; and
@@ -80,43 +82,68 @@ It contains **5,916 unique job records**. Validation found:
 
 Earlier dated datasets remain available under `data-collection/deliverables/` for reproducibility and comparison.
 
-## Running the Project
+## Start Using the Project
 
-The project components can be run separately. Refer to the component documentation for complete setup instructions.
+- **Website:** follow [First-time website setup](DOCKER.md#first-time-website-setup).
+  It starts the site and loads the included data; no Azure/OpenRouter keys or
+  new AI classification are needed. Then open http://localhost:8080 on that computer.
+- **Tableau dashboard:** download [AV jobs market analysis_Final.twbx](dashboard/AV%20jobs%20market%20analysis_Final.twbx)
+  (open the file link, then choose **Download raw file**) and open it in Tableau
+  Desktop, Tableau Public Desktop, or Tableau Reader. It includes its data and
+  does not need MySQL. See [dashboard instructions](dashboard/README.md).
 
-### Website
+The website initially uses the 13 October 2026 snapshot; the separate Tableau
+workbook uses 25 September 2026. `localhost` is a local address, not a public
+website link. To use a hosted deployment, obtain its URL from the project operator.
 
-The website requires:
+## Website Maintenance and Handover
 
-1. a running MySQL database with an approved published release;
-2. the Flask backend API; and
-3. the React frontend.
+Start with [the Docker guide](DOCKER.md) to run the website and update its data.
+The React website reads published MySQL data through the Flask API. Collection,
+classification and database import are operator-started jobs; there is no
+scheduled end-to-end data update in the current setup.
 
-The backend normally runs at:
+| Task | Guide |
+| --- | --- |
+| Start the website, configure credentials, run a weekly update | [Docker guide](DOCKER.md) |
+| Validate/import data, publish a release, back up or recover MySQL | [Database operating guide](database/TEAM_GUIDE.md) |
+| Revert or correct a published data release | [Release revisions](database/RELEASE_REVISIONS.md) |
+| Check the API and database connection | [Backend guide](backend/README.md) |
+| Understand the website filters and charts | [Frontend guide](frontend/README.md) |
+| Open or refresh the separate Tableau workbook | [Dashboard guide](dashboard/README.md) |
 
-```text
-http://127.0.0.1:5000
-```
+### Updating Data
 
-The frontend normally runs at:
+1. Collect and classify a dated dataset, or download an existing reviewed pair:
+   `data-collection/deliverables/<date>/jobs_history_translated.json` and its
+   complete classification output folder. Existing output can be imported
+   without rerunning paid classification.
+2. On the machine hosting the website database, validate and import the
+   collection and its matching classification by following
+   [the weekly Docker steps](DOCKER.md#weekly-pipeline). Keep the same date and
+   exact source file throughout.
+3. Use `import-analysis --publish` to run blocking release QA and publish only
+   when it passes. Inspect any warnings, then reload the website and verify the
+   API and pages as described in the Docker guide.
 
-```text
-http://127.0.0.1:5173
-```
+Uploading files to GitHub shares the dataset; it does **not** import it into
+MySQL. Importing into a developer's local database does not update a website
+connected to another database. Keep the Compose project name consistent so
+commands use the intended database and cache volumes.
 
-Database credentials and API keys must be stored in local `.env` files and must not be committed to GitHub.
+With Watchtower enabled, new backend/frontend images can update automatically
+when published. This updates application code, not job records, classification,
+or database schema. The separate Tableau `.twbx` workbook contains a saved
+extract and requires its own refresh and save to show newer data.
 
-### Tableau Dashboard
+### Responsibilities at Handover
 
-Open the following packaged workbook with Tableau Desktop, Tableau Public Desktop, or Tableau Reader:
-
-```text
-dashboard/AV jobs market analysis_Final.twbx
-```
-
-The workbook contains a packaged Hyper extract, so a live MySQL connection is not required for viewing it.
-
-The current dashboard is a fixed snapshot based on the **25 September 2026** classified release. Updating MySQL does not automatically refresh the packaged workbook.
+Record the deployed URL, hosting machine, Compose project name, published data
+week/release key and maintenance contact before handing over. Assign an operator
+for data updates, publication, API costs, backups and recovery. Transfer access
+to the hosting account, registry and API services securely; keep passwords and
+API keys out of GitHub. Store database backups outside the container and retain
+a separate copy. Ordinary website visitors do not run these maintenance steps.
 
 ## Testing and Validation
 

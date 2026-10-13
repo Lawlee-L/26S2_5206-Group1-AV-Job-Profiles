@@ -129,6 +129,14 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
                           help="classification pipeline Git commit SHA (7–64 hex characters)")
     analysis.add_argument("--candidate", action="store_true",
                           help="stage a same-week revision; do not change the official classification")
+    analysis.add_argument(
+        "--publish", action="store_true",
+        help="after import, run QA and publish automatically when all blocking checks pass",
+    )
+    analysis.add_argument(
+        "--historical", action="store_true",
+        help="with --publish, select an older week without replacing the current Dashboard release",
+    )
     backup = subs.add_parser("backup", help="create a compressed full-database backup")
     add_audit_dir(backup)
     backup.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
@@ -149,6 +157,16 @@ def make_parser(description: str | None = None) -> argparse.ArgumentParser:
     publish.add_argument("--historical", action="store_true",
                          help="freeze an older week's approved analysis without changing the current release")
     publish.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
+    finalize = subs.add_parser(
+        "finalize-release", help="run QA and publish an existing draft when the checks pass"
+    )
+    add_audit_dir(finalize)
+    finalize.add_argument("--release-key", required=True)
+    finalize.add_argument(
+        "--historical", action="store_true",
+        help="select an older week without replacing the current Dashboard release",
+    )
+    finalize.add_argument("--backup-dir", type=Path, default=ROOT / "database" / "backups")
     freeze = subs.add_parser("freeze-release", help="freeze an already-published legacy release")
     add_audit_dir(freeze)
     freeze.add_argument("--release-key", required=True)
@@ -212,7 +230,24 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
                 week_date=args.week_date, historical=args.historical),
                                                args.backup_dir)
         elif args.command == "import-analysis":
+            if args.historical and not args.publish:
+                raise ImportErrorSafe("--historical requires --publish")
+            if args.publish and args.candidate:
+                raise ImportErrorSafe(
+                    "--publish cannot be used with --candidate; review and activate the revision separately"
+                )
             result = service.import_analysis(_analysis_files_from_args(args), args.backup_dir, args.git_commit)
+            if args.publish:
+                if result.get("status") != "completed":
+                    raise ImportErrorSafe(
+                        "Analysis was imported but is incomplete; the release remains a draft"
+                    )
+                result = {
+                    "import": result,
+                    "finalization": service.finalize_release(
+                        result["release_key"], args.backup_dir, historical=args.historical
+                    ),
+                }
         elif args.command == "backup":
             result = service.backup(args.backup_dir)
         elif args.command == "restore":
@@ -229,6 +264,10 @@ def main(argv: list[str] | None = None, *, implementation: ModuleType | None = N
                 args.release_key, args.backup_dir,
                 freeze_existing=args.command == "freeze-release",
                 historical=getattr(args, "historical", False))
+        elif args.command == "finalize-release":
+            result = service.finalize_release(
+                args.release_key, args.backup_dir, historical=args.historical
+            )
         elif args.command == "trend-readiness":
             result = service.trend_readiness()
         elif args.command == "list-releases":

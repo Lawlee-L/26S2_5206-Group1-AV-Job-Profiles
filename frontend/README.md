@@ -78,6 +78,10 @@ Open `http://127.0.0.1:5173/jobs`. Restart Vite after changing `.env`.
 If using different ports, update both the API base URL and backend CORS origins.
 Do not deploy these development servers as public production services.
 
+The Docker build intentionally leaves `VITE_API_BASE_URL` empty so browser requests
+use the same-origin `/api` proxy provided by nginx. The `127.0.0.1:5000` setting
+above is only for running the frontend and backend as separate development servers.
+
 ## 3. Search and filtering
 
 All filters are combined with **AND**, except that the general search checks
