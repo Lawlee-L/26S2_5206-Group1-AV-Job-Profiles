@@ -1112,7 +1112,8 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
             started = parse_datetime(metadata.get("started_at"), "run_metadata.started_at") or datetime.now(timezone.utc).replace(tzinfo=None)
             completed = started + __import__("datetime").timedelta(seconds=float(metadata.get("runtime_seconds", 0) or 0))
             parameters = {key: metadata.get(key) for key in (
-                "embedding_model", "embedded_text", "min_cluster_size", "min_samples", "n_input_rows",
+                "embedding_model", "embedded_text", "chunk_words", "cluster_params",
+                "min_cluster_size", "min_samples", "n_input_rows",
                 "n_after_dedupe", "n_duplicates_removed", "n_records", "n_llm_failures", "languages", "groups",
                 "temperature", "n_api_postings", "n_cached", "prompt_tokens", "output_tokens", "cost_usd")}
             parameters["hash_contract_version"] = HASH_CONTRACT_VERSION
@@ -1146,6 +1147,9 @@ def apply_analysis(postings_path: Path, metadata_path: Path, source_path: Path,
                          sum(1 for group in report["cluster_summaries"].values()
                              for summary in group.values() if not summary["is_noise"]),
                          stable_json({"min_samples": metadata.get("min_samples"),
+                                      # Per-population UMAP/HDBSCAN settings from current pipeline runs.
+                                      "cluster_params": metadata.get("cluster_params"),
+                                      "chunk_words": metadata.get("chunk_words"),
                                       "av_relevant_and_other_clustered_separately": True,
                                       "cluster_population_field": "clusters.population"}),
                          "AV and non-AV clusters retain source numbers and are distinguished by population.",

@@ -9,7 +9,10 @@ record. No posting is dropped: each lands in one group or the other.
     python run_pipeline_v2.py --dry-run              # cost estimate, no API calls
     python run_pipeline_v2.py --limit 50             # paid sample run
     python run_pipeline_v2.py --sweep                # cluster-parameter grid, then exit
-    python run_pipeline_v2.py --min-cluster-size 15  # full run
+    python run_pipeline_v2.py --db                   # full run, reusing answers from MySQL
+
+Cluster settings per group live in config.CLUSTER_PARAMS; how they were chosen is
+documented in notebooks/clustering_decisions.ipynb.
 """
 
 from __future__ import annotations
@@ -58,16 +61,18 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--output-dir", default=str(cfg.OUTPUT_DIR))
     p.add_argument("--model", default=cfg.LLM_MODEL, help="OpenRouter model id")
     p.add_argument("--limit", type=int, help="random sample of N postings (after dedupe)")
-    p.add_argument("--min-cluster-size", type=int, default=cfg.MIN_CLUSTER_SIZE)
-    p.add_argument("--min-samples", type=int, default=cfg.MIN_SAMPLES)
+    p.add_argument("--min-cluster-size", type=int,
+                   help="override config.CLUSTER_PARAMS for both groups")
+    p.add_argument("--min-samples", type=int,
+                   help="override config.CLUSTER_PARAMS for both groups")
     p.add_argument("--sweep", action="store_true",
                    help="sweep min_cluster_size x min_samples per group, print the grid, and exit")
     p.add_argument("--no-cache", action="store_true",
                    help="ignore cached LLM replies and embeddings (paid: re-calls the model)")
     p.add_argument("--dry-run", action="store_true", help="print the cost estimate and exit")
     p.add_argument("--db", action="store_true",
-                   help="also write the run to <output-dir>/av_job_profiles.sqlite (the tables "
-                        "and columns of schema.mysql.sql), reusing records already stored there")
+                   help="reuse answers already imported into the team's MySQL database "
+                        "(AVDB_* settings) for postings whose text, model and prompt match")
     p.add_argument("--reference-only", action="store_true",
                    help="run the model on the 14 reference postings only, score it against "
                         "the Sonnet 5 answers, and exit (for choosing a model)")
@@ -106,7 +111,6 @@ def attach_records(df: pd.DataFrame, results: list[dict]) -> tuple[pd.DataFrame,
     # When the model is unsure, count the posting as AV-relevant: a little noise in the AV
     # group is better than missing its skills. The model's own verdict stays in av_relevant_model.
     df["av_relevant"] = df["av_relevant_model"] | (df["relevance_confidence"] == "Low")
-    df["reused_from"] = [r.get("reused_from") for r in results if r["record"] is not None]
     df["cluster_text"] = [cluster_text(r) for r in records]
     return df.reset_index(drop=True), failed
 
@@ -126,20 +130,28 @@ def group_stats(labels: np.ndarray) -> dict:
             "n_noise": int((labels == -1).sum())}
 
 
-def cluster_group(part: pd.DataFrame, embeddings: np.ndarray, args,
-                  first_id: int) -> tuple[np.ndarray, pd.DataFrame]:
-    """UMAP + HDBSCAN + summary for one relevance group.
+def cluster_params(group: str, args) -> dict:
+    """One group's tuned settings (config.CLUSTER_PARAMS), with any command-line overrides."""
+    params = dict(cfg.CLUSTER_PARAMS[group])
+    if args.min_cluster_size is not None:
+        params["min_cluster_size"] = args.min_cluster_size
+    if args.min_samples is not None:
+        params["min_samples"] = args.min_samples
+    return params
+
+
+def cluster_group(part: pd.DataFrame, embeddings: np.ndarray, params: dict,
+                  first_id: int) -> tuple[np.ndarray, pd.DataFrame, dict]:
+    """UMAP + HDBSCAN + summary for one relevance group, and the settings actually used.
 
     Cluster ids start at first_id so they stay unique across both groups; noise stays -1.
     """
-    reduced = cluster.reduce_dimensions(embeddings)
-    labels = cluster.run_hdbscan(cluster.distance_matrix(reduced),
-                                 args.min_cluster_size, args.min_samples)
+    labels, used = cluster.fit_group(embeddings, params)
     labels = np.where(labels >= 0, labels + first_id, -1)
     stats = group_stats(labels)
     print(f"  {stats['n_clusters']} clusters, {stats['n_noise']} noise "
-          f"({100 * stats['n_noise'] / len(labels):.1f}%)")
-    return labels, cluster.summarize_clusters(part, labels)
+          f"({100 * stats['n_noise'] / max(len(labels), 1):.1f}%)")
+    return labels, cluster.summarize_clusters(part, labels), used
 
 
 def write_group_outputs(group_dir: Path, part: pd.DataFrame, summary: pd.DataFrame) -> None:
@@ -213,25 +225,25 @@ def main() -> int:
         df = df.reset_index(drop=True)
         print(f"  --limit: random sample of {len(df)}")
 
+    reused = {}
+    if args.db and not args.no_cache:
+        conn = store.connect()
+        try:
+            reused = store.reusable_records(conn, df, args.model)
+        finally:
+            conn.close()
+        print(f"  {len(reused)} answers reused from MySQL")
+
     if args.dry_run:
-        est = llm.estimate_cost(df, args.model, use_cache=not args.no_cache)
+        est = llm.estimate_cost(df[~df["source_key"].isin(reused)], args.model,
+                                use_cache=not args.no_cache)
         print(json.dumps(est, indent=2))
         return 0
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    conn = None
-    reused = {}
-    if args.db:
-        conn = store.connect(out_dir / "av_job_profiles.sqlite")
-        store.load_jobs(conn, args.input)   # temporary, until the team's job import exists
-        if not args.no_cache:
-            reused = store.reusable_records(conn, df, args.model)
-
     print("\n[2/5] LLM normalisation")
-    if args.db:
-        print(f"  {len(reused)} reused from the database")
     fresh = iter(llm.normalise_postings(df[~df["source_key"].isin(reused)], args.model,
                                         use_cache=not args.no_cache))
     results = [reused.get(key) or next(fresh) for key in df["source_key"]]
@@ -241,25 +253,31 @@ def main() -> int:
           f"${usage['cost_usd']:.4f} for {usage['n_api_postings']} postings")
 
     print("\n[3/5] Embedding role_summary + responsibilities + skills")
-    # Titles are not embedded: some are not English, and MiniLM is English-only.
+    # Titles are not embedded: the check that clusters mean something relies on them.
     embeddings = embed.embed_postings(df["cluster_text"], use_cache=not args.no_cache)
 
-    print(f"\n[4/5] Clustering each relevance group separately (HDBSCAN, "
-          f"min_cluster_size={args.min_cluster_size}, min_samples={args.min_samples})")
+    print("\n[4/5] Clustering each relevance group separately (UMAP + HDBSCAN)")
     df["cluster_id"] = -1
     summaries, next_id = {}, 0
+    params = {name: cluster_params(name, args) for name in GROUPS.values()}
     for relevant, name in GROUPS.items():
         mask = (df["av_relevant"] == relevant).to_numpy()
-        print(f"  {name}: {mask.sum()} postings")
+        print(f"  {name}: {mask.sum()} postings, {params[name]}")
         if args.sweep:
-            table = cluster.sweep_min_cluster_size(cluster.reduce_dimensions(embeddings[mask]))
+            settings = cluster.fit_umap_settings(int(mask.sum()), params[name]["umap_n_neighbors"],
+                                                 params[name]["umap_components"])
+            if settings is None:
+                print("  too few postings to sweep")
+                continue
+            table = cluster.sweep_min_cluster_size(cluster.reduce_dimensions(embeddings[mask], *settings))
             print(table.to_string(index=False))
             (out_dir / name).mkdir(exist_ok=True)
             table.to_csv(out_dir / name / "cluster_sweep.csv", index=False)
             continue
-        labels, summaries[name] = cluster_group(df[mask], embeddings[mask], args, next_id)
+        labels, summaries[name], params[name] = cluster_group(df[mask], embeddings[mask],
+                                                              params[name], next_id)
         df.loc[mask, "cluster_id"] = labels
-        next_id = max(next_id, labels.max() + 1)
+        next_id = max(next_id, labels.max(initial=-1) + 1)
     if args.sweep:
         return 0
 
@@ -288,9 +306,9 @@ def main() -> int:
         "n_duplicates_removed": len(dropped), "limit": args.limit,
         "n_records": len(df), "n_llm_failures": len(failed),
         "model": args.model, "prompt_version": llm.PROMPT_ID,
-        "temperature": cfg.LLM_TEMPERATURE, **usage,
-        "embedding_model": cfg.EMBED_MODEL, "embedded_text": "role_summary+responsibilities+skills",
-        "min_cluster_size": args.min_cluster_size, "min_samples": args.min_samples,
+        "temperature": cfg.LLM_TEMPERATURE, **usage, "n_reused_from_db": len(reused),
+        "embedding_model": cfg.EMBED_MODEL, "chunk_words": cfg.CHUNK_WORDS,
+        "embedded_text": "role_summary+responsibilities+skills", "cluster_params": params,
         "groups": {name: group_stats(df.loc[df["av_relevant"] == relevant, "cluster_id"].to_numpy())
                    for relevant, name in GROUPS.items()},
         "languages": df["language_of_posting"].value_counts().to_dict(),
@@ -298,12 +316,6 @@ def main() -> int:
     }
     (out_dir / "run_metadata.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     print(f"  wrote {out_dir}/")
-    if conn:
-        run_key = store.save_run(conn, df, failed, dropped, summaries, meta)
-        print(f"  wrote {out_dir / 'av_job_profiles.sqlite'} (analysis run {run_key})")
-        for table, n in store.row_counts(conn).items():
-            print(f"    {table}: {n}")
-        conn.close()
     print(f"\nDone in {time.time() - t0:.1f}s")
     return 0
 

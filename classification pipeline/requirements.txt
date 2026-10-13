@@ -10,3 +10,4 @@ openrouter>=1.2            # model client
 tiktoken>=0.7              # --dry-run token counts
 jsonschema>=4.0            # validating model replies
 python-dotenv>=1.0        # loads OPENROUTER_API_KEY from .env
+PyMySQL>=1.1,<2            # --db: reuse answers from the team MySQL database
