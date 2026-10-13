@@ -30,6 +30,46 @@ def reduce_dimensions(embeddings: np.ndarray, n_neighbors: int, n_components: in
     return reducer.fit_transform(embeddings)
 
 
+# UMAP's spectral start needs n_components < n - 1 (scipy's eigh refuses k >= N) and its
+# neighbour graph needs n_neighbors < n, so a tiny group -- a --limit sample, or a group
+# with only a few successful records -- cannot use the tuned settings as they are.
+MIN_UMAP_ROWS = 3
+
+
+def fit_umap_settings(n_rows: int, n_neighbors: int, n_components: int) -> tuple[int, int] | None:
+    """(n_neighbors, n_components) shrunk to what n_rows postings allow; None if too few to reduce.
+
+    Groups of at least the tuned min_cluster_size are never shrunk (30 rows allow 28 dims),
+    so this only changes small samples run with a --min-cluster-size override.
+    """
+    if n_rows < MIN_UMAP_ROWS:
+        return None
+    return min(n_neighbors, n_rows - 1), min(n_components, n_rows - 2)
+
+
+def fit_group(embeddings: np.ndarray, params: dict) -> tuple[np.ndarray, dict]:
+    """UMAP + HDBSCAN for one group. Returns labels (-1 == noise) and the settings actually used.
+
+    A group smaller than min_cluster_size cannot hold a cluster, so it is kept as noise
+    without running UMAP at all (HDBSCAN would mark every posting noise anyway). Otherwise
+    the UMAP settings are shrunk to fit the group when needed and the change is recorded.
+    """
+    n = len(embeddings)
+    used = dict(params)
+    settings = fit_umap_settings(n, params["umap_n_neighbors"], params["umap_components"])
+    if settings is None or n < params["min_cluster_size"]:
+        used["small_group"] = f"{n} postings, below min_cluster_size: not clustered, all noise"
+        print(f"  [cluster] {used['small_group']}")
+        return np.full(n, -1, dtype=int), used
+    if settings != (params["umap_n_neighbors"], params["umap_components"]):
+        used["umap_n_neighbors"], used["umap_components"] = settings
+        used["small_group"] = (f"{n} postings: UMAP reduced from {params['umap_n_neighbors']} "
+                               f"neighbours / {params['umap_components']}d to fit")
+    reduced = reduce_dimensions(embeddings, *settings)
+    return run_hdbscan(distance_matrix(reduced), params["min_cluster_size"],
+                       params["min_samples"]), used
+
+
 def distance_matrix(reduced: np.ndarray) -> np.ndarray:
     """Euclidean distances in UMAP space.
 
@@ -150,10 +190,17 @@ def _technical_lean(terms: list[str], titles: list[str]) -> tuple[float, str]:
     return round(score, 3), lean
 
 
+SUMMARY_COLUMNS = ["cluster_id", "size", "is_noise", "technical_score", "lean", "n_companies",
+                   "top_companies", "top_terms", "example_titles", "job_family",
+                   "specialisation", "notes"]
+
+
 def summarize_clusters(df: pd.DataFrame, labels: np.ndarray) -> pd.DataFrame:
     """Top TF-IDF terms of `cluster_text` + example titles per cluster, for hand-labelling."""
     from sklearn.feature_extraction.text import TfidfVectorizer
 
+    if len(df) == 0:
+        return pd.DataFrame(columns=SUMMARY_COLUMNS)
     df = df.copy()
     df["cluster_id"] = labels
 
@@ -165,17 +212,23 @@ def summarize_clusters(df: pd.DataFrame, labels: np.ndarray) -> pd.DataFrame:
         sublinear_tf=True,
         max_features=40000,
     )
-    matrix = vec.fit_transform(df["cluster_text"])
-    vocab = np.array(vec.get_feature_names_out())
+    try:
+        matrix = vec.fit_transform(df["cluster_text"])
+        vocab = np.array(vec.get_feature_names_out())
+    except ValueError:
+        # Too few postings for min_df / max_df (under 6, or no shared terms): no top terms.
+        matrix = None
 
     rows = []
     for cid in sorted(set(labels)):
         mask = (labels == cid)
         sub = df[mask]
-        # Mean TF-IDF within the cluster surfaces the cluster's own vocabulary.
-        mean_tfidf = np.asarray(matrix[mask].mean(axis=0)).ravel()
-        top_idx = np.argsort(mean_tfidf)[::-1][:cfg.TOP_TFIDF_TERMS]
-        terms = [vocab[i] for i in top_idx if mean_tfidf[i] > 0]
+        terms = []
+        if matrix is not None:
+            # Mean TF-IDF within the cluster surfaces the cluster's own vocabulary.
+            mean_tfidf = np.asarray(matrix[mask].mean(axis=0)).ravel()
+            top_idx = np.argsort(mean_tfidf)[::-1][:cfg.TOP_TFIDF_TERMS]
+            terms = [vocab[i] for i in top_idx if mean_tfidf[i] > 0]
 
         titles = sub["name"].tolist()
         example_titles = pd.Series(titles).drop_duplicates().head(

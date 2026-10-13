@@ -155,6 +155,11 @@ Settings live in `avjobs/config.py`; the ones most likely to change:
 | `NEAR_DUP_THRESHOLD` | `0.95` | similarity at which two postings of one company are duplicates |
 | `SENIORITY_LABELS` | Intern … Executive, Other | the seniority scale |
 
+A group smaller than its `min_cluster_size` (a `--limit` sample, or few successful
+records) is not clustered: every posting stays noise, and `run_metadata.json` notes it
+under `cluster_params.<group>.small_group`. With a `--min-cluster-size` override, UMAP's
+neighbours and dimensions shrink to fit a small group and the values used are recorded.
+
 The prompt and output schema are in `avjobs/llm.py` (`PROMPT`, `SCHEMA`,
 `PROMPT_VERSION`). Changing either invalidates cached answers, so the next run
 pays again.
@@ -171,15 +176,22 @@ Roughly **$2 and 40 minutes for 4,500 postings** with 10 calls in flight. Run
 every embedding and clustering choice with the evidence behind it: which text to embed,
 which embedding model (six compared), chunk size, and the UMAP/HDBSCAN settings for each
 group. It uses no labels and makes no LLM calls: postings are read from a `--db` run
-(`output_full/av_job_profiles.sqlite`, analysis run 1) and every check is computed
-locally. The committed copy already shows its outputs; to re-run it:
+(`output_full/av_job_profiles.sqlite`, analysis run 1, made from the 2026-09-25 input)
+and every check is computed locally. The committed copy already shows its outputs; to
+re-run it, first create that database:
 
 ```bash
 pip install -r requirements-notebook.txt
-python run_pipeline_v2.py --input postings.json --output-dir output_full --db
+input=../data-collection/deliverables/2026-09-25/jobs_history_translated.json
+python run_pipeline_v2.py --input $input --dry-run          # check: estimate should be ~$0
+python run_pipeline_v2.py --input $input --output-dir output_full --db
 ```
 
-then open the notebook with the `.venv` kernel. Helpers are in `notebooks/cluster_eval.py`.
+**The second command is not free.** The notebook itself is local, but the pipeline run
+calls OpenRouter for every posting missing from the answer cache (`.cache/llm/`, which
+is not in the repository): about $2 for the full file on a fresh checkout. Run
+`--dry-run` first and stop if the estimate is not zero. Then open the notebook with
+the `.venv` kernel. Helpers are in `notebooks/cluster_eval.py`.
 
 ## Tests
 
@@ -193,6 +205,8 @@ python -m unittest discover -s tests -t . -v
   the run, a fatal error cancels the queue, re-runs use the cache.
 - `tests/test_store.py`: the database end to end, including reuse and roll-back
   (skipped unless the dataset file `jobs_history_translated.json` is present).
+- `tests/test_small_groups.py`: empty, single-posting and 8-posting groups, limited
+  samples and `--sweep`, with real UMAP/HDBSCAN on synthetic data (no model download).
 
 ## Layout
 

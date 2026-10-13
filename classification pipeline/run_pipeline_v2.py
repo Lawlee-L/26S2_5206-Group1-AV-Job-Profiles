@@ -142,20 +142,17 @@ def cluster_params(group: str, args) -> dict:
 
 
 def cluster_group(part: pd.DataFrame, embeddings: np.ndarray, params: dict,
-                  first_id: int) -> tuple[np.ndarray, pd.DataFrame]:
-    """UMAP + HDBSCAN + summary for one relevance group.
+                  first_id: int) -> tuple[np.ndarray, pd.DataFrame, dict]:
+    """UMAP + HDBSCAN + summary for one relevance group, and the settings actually used.
 
     Cluster ids start at first_id so they stay unique across both groups; noise stays -1.
     """
-    reduced = cluster.reduce_dimensions(embeddings, params["umap_n_neighbors"],
-                                        params["umap_components"])
-    labels = cluster.run_hdbscan(cluster.distance_matrix(reduced),
-                                 params["min_cluster_size"], params["min_samples"])
+    labels, used = cluster.fit_group(embeddings, params)
     labels = np.where(labels >= 0, labels + first_id, -1)
     stats = group_stats(labels)
     print(f"  {stats['n_clusters']} clusters, {stats['n_noise']} noise "
-          f"({100 * stats['n_noise'] / len(labels):.1f}%)")
-    return labels, cluster.summarize_clusters(part, labels)
+          f"({100 * stats['n_noise'] / max(len(labels), 1):.1f}%)")
+    return labels, cluster.summarize_clusters(part, labels), used
 
 
 def write_group_outputs(group_dir: Path, part: pd.DataFrame, summary: pd.DataFrame) -> None:
@@ -268,15 +265,20 @@ def main() -> int:
         mask = (df["av_relevant"] == relevant).to_numpy()
         print(f"  {name}: {mask.sum()} postings, {params[name]}")
         if args.sweep:
-            table = cluster.sweep_min_cluster_size(cluster.reduce_dimensions(
-                embeddings[mask], params[name]["umap_n_neighbors"], params[name]["umap_components"]))
+            settings = cluster.fit_umap_settings(int(mask.sum()), params[name]["umap_n_neighbors"],
+                                                 params[name]["umap_components"])
+            if settings is None:
+                print("  too few postings to sweep")
+                continue
+            table = cluster.sweep_min_cluster_size(cluster.reduce_dimensions(embeddings[mask], *settings))
             print(table.to_string(index=False))
             (out_dir / name).mkdir(exist_ok=True)
             table.to_csv(out_dir / name / "cluster_sweep.csv", index=False)
             continue
-        labels, summaries[name] = cluster_group(df[mask], embeddings[mask], params[name], next_id)
+        labels, summaries[name], params[name] = cluster_group(df[mask], embeddings[mask],
+                                                              params[name], next_id)
         df.loc[mask, "cluster_id"] = labels
-        next_id = max(next_id, labels.max() + 1)
+        next_id = max(next_id, labels.max(initial=-1) + 1)
     if args.sweep:
         return 0
 
