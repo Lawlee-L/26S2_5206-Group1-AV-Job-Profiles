@@ -1,344 +1,90 @@
-import React from "react";
-
-import {
-  Link,
-  useParams,
-} from "react-router-dom";
-
-import {
-  ArrowLeft,
-  MapPin,
-  Briefcase,
-  GraduationCap,
-  CalendarDays,
-  DollarSign,
-  Bookmark,
-  ExternalLink,
-} from "lucide-react";
-
+import React, { useEffect, useState } from "react";
+import { Link, useParams, useLocation } from "react-router-dom";
+import { ArrowLeft, Bookmark, ExternalLink, MapPin } from "lucide-react";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import CompanyLogo from "../components/CompanyLogo";
-import { jobs } from "../data/jobs";
+import { getJob } from "../api/jobs";
+import { locationText, workArrangement, salaryText, compactText, groupedSkills } from "../utils/jobDisplay";
+import { getFavorites, toggleFavorite } from "../utils/favorites";
+
+const formatDate = value => value ? new Date(value).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" }) : "Not available";
+const levelText = value => value ? value.replaceAll("_", " ").replace(/^./, letter => letter.toUpperCase()) : "";
+export function safePostingUrl(value) {
+  try { const url = new URL(value); return ["https:", "http:"].includes(url.protocol) ? url.href : ""; } catch { return ""; }
+}
+function experienceText(job) {
+  const years = job.experienceMinYears != null && job.experienceMaxYears != null ? `${job.experienceMinYears}–${job.experienceMaxYears} years` :
+    job.experienceMinYears != null ? `${job.experienceMinYears}+ years` : job.experienceMaxYears != null ? `Up to ${job.experienceMaxYears} years` : "";
+  return [levelText(job.level || job.seniority), years].filter(Boolean).join(" · ");
+}
 
 export default function JobDetails() {
   const { id } = useParams();
-
-  /*
-    Frontend-only temporary lookup.
-
-    Later your teammates can replace this with
-    the real job object from their backend/database.
-  */
-
-  const job =
-    jobs.find(
-      (item) => String(item.id) === String(id)
-    ) || jobs[0];
-
-  return (
-    <div className="app-shell">
-      <Header />
-
-      <main className="job-details-page">
-        {/* BACK BUTTON */}
-
-        <Link
-          to="/jobs"
-          className="job-details-back"
-        >
-          <ArrowLeft size={13} />
-
-          Back to Jobs
-        </Link>
-
-        {/* ==========================
-            TOP JOB CARD
-        ========================== */}
-
-        <section className="job-details-header">
-          <div className="job-details-main">
-            <div className="job-details-logo">
-              <CompanyLogo
-                company={job.company}
-              />
-            </div>
-
-            <div className="job-details-title">
-              <h1>{job.title}</h1>
-
-              <strong>{job.company}</strong>
-
-              <div className="job-details-meta">
-                <span>
-                  <MapPin size={11} />
-
-                  {job.location}
-                </span>
-
-                <span>•</span>
-
-                <span>
-                  <Briefcase size={11} />
-
-                  {job.type}
-                </span>
-
-                <span>•</span>
-
-                <span>
-                  <GraduationCap size={11} />
-
-                  {job.level}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* BUTTONS */}
-
-          <div className="job-details-actions">
-            <button className="apply-job-button">
-              Apply Now
-            </button>
-
-            <button className="save-job-button">
-              <Bookmark size={14} />
-
-              Save Job
-            </button>
-          </div>
-
-          {/* JOB SUMMARY */}
-
-          <div className="job-summary">
-            <div className="job-summary-item">
-              <CalendarDays size={19} />
-
-              <div>
-                <span>Posted Date</span>
-
-                <strong>
-                  {job.postedDate ||
-                    "Aug 20, 2026"}
-                </strong>
-              </div>
-            </div>
-
-            <div className="job-summary-item">
-              <DollarSign size={19} />
-
-              <div>
-                <span>Salary</span>
-
-                <strong>
-                  {job.salary ||
-                    "$150,000 - $200,000 per year"}
-                </strong>
-              </div>
-            </div>
-
-            <div className="job-summary-item">
-              <GraduationCap size={19} />
-
-              <div>
-                <span>Experience</span>
-
-                <strong>
-                  {job.experience || "5+ years"}
-                </strong>
-              </div>
-            </div>
-
-            <div className="job-summary-item">
-              <Briefcase size={19} />
-
-              <div>
-                <span>Employment Type</span>
-
-                <strong>{job.type}</strong>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ==========================
-            MAIN CONTENT
-        ========================== */}
-
-        <div className="job-details-layout">
-          {/* LEFT */}
-
-          <section className="job-description-card">
-            <h2>Job Description</h2>
-
-            <p>
-              NVIDIA is seeking a Senior Perception
-              Software Engineer to join our Autonomous
-              Machines team. You will work on developing
-              cutting-edge perception systems for
-              self-driving vehicles.
-            </p>
-
-            <h3>Responsibilities</h3>
-
-            <ul>
-              <li>
-                Design and implement perception
-                algorithms for AV systems
-              </li>
-
-              <li>
-                Work with LiDAR, camera, and radar data
-              </li>
-
-              <li>
-                Optimize performance for real-time
-                systems
-              </li>
-
-              <li>
-                Collaborate with cross-functional teams
-              </li>
-            </ul>
-
-            <h3>Requirements</h3>
-
-            <ul>
-              <li>
-                5+ years of experience in C++ software
-                development
-              </li>
-
-              <li>
-                Strong knowledge of computer vision and
-                deep learning
-              </li>
-
-              <li>
-                Experience with LiDAR data processing
-              </li>
-
-              <li>
-                Bachelor's or Master's degree in
-                Computer Science or related field
-              </li>
-            </ul>
-
-            <h3>Preferred Skills</h3>
-
-            <div className="job-details-skills">
-              {(job.skills || [
-                "C++",
-                "Python",
-                "CUDA",
-                "Computer Vision",
-              ]).map((skill) => (
-                <span key={skill}>
-                  {skill}
-                </span>
-              ))}
-
-              <span>Deep Learning</span>
-              <span>LiDAR</span>
-              <span>ROS2</span>
-            </div>
-          </section>
-
-          {/* RIGHT SIDEBAR */}
-
-          <aside className="job-details-sidebar">
-            {/* ABOUT */}
-
-            <div className="job-side-card">
-              <h2>
-                About {job.company}
-              </h2>
-
-              <p>
-                NVIDIA is a global leader in accelerated
-                computing. Our work in AI and autonomous
-                machines is transforming the future.
-              </p>
-
-              <a href="#company">
-                View Company Page
-                <span>→</span>
-              </a>
-            </div>
-
-            {/* DETAILS */}
-
-            <div className="job-side-card">
-              <h2>Job Details</h2>
-
-              <div className="job-detail-field">
-                <span>Job ID</span>
-
-                <strong>
-                  NVIDIA-123456
-                </strong>
-              </div>
-
-              <div className="job-detail-field">
-                <span>Location</span>
-
-                <strong>
-                  {job.location}
-                </strong>
-              </div>
-
-              <div className="job-detail-field">
-                <span>
-                  Experience Level
-                </span>
-
-                <strong>
-                  {job.level}
-                </strong>
-              </div>
-
-              <div className="job-detail-field">
-                <span>Education</span>
-
-                <strong>
-                  Bachelor's or Master's degree
-                </strong>
-              </div>
-
-              <div className="job-detail-field">
-                <span>
-                  Employment Type
-                </span>
-
-                <strong>
-                  {job.type}
-                </strong>
-              </div>
-            </div>
-          </aside>
-        </div>
-
-        {/* ==========================
-            ORIGINAL JOB
-        ========================== */}
-
-        <section className="original-job-card">
-          <h2>
-            Original Job Posting
-          </h2>
-
-          <p>
-            View the original job posting on{" "}
-            {job.company}'s careers page.
-          </p>
-
-          <button>
-            View Original Job
-
-            <ExternalLink size={13} />
-          </button>
-        </section>
-      </main>
-    </div>
-  );
+  const route = useLocation();
+  const candidate = route.state?.returnTo;
+  const backTo = typeof candidate === "string" && /^\/(jobs|clusters|saved)(\?|$)/.test(candidate) ? candidate : `/jobs${route.search}`;
+  const backLabel = backTo.startsWith("/saved") ? "Back to saved jobs" : backTo.startsWith("/clusters") ? "Back to insights" : "Back to Jobs";
+  const [job, setJob] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const [favorites, setFavorites] = useState(getFavorites);
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true); setError(""); setJob(null);
+    getJob(id).then(result => { if (!cancelled) setJob(result.data || null); })
+      .catch(() => { if (!cancelled) setError("The job could not be loaded or is no longer in the published dataset. Check its original posting if you saved a copy."); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [id, attempt]);
+  const key = job?.sourceKey || job?.id;
+  const saved = favorites.some(item => String(item.sourceKey || item.id) === String(key));
+  const sourceUrl = safePostingUrl(job?.jobUrl);
+  const skillGroups = groupedSkills(job?.skills);
+  const description = job?.descriptionDisplay || job?.description || "";
+  const summary = job?.roleSummary || compactText(description, 500);
+  const salaryKnown = job && (job.salaryMin != null || job.salaryMax != null || job.salary || job.salaryDisplay);
+  const workKnown = ["remote", "hybrid", "onsite"].includes(job?.remoteType);
+  const missing = job ? [!salaryKnown && "salary", !workKnown && "work arrangement"].filter(Boolean) : [];
+  return <div className="app-shell"><Header /><main className="job-details-page product-detail">
+    <Link to={backTo} className="job-details-back"><ArrowLeft size={15} />{backLabel}</Link>
+    {loading ? <p role="status">Loading job…</p> : error || !job ? <section className="empty-state card border-0 p-4" role="alert">
+      <h1 className="h4">Job not found</h1><p>{error || "This job is unavailable."}</p><button className="btn btn-outline-primary align-self-start" onClick={() => setAttempt(value => value + 1)}>Retry</button>
+    </section> : <>
+      <section className="job-details-header">
+        <div className="job-details-main"><div className="job-details-logo"><CompanyLogo company={job.company} /></div>
+          <div className="job-details-title"><strong>{job.company}</strong><h1>{job.title || "Job title not available"}</h1>
+            <div className="job-details-meta"><MapPin size={16} />{locationText(job)}</div></div></div>
+        <div className="job-details-actions">{sourceUrl ? <a className="btn btn-primary" href={sourceUrl} target="_blank" rel="noopener noreferrer">Apply Now<ExternalLink size={15} /></a> : <span className="small text-secondary">Original posting unavailable</span>}
+          <button className="btn btn-outline-primary" onClick={() => { toggleFavorite({ ...job, id: key }); setFavorites(getFavorites()); }}>
+            <Bookmark size={15} fill={saved ? "currentColor" : "none"} />{saved ? "Saved" : "Save Job"}</button></div>
+        <dl className="detail-facts">
+          {job.postedDate && <div><dt>Posted Date</dt><dd>{formatDate(job.postedDate)}</dd></div>}
+          {salaryKnown && <div><dt>Salary</dt><dd>{salaryText(job)}</dd></div>}
+          {experienceText(job) && <div><dt>Experience</dt><dd>{experienceText(job)}</dd></div>}
+          {workKnown && <div><dt>Work Arrangement</dt><dd>{workArrangement(job)}</dd></div>}
+        </dl>
+        {missing.length > 0 && <p className="detail-missing">Not stated by the source: {missing.join(", ")}.</p>}
+      </section>
+      <section className="job-description-card"><h2>Job Description</h2>
+        <p>{summary || "No job description is available for this role."}</p>
+        {job.roleSummary && <p className="extraction-note">Automatically prepared summary. The original advertisement is the authoritative source.</p>}
+        {description && <details className="source-field-details p-3 mb-3"><summary>Full job description</summary><p className="source-body">{description}</p></details>}
+        {(job.responsibilities || []).length > 0 && <><h3>Responsibilities</h3><ul>{job.responsibilities.map((text, index) => <li key={index}>{text}</li>)}</ul></>}
+        {(job.requirements || []).length > 0 && <><h3>Requirements</h3><ul>{job.requirements.map((text, index) => <li key={index}>{text}</li>)}</ul></>}
+        <h3>Extracted Skills</h3><p className="extraction-note">Automatically extracted from the posting; not a separate list of employer-preferred skills.</p>
+        {Object.entries(skillGroups).map(([group, names]) => names.length > 0 && <div className="detail-skill-group" key={group}><h4>{group}</h4><div className="job-details-skills">
+          {names.map(name => <Link to={`/jobs?skill=${encodeURIComponent(name)}`} key={name}>{name}</Link>)}</div></div>)}
+        {!job.skills?.length && <p>No skills information available.</p>}
+      </section>
+      <details className="source-field-details detail-source p-3"><summary>Data source and original fields</summary>
+        <p>Published snapshot, not a live vacancy check. Confirm availability on the original recruitment website before applying.</p>
+        <dl className="source-facts">{job.lastSeenDate && <><dt>Last seen in collection</dt><dd>{formatDate(job.lastSeenDate)}</dd></>}
+          <dt>Recruitment platform</dt><dd>{job.platform || "Not available"}</dd><dt>Internal record ID</dt><dd>{job.jobId || key}</dd></dl>
+        {(job.locationDisplay || job.location) && <details><summary>Full location information from the source</summary><p className="source-body">{job.locationDisplay || job.location}</p></details>}
+        {(job.salaryDisplay || job.salary) && <details><summary>Full salary information from the source</summary><p className="source-body">{job.salaryDisplay || job.salary}</p></details>}
+      </details>
+    </>}
+  </main><Footer /></div>;
 }
