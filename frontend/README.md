@@ -58,13 +58,39 @@ Keep this terminal running. The default backend URL is `http://127.0.0.1:5000`.
 
 ## 2. Start this frontend
 
-Create local `frontend/.env` (do not commit secrets):
+Copy [frontend/.env.example](.env.example) to local `frontend/.env` and edit it
+(do not commit your configured file). Run from the repository root:
+
+```powershell
+# Windows: preserve an existing configuration.
+if (-not (Test-Path frontend/.env)) { Copy-Item frontend/.env.example frontend/.env }
+```
+
+```bash
+# macOS/Linux: preserve an existing configuration.
+if [ ! -e frontend/.env ]; then cp frontend/.env.example frontend/.env; fi
+```
+
+| Variable | Required / optional | Value and purpose |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | Required for a non-default backend/deployment; optional for the default local setup | Backend origin, e.g. `http://127.0.0.1:5000`. No `/api` suffix or trailing slash; routes already append `/api/...`. |
+| `VITE_LOGO_DEV_TOKEN` | **Optional** | Logo.dev CDN **publishable** `pk_...` key. Leave blank for website icons/initials; never use a secret `sk_...` key. |
+
+Local example:
 
 ```dotenv
 VITE_API_BASE_URL=http://127.0.0.1:5000
-# Optional public CDN key, never a secret sk_ key:
-# VITE_LOGO_DEV_TOKEN=pk_...
+VITE_LOGO_DEV_TOKEN=
 ```
+
+**Docker responsibility:** these variables are frontend **build-time** settings,
+not Flask settings. An intended empty API base for same-origin nginx proxying
+requires the changes in [integration guide section 5.1](../docs/integration/README.md#51-route-frontend-requests-through-nginx).
+Current `main` still has a `||` fallback, so an empty value alone does not enable
+same-origin requests. Sunjol must wire the build arguments/environment and
+rebuild the image. Copying this template or changing only the running container's
+environment does not make those changes. Do not set the base to `/api` or the
+Docker-internal service hostname. Every `VITE_*` value is browser-visible.
 
 In `backend/.env`, allow the exact frontend origin, for example:
 

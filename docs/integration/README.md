@@ -83,7 +83,9 @@ Keep that terminal running. In a browser, check `http://127.0.0.1:5000/api/healt
 
 ### 3.2 Frontend configuration and startup
 
-Create **`frontend/.env`**:
+Copy [frontend/.env.example](../../frontend/.env.example) to **`frontend/.env`**
+without overwriting an existing configuration. The template marks the API
+origin's required/non-default case and the optional public logo key. Example:
 
 ```dotenv
 VITE_API_BASE_URL=http://127.0.0.1:5000
@@ -208,6 +210,13 @@ In the frontend Dockerfile's **build stage**, before `npm run build`:
 ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 ```
+
+If Logo.dev is desired, also declare and forward the **optional publishable**
+`VITE_LOGO_DEV_TOKEN` build argument/environment value (default empty) before the
+build. Keep the safe key names in `.env.example`/`.env.docker.example` and wire
+the Compose `frontend.build.args` or CI build arguments deliberately. The root
+Docker `.env` and `frontend/.env` are not automatically the same configuration;
+creating the template does not perform this wiring. Never use an `sk_` key.
 
 Vite configuration is baked into the compiled JS. Changing a runtime container environment variable without rebuilding the frontend is insufficient. For local development, keep the full API origin in `frontend/.env`.
 
