@@ -140,7 +140,8 @@ def load_collection(path: Path) -> tuple[list[dict[str, Any]], str]:
     rows: list[dict[str, Any]] = []
     seen_keys: set[str] = set()
     seen_source_jobs: set[tuple[str, str]] = set()
-    company_for_source: dict[str, tuple[str, str, str]] = {}
+    identity_for_source: dict[str, tuple[str, str]] = {}
+    platform_for_source: dict[str, tuple[tuple[date, datetime, bool], str]] = {}
     for index, record in enumerate(raw, start=1):
         if not isinstance(record, dict):
             raise ImportErrorSafe(f"Row {index}: expected an object")
@@ -167,10 +168,10 @@ def load_collection(path: Path) -> tuple[list[dict[str, Any]], str]:
             raise ImportErrorSafe(f"Duplicate source_id/source_job_id in input: {source_id}/{source_job_id}")
         if source_job_id:
             seen_source_jobs.add((source_id, source_job_id))
-        source_identity = (company, platform, region)
-        if source_id in company_for_source and company_for_source[source_id] != source_identity:
-            raise ImportErrorSafe(f"source_id {source_id!r} maps to inconsistent company/platform/region")
-        company_for_source[source_id] = source_identity
+        source_identity = (company, region)
+        if source_id in identity_for_source and identity_for_source[source_id] != source_identity:
+            raise ImportErrorSafe(f"source_id {source_id!r} maps to inconsistent company/region")
+        identity_for_source[source_id] = source_identity
         active, is_new = meta.get("is_active"), meta.get("is_new_in_latest_run", False)
         if not isinstance(active, bool) or not isinstance(is_new, bool):
             raise ImportErrorSafe(f"Row {index}: is_active and is_new_in_latest_run must be booleans")
@@ -179,6 +180,15 @@ def load_collection(path: Path) -> tuple[list[dict[str, Any]], str]:
         if last_seen < first_seen:
             raise ImportErrorSafe(f"Row {index}: last_seen_date precedes first_seen_date")
         collected_at = parse_datetime(meta.get("collected_at"), f"row {index} collected_at", required=True)
+        platform_rank = (last_seen, collected_at, active)
+        previous_platform = platform_for_source.get(source_id)
+        if previous_platform is None or platform_rank > previous_platform[0]:
+            platform_for_source[source_id] = (platform_rank, platform)
+        elif platform_rank == previous_platform[0] and platform != previous_platform[1]:
+            raise ImportErrorSafe(
+                f"source_id {source_id!r} has ambiguous current platforms "
+                f"{previous_platform[1]!r} and {platform!r}"
+            )
         date_posted = parse_datetime(data.get("date_posted"), f"row {index} date_posted")
         salary = data.get("salary")
         if salary is not None and not isinstance(salary, (str, int, float, dict, list)):
@@ -213,6 +223,11 @@ def load_collection(path: Path) -> tuple[list[dict[str, Any]], str]:
         values["content_hash"] = classifier_description_sha1(values["job_description"])
         values["record_hash_sha256"] = canonical_record_sha256(values)
         rows.append(values)
+    # A careers source may migrate between ATS platforms while retaining its stable
+    # source_id. Keep each record's original platform for provenance and analysis
+    # joins, while separately carrying the newest platform for job_sources.
+    for row in rows:
+        row["current_source_platform"] = platform_for_source[row["source_id"]][1]
     return rows, sha256_file(path)
 
 
@@ -513,7 +528,8 @@ def slugify(value: str) -> str:
 
 
 def ensure_source(cur, company: str, source_id: str, platform: str, region: str,
-                  created_company_ids: list[int], created_source_ids: list[str]) -> None:
+                  created_company_ids: list[int], created_source_ids: list[str],
+                  updated_source_platforms: list[dict[str, str]]) -> None:
     slug = slugify(company)
     cur.execute("SELECT company_id, company_name FROM companies WHERE company_name=%s", (company,))
     company_row = cur.fetchone()
@@ -530,9 +546,15 @@ def ensure_source(cur, company: str, source_id: str, platform: str, region: str,
     cur.execute("SELECT company_id, platform, region FROM job_sources WHERE source_id=%s", (source_id,))
     source_row = cur.fetchone()
     if source_row:
-        if (source_row["company_id"] != company_id or source_row["platform"] != platform
-                or source_row["region"] != region):
-            raise ImportErrorSafe(f"Existing source {source_id!r} conflicts with company/platform/region")
+        if source_row["company_id"] != company_id or source_row["region"] != region:
+            raise ImportErrorSafe(f"Existing source {source_id!r} conflicts with company/region")
+        if source_row["platform"] != platform:
+            updated_source_platforms.append({
+                "source_id": source_id,
+                "previous_platform": source_row["platform"],
+                "applied_platform": platform,
+            })
+            cur.execute("UPDATE job_sources SET platform=%s WHERE source_id=%s", (platform, source_id))
     else:
         cur.execute("INSERT INTO job_sources (source_id, company_id, platform, region) VALUES (%s,%s,%s,%s)",
                     (source_id, company_id, platform, region))
@@ -650,11 +672,13 @@ def apply_collection(path: Path, backup_dir: Path,
             )
             created_company_ids: list[int] = []
             created_source_ids: list[str] = []
+            updated_source_platforms: list[dict[str, str]] = []
             if not historical:
                 for source_id in source_ids:
                     record = next(r for r in rows if r["source_id"] == source_id)
-                    ensure_source(cur, record["company"], source_id, record["platform"], record["region"],
-                                  created_company_ids, created_source_ids)
+                    ensure_source(cur, record["company"], source_id,
+                                  record["current_source_platform"], record["region"],
+                                  created_company_ids, created_source_ids, updated_source_platforms)
 
             current = fetch_jobs_by_keys(cur, [r["source_key"] for r in rows])
             if historical:
@@ -735,6 +759,7 @@ def apply_collection(path: Path, backup_dir: Path,
                         "location_quality": location_report,
                         "snapshot_sha256": digest, "source_ids": source_ids,
                         "created_company_ids": created_company_ids, "created_source_ids": created_source_ids,
+                        "updated_source_platforms": updated_source_platforms,
                         "inserted": stats["inserted"], "updated": stats["updated"],
                         "unchanged": stats["unchanged"], "synthetic_snapshot": True}
             cur.execute("UPDATE import_batches SET status='completed',accepted_rows=%s,completed_at=UTC_TIMESTAMP(6),"
@@ -1380,6 +1405,18 @@ def rollback_latest(batch_id: int | None, backup_dir: Path) -> dict[str, Any]:
                                 "(SELECT 1 FROM jobs WHERE source_id=%s) AND NOT EXISTS "
                                 "(SELECT 1 FROM source_run_results WHERE source_id=%s)",
                                 (source_id, source_id, source_id))
+                for source_update in metadata.get("updated_source_platforms", []):
+                    cur.execute("SELECT platform FROM job_sources WHERE source_id=%s",
+                                (source_update["source_id"],))
+                    current_source = cur.fetchone()
+                    if (current_source is None
+                            or current_source["platform"] != source_update["applied_platform"]):
+                        raise ImportErrorSafe(
+                            f"Source {source_update['source_id']!r} changed after this batch; "
+                            "refusing to overwrite later work"
+                        )
+                    cur.execute("UPDATE job_sources SET platform=%s WHERE source_id=%s",
+                                (source_update["previous_platform"], source_update["source_id"]))
                 for company_id in metadata.get("created_company_ids", []):
                     cur.execute("DELETE FROM companies WHERE company_id=%s AND NOT EXISTS "
                                 "(SELECT 1 FROM job_sources WHERE company_id=%s)", (company_id, company_id))

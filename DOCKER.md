@@ -63,17 +63,19 @@ weekly-update ──► deliverables/<date>/jobs_history_translated.json
                          │                         ▼
                          │            output/<date>/postings_all.json, ...
                          ▼                         │
-              import-analysis ◄────────────────────┘
+              import-analysis --publish ◄──────────┘
               (--source-input = the same weekly file)
                          │
                          ▼
-              qa-release ──► publish-release ──► API / website
+              automatic QA ──► safe publication ──► API / website
 ```
 
 - `import-analysis` attaches the classification to jobs already in MySQL, so
   `import-collection` must run first for that week.
 - `import-analysis` checks that the classifier ran on exactly the weekly file
   given as `--source-input`, and that `--week-date` matches the collection.
+- With `--publish`, the importer runs release QA and publishes only if all
+  blocking checks pass. A failed check leaves the imported release as a draft.
 - Each week can be imported once. To replace a published week, use the
   revision steps in `database/RELEASE_REVISIONS.md` (`--candidate` and
   `activate-release`).
@@ -96,8 +98,8 @@ docker compose run --rm importer plan-collection --input "$li"
 docker compose run --rm importer plan-analysis "${files[@]}"
 docker compose run --rm importer import-collection --input "$li" --week-date 2026-09-25
 docker compose run --rm importer import-analysis "${files[@]}" \
-  --week-date 2026-09-25 --git-commit e4f1b77cc56f048c06196e7a27865d98084c2e2a
-# No publication is needed for classification reuse.
+  --week-date 2026-09-25 --git-commit e4f1b77cc56f048c06196e7a27865d98084c2e2a \
+  --publish --historical
 docker compose run --rm classifier \
   --input input/2026-10-13/jobs_history_translated.json --db --dry-run
 ```
@@ -106,7 +108,8 @@ The array example uses bash/zsh; PowerShell equivalents are in
 `database/TEAM_GUIDE.md`. Import the 25 September pair only if it is not already
 selected in this database. For an existing newer collection, use the guide's
 historical backfill route. Keep `output_full/` paired with 25 September, never
-with the new week's input. A draft analysis is sufficient for reuse.
+with the new week's input. Historical publication is required if the date
+should appear in `/trends`; `--historical` preserves the newer current release.
 
 Local verification on 13 October 2026 (`avjobs-live` Compose project):
 6,044 inputs → 849 duplicates removed → 5,195 postings; 4,517 MySQL answers
@@ -176,7 +179,7 @@ docker compose run --rm importer plan-analysis \
   --duplicates "classification pipeline/output/2026-10-17/duplicates_removed.csv" \
   --failures "classification pipeline/output/2026-10-17/llm_failures.csv"
 ```
-Then import (takes a backup first and creates a draft release):
+Then import, check and publish (backups are created before database changes):
 ```bash
 docker compose run --rm importer import-analysis \
   --source-input "data-collection/deliverables/2026-10-17/jobs_history_translated.json" \
@@ -187,16 +190,22 @@ docker compose run --rm importer import-analysis \
   --duplicates "classification pipeline/output/2026-10-17/duplicates_removed.csv" \
   --failures "classification pipeline/output/2026-10-17/llm_failures.csv" \
   --week-date 2026-10-17 \
-  --git-commit $(git rev-parse HEAD)
+  --git-commit $(git rev-parse HEAD) \
+  --publish
 ```
-It prints a `release_key` starting with `draft-`.
+If QA fails, the release remains a draft and the command reports the blocking
+checks instead of publishing incomplete data.
 
-### 5. Check and publish the release
+### 5. Finalize an existing draft (only when needed)
 
+If an older run was imported without `--publish`, finish it without rerunning
+collection, translation or classification:
 ```bash
-docker compose run --rm importer qa-release --release-key <release_key>
-docker compose run --rm importer publish-release --release-key <release_key>
+docker compose run --rm importer finalize-release --release-key <release_key>
 ```
+Add `--historical` when the draft is older than the current published release.
+The separate `qa-release` and `publish-release` commands remain available for
+manual review workflows.
 The published AV jobs and clusters are then served at
 http://localhost:8080/api/jobs and http://localhost:8080/api/clusters.
 Backups go to `database/backups/`, logs to `database/operation_logs/`.
@@ -229,8 +238,8 @@ GitHub are not automatically imported. Use the same Compose project name for
 startup, pipeline jobs and maintenance; if started with `-p avjobs-live`, add
 `-p avjobs-live` to subsequent Compose commands too.
 
-Before `publish-release`, confirm `qa-release` reports `passed`, inspect warnings,
-and obtain the release decision from the responsible operator/team. Keep the
+When `import-analysis --publish` or `finalize-release` succeeds, QA has passed
+and the immutable snapshot has been published. Inspect warnings and keep the
 printed release key and matching week in the handover record.
 
 After publication, check these URLs (replace the host/port for your deployment):

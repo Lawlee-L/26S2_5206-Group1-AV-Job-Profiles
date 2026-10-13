@@ -227,6 +227,56 @@ class ReleaseRevisionTests(unittest.TestCase):
         self.assertEqual(result, {"ok": True})
         self.assertEqual(calls, [(self.request, Path("backups"))])
 
+    def test_finalize_release_publishes_only_after_passed_qa(self):
+        calls = []
+        backend = SimpleNamespace(
+            qa_release=lambda key: calls.append(("qa", key)) or {
+                "status": "passed", "errors": []
+            },
+            publish_release=lambda key, path, freeze, historical: calls.append(
+                ("publish", key, path, freeze, historical)
+            ) or {"status": "published"},
+        )
+        result = ImporterService(backend).finalize_release(
+            "draft-1", Path("backups"), historical=True
+        )
+        self.assertEqual(result["publication"], {"status": "published"})
+        self.assertEqual(calls, [
+            ("qa", "draft-1"),
+            ("publish", "draft-1", Path("backups"), False, True),
+        ])
+
+    def test_finalize_release_keeps_draft_when_qa_fails(self):
+        calls = []
+        backend = SimpleNamespace(
+            qa_release=lambda key: {"status": "failed", "errors": ["missing jobs"]},
+            publish_release=lambda *args: calls.append(args),
+        )
+        with self.assertRaisesRegex(ImportErrorSafe, "remains a draft"):
+            ImporterService(backend).finalize_release("draft-1", Path("backups"))
+        self.assertEqual(calls, [])
+
+    def test_import_analysis_can_request_safe_automatic_publication(self):
+        args = make_parser().parse_args(
+            [
+                "import-analysis", "--publish", "--historical",
+                "--week-date", "2026-09-25", "--git-commit", "abcdef0",
+                "--postings", "p.json", "--metadata", "m.json",
+                "--source-input", "li.json", "--av-summary", "av.csv",
+                "--other-summary", "other.csv", "--duplicates", "d.csv",
+                "--failures", "f.csv",
+            ]
+        )
+        self.assertTrue(args.publish)
+        self.assertTrue(args.historical)
+
+    def test_finalize_release_command_accepts_historical_mode(self):
+        args = make_parser().parse_args(
+            ["finalize-release", "--release-key", "draft-1", "--historical"]
+        )
+        self.assertEqual(args.release_key, "draft-1")
+        self.assertTrue(args.historical)
+
     def test_frozen_counts_check_skill_and_cluster_coverage(self):
         counts = {"job": 2, "cluster": 1, "skilled_jobs": 1}
         qa = {

@@ -22,7 +22,7 @@ const job = { sourceKey: "greenhouse|kodiak|id:42", company: "Kodiak", title: "A
 beforeEach(() => {
   localStorage.clear();
   vi.stubGlobal("fetch", vi.fn(async (input) => {
-    const url = new URL(input);
+    const url = new URL(input, "http://localhost");
     let body;
     if (url.pathname === "/api/job-facets") body = { data: facetFixture() };
     else if (url.pathname === "/api/locations") body = { data: { locations: geo } };
@@ -47,7 +47,7 @@ function RouteProbe() {
     <button onClick={() => navigate(-1)}>Browser back</button></>;
 }
 const mount = (path = "/jobs") => render(<MemoryRouter initialEntries={[path]}><App /><RouteProbe /></MemoryRouter>);
-const lastJobUrl = () => new URL(fetch.mock.calls.filter(([url]) => new URL(url).pathname === "/api/jobs").at(-1)[0]);
+const lastJobUrl = () => new URL(fetch.mock.calls.filter(([url]) => new URL(url, "http://localhost").pathname === "/api/jobs").at(-1)[0], "http://localhost");
 function facetFixture() {
   return { company: [{ value: "Kodiak", count: 1 }], country: [{ value: "US", count: 1 }, { value: "DE", count: 1 }],
     state_region: [{ value: "CA", count: 1 }, { value: "Berlin", count: 1 }],
@@ -71,6 +71,11 @@ async function advanced(user) {
 }
 
 describe("real frontend API serialization", () => {
+  it("uses the same-origin API proxy by default", async () => {
+    await getJobs();
+    expect(fetch).toHaveBeenCalledWith(expect.stringMatching(/^\/api\/jobs\?/), expect.anything());
+  });
+
   it("applies salary bounds with explicit units and clears stale bounds on unit change", async () => {
     const user = userEvent.setup(); mount();
     await advanced(user);
@@ -164,7 +169,7 @@ describe("real frontend API serialization", () => {
   it("finds a rare skill without rendering thousands of options", async () => {
     const original = fetch.getMockImplementation();
     fetch.mockImplementation(async (input) => {
-      if (new URL(input).pathname === "/api/job-facets") return { ok: true, json: async () => ({
+      if (new URL(input, "http://localhost").pathname === "/api/job-facets") return { ok: true, json: async () => ({
         data: { ...facetFixture(), skill: [...Array.from({ length: 200 }, (_, i) => ({ value: `Common ${i}`, count: 1 })), { value: "Z-rare skill", count: 1 }] },
       }) };
       return original(input);
@@ -182,7 +187,7 @@ describe("real frontend API serialization", () => {
   it("narrows country and work options after company selection", async () => {
     const original = fetch.getMockImplementation();
     fetch.mockImplementation(async input => {
-      const url = new URL(input);
+      const url = new URL(input, "http://localhost");
       if (url.pathname === "/api/job-facets" && url.searchParams.get("company") === "Kodiak") {
         return { ok: true, json: async () => ({ data: { ...facetFixture(), country: [{ value: "US", count: 1 }] } }) };
       }
@@ -232,7 +237,7 @@ describe("real frontend API serialization", () => {
   it("does not offer stale global options when facets fail, and supports retry", async () => {
     const original = fetch.getMockImplementation();
     let failed = true;
-    fetch.mockImplementation(async input => new URL(input).pathname === "/api/job-facets" && failed
+    fetch.mockImplementation(async input => new URL(input, "http://localhost").pathname === "/api/job-facets" && failed
       ? { ok: false, status: 503, json: async () => ({ error: "Options temporarily unavailable" }) } : original(input));
     const user = userEvent.setup(); mount("/jobs?company=Kodiak");
     await screen.findByRole("alert");
@@ -264,7 +269,7 @@ describe("real frontend API serialization", () => {
     const original = fetch.getMockImplementation();
     const pending = [];
     fetch.mockImplementation(async (input, options) => {
-      const url = new URL(input);
+      const url = new URL(input, "http://localhost");
       if (url.searchParams.get("company") === "Kodiak") {
         return new Promise(resolve => pending.push({ resolve, path: url.pathname, signal: options.signal }));
       }

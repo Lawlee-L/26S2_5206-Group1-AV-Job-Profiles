@@ -860,14 +860,15 @@ cross-company deduplication, cyclic duplicate links, missing outcomes, and
 cluster count mismatches. It records successful analyses, failed analyses,
 dedupe links, skills, cluster memberships, model/cost metadata, the pipeline
 commit, and a draft dashboard release. Cluster names remain blank until labels
-are proposed and reviewed; no release is published automatically.
+are proposed and reviewed. Add `--publish` to run blocking QA and publish the
+draft automatically; failed QA leaves the draft unchanged.
 
 ```text
 python database/weekly_import.py plan-analysis --postings path/to/postings_all.json --metadata path/to/run_metadata.json --source-input data-collection/deliverables/2026-09-25/jobs_history_translated.json --av-summary path/to/av_relevant/cluster_summary.csv --other-summary path/to/not_av_relevant/cluster_summary.csv --duplicates path/to/duplicates_removed.csv --failures path/to/llm_failures.csv
 ```
 
 After the plan reconciles, run `import-analysis` with the same arguments plus
-`--week-date 2026-09-25`. It
+`--week-date 2026-09-25`; add `--publish` for automatic QA and publication. It
 also creates a full backup before writing. The analysis is joined only by
 `source_key`; `row_index` is retained for traceability and never used as a key.
 Pass the exact classification pipeline Git commit as `--git-commit <sha>` so
@@ -891,6 +892,7 @@ python database/weekly_import.py backup
 python database/weekly_import.py restore --file path/to/av_job_profiles_TIMESTAMP.sql.gz --target-db av_job_profiles_restore
 python database/weekly_import.py qa-release --release-key <release-key>
 python database/weekly_import.py publish-release --release-key <draft-key>
+python database/weekly_import.py finalize-release --release-key <draft-key>
 python database/weekly_import.py trend-readiness
 ```
 
