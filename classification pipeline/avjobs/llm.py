@@ -243,8 +243,9 @@ def estimate_cost(df, model: str, use_cache: bool = True) -> dict:
     import tiktoken
 
     enc = tiktoken.get_encoding("o200k_base")
-    todo = df[[not (use_cache and _cache_path(k, d, model).exists())
-               for k, d in zip(df["source_key"], df["description"])]]
+    # .loc keeps the columns when every posting is cached; df[[]] would select no columns.
+    todo = df.loc[[not (use_cache and _cache_path(k, d, model).exists())
+                   for k, d in zip(df["source_key"], df["description"])]]
     fixed = len(enc.encode(PROMPT)) + len(enc.encode(json.dumps(SCHEMA)))
     prompt_tokens = sum(fixed + len(enc.encode(_user_message(t, d)))
                         for t, d in zip(todo["name"], todo["description"]))

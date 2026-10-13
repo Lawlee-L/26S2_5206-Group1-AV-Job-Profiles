@@ -9,7 +9,7 @@ record. No posting is dropped: each lands in one group or the other.
     python run_pipeline_v2.py --dry-run              # cost estimate, no API calls
     python run_pipeline_v2.py --limit 50             # paid sample run
     python run_pipeline_v2.py --sweep                # cluster-parameter grid, then exit
-    python run_pipeline_v2.py --db                   # full run, stored in SQLite
+    python run_pipeline_v2.py --db                   # full run, reusing answers from MySQL
 
 Cluster settings per group live in config.CLUSTER_PARAMS; how they were chosen is
 documented in notebooks/clustering_decisions.ipynb.
@@ -71,8 +71,8 @@ def parse_args() -> argparse.Namespace:
                    help="ignore cached LLM replies and embeddings (paid: re-calls the model)")
     p.add_argument("--dry-run", action="store_true", help="print the cost estimate and exit")
     p.add_argument("--db", action="store_true",
-                   help="also write the run to <output-dir>/av_job_profiles.sqlite (the tables "
-                        "and columns of schema.mysql.sql), reusing records already stored there")
+                   help="reuse answers already imported into the team's MySQL database "
+                        "(AVDB_* settings) for postings whose text, model and prompt match")
     p.add_argument("--reference-only", action="store_true",
                    help="run the model on the 14 reference postings only, score it against "
                         "the Sonnet 5 answers, and exit (for choosing a model)")
@@ -111,7 +111,6 @@ def attach_records(df: pd.DataFrame, results: list[dict]) -> tuple[pd.DataFrame,
     # When the model is unsure, count the posting as AV-relevant: a little noise in the AV
     # group is better than missing its skills. The model's own verdict stays in av_relevant_model.
     df["av_relevant"] = df["av_relevant_model"] | (df["relevance_confidence"] == "Low")
-    df["reused_from"] = [r.get("reused_from") for r in results if r["record"] is not None]
     df["cluster_text"] = [cluster_text(r) for r in records]
     return df.reset_index(drop=True), failed
 
@@ -226,25 +225,25 @@ def main() -> int:
         df = df.reset_index(drop=True)
         print(f"  --limit: random sample of {len(df)}")
 
+    reused = {}
+    if args.db and not args.no_cache:
+        conn = store.connect()
+        try:
+            reused = store.reusable_records(conn, df, args.model)
+        finally:
+            conn.close()
+        print(f"  {len(reused)} answers reused from MySQL")
+
     if args.dry_run:
-        est = llm.estimate_cost(df, args.model, use_cache=not args.no_cache)
+        est = llm.estimate_cost(df[~df["source_key"].isin(reused)], args.model,
+                                use_cache=not args.no_cache)
         print(json.dumps(est, indent=2))
         return 0
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    conn = None
-    reused = {}
-    if args.db:
-        conn = store.connect(out_dir / "av_job_profiles.sqlite")
-        store.load_jobs(conn, args.input)   # temporary, until the team's job import exists
-        if not args.no_cache:
-            reused = store.reusable_records(conn, df, args.model)
-
     print("\n[2/5] LLM normalisation")
-    if args.db:
-        print(f"  {len(reused)} reused from the database")
     fresh = iter(llm.normalise_postings(df[~df["source_key"].isin(reused)], args.model,
                                         use_cache=not args.no_cache))
     results = [reused.get(key) or next(fresh) for key in df["source_key"]]
@@ -307,7 +306,7 @@ def main() -> int:
         "n_duplicates_removed": len(dropped), "limit": args.limit,
         "n_records": len(df), "n_llm_failures": len(failed),
         "model": args.model, "prompt_version": llm.PROMPT_ID,
-        "temperature": cfg.LLM_TEMPERATURE, **usage,
+        "temperature": cfg.LLM_TEMPERATURE, **usage, "n_reused_from_db": len(reused),
         "embedding_model": cfg.EMBED_MODEL, "chunk_words": cfg.CHUNK_WORDS,
         "embedded_text": "role_summary+responsibilities+skills", "cluster_params": params,
         "groups": {name: group_stats(df.loc[df["av_relevant"] == relevant, "cluster_id"].to_numpy())
@@ -317,12 +316,6 @@ def main() -> int:
     }
     (out_dir / "run_metadata.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     print(f"  wrote {out_dir}/")
-    if conn:
-        run_key = store.save_run(conn, df, failed, dropped, summaries, meta)
-        print(f"  wrote {out_dir / 'av_job_profiles.sqlite'} (analysis run {run_key})")
-        for table, n in store.row_counts(conn).items():
-            print(f"    {table}: {n}")
-        conn.close()
     print(f"\nDone in {time.time() - t0:.1f}s")
     return 0
 

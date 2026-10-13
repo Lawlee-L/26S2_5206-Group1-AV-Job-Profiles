@@ -14,7 +14,7 @@ postings JSON
   → [2] one LLM call per posting     strict JSON record, validated; 10 calls in flight
   → [3] embed the record             gte-base on role summary + responsibilities + skills
   → [4] cluster each group apart     AV-relevant and other postings: UMAP → HDBSCAN
-  → [5] write outputs                CSV / JSON / Markdown, optionally a SQLite database
+  → [5] write outputs                CSV / JSON / Markdown, loaded into MySQL by the importer
 ```
 
 ## Design choices
@@ -29,8 +29,8 @@ postings JSON
 - **Clusters are named by people, not by the code.** The pipeline writes a
   labelling worksheet with top terms and example titles for each cluster.
 - **Nothing is paid for twice.** Answers are cached per posting, and with `--db`
-  they are reused from the database when the model, the exact prompt and the
-  posting text are unchanged.
+  they are reused from the team's MySQL database (from any machine) when the
+  model, the exact prompt and the posting text are unchanged.
 
 ## Setup
 
@@ -77,10 +77,13 @@ Always pass `--input` (the default in `avjobs/config.py` points at an older expo
 # Cost estimate only: counts tokens, no model calls
 python run_pipeline_v2.py --input postings.json --dry-run
 
-# Small paid sample (random, after dedupe)
-python run_pipeline_v2.py --input postings.json --limit 50 --output-dir output_sample --db
+# What it would cost after reusing answers already in MySQL
+python run_pipeline_v2.py --input postings.json --db --dry-run
 
-# Full run, written to files and to SQLite
+# Small paid sample (random, after dedupe)
+python run_pipeline_v2.py --input postings.json --limit 50 --output-dir output_sample
+
+# Full run, paying only for postings MySQL has no answer for
 python run_pipeline_v2.py --input postings.json --db
 
 # Try cluster settings on cached records (free), then override both groups' settings
@@ -96,7 +99,7 @@ python run_pipeline_v2.py --input postings.json --min-cluster-size 20 --db
 | `--limit N` | random sample of N postings |
 | `--min-cluster-size`, `--min-samples` | HDBSCAN settings for both groups (overrides `CLUSTER_PARAMS`) |
 | `--sweep` | print a grid of cluster settings per group, then stop |
-| `--db` | also write `<output-dir>/av_job_profiles.sqlite`, reusing stored answers |
+| `--db` | reuse answers already imported into MySQL (needs `AVDB_*` in `.env`; see [Database](#database)) |
 | `--no-cache` | ignore cached answers and call the model again (paid) |
 | `--dry-run` | print the cost estimate and stop |
 | `--reference-only` | score the model on 14 hand-checked reference postings (needs `test_set_postings.json` and `sonnet5_reference_answers.json`, not included) |
@@ -119,30 +122,32 @@ same command: finished postings are skipped.
     needs_review.csv               postings that fit no cluster (noise)
     cluster_summary.csv            size, top terms, example titles, companies
     cluster_labelling_worksheet.md for naming clusters
-  av_job_profiles.sqlite     with --db
 ```
 
 ## Database
 
 The **integration MySQL schema** is `../database/schema.mysql.sql`, and the
-team's import procedure is in `../database/TEAM_GUIDE.md`. This pipeline's
-`schema.mysql.sql` and optional `--db` SQLite tables are local pipeline
-artifacts, **not** a second authoritative backend database. `--db` writes
-local SQLite results (`avjobs/schema.sql`) for pipeline inspection:
+team's import procedure is in `../database/TEAM_GUIDE.md`. The pipeline never
+writes to it: its output files are loaded by the importer.
 
-| Table | Holds |
-|---|---|
-| `companies`, `job_sources`, `jobs` | the postings (temporary loader: the team's job import will replace it); duplicates link to the kept copy |
-| `analysis_runs` | one row per run: model, prompt version, tokens, cost |
-| `job_analyses` | one row per posting per run: relevance, confidence, reason, summary, seniority, experience, the full record |
-| `skills`, `job_skills` | each skill once (by name ignoring case, and type) and every mention with its evidence |
-| `cluster_runs`, `clusters`, `job_cluster_assignments` | clusters per group and each posting's cluster |
+With `--db` the pipeline **reads** that database before calling the model
+(`avjobs/store.py`). A posting reuses an earlier answer when the model, the exact
+prompt (`analysis_runs.prompt_version`, e.g. `p5-72e4e4cb`) and the posting text
+(`job_analyses.input_content_hash`) all match a successful analysis; the latest
+one wins. Only the rest are sent to the model, and `run_metadata.json` records how
+many were reused (`n_reused_from_db`). Connection settings are the importer's,
+in this folder's `.env`:
 
-Each run adds a new `analysis_runs` row, so queries should filter to one run
-(usually the latest). A stored answer is reused as `result_origin = 'reused'`,
-pointing at the original, only when the model, the exact prompt
-(`analysis_runs.prompt_version`, e.g. `p5-72e4e4cb`) and the posting text
-(`job_analyses.input_content_hash`) all match.
+```
+AVDB_HOST=127.0.0.1
+AVDB_PORT=3306
+AVDB_NAME=av_job_profiles
+AVDB_USER=...        # read-only: SELECT on jobs, job_analyses, analysis_runs
+AVDB_PASSWORD=...
+```
+
+If `--db` is given and MySQL cannot be reached, the run stops instead of paying
+for answers the database may already hold.
 
 An optional **pipeline-local** MySQL container is included: `docker compose up -d`
 loads this folder's `schema.mysql.sql` (needs `MYSQL_ROOT_PASSWORD` and
@@ -182,10 +187,13 @@ Roughly **$2 and 40 minutes for 4,500 postings** with 10 calls in flight. Run
 [`notebooks/clustering_decisions.ipynb`](notebooks/clustering_decisions.ipynb) documents
 every embedding and clustering choice with the evidence behind it: which text to embed,
 which embedding model (six compared), chunk size, and the UMAP/HDBSCAN settings for each
-group. It uses no labels and makes no LLM calls: postings are read from a `--db` run
-(`output_full/av_job_profiles.sqlite`, analysis run 1, made from the 2026-09-25 input)
-and every check is computed locally. The committed copy already shows its outputs; to
-re-run it, first create that database:
+group. It uses no labels and makes no LLM calls: postings are read from
+`output_full/av_job_profiles.sqlite` (analysis run 1, made from the 2026-09-25 input)
+and every check is computed locally. The committed copy already shows its outputs.
+
+That SQLite file was written by the pipeline's earlier `--db` option, which now reads
+MySQL instead, and it is not in the repository. To re-create it, run the pipeline from
+commit `701f0ce` (the last version that wrote SQLite):
 
 ```bash
 pip install -r requirements-notebook.txt
@@ -196,7 +204,7 @@ python run_pipeline_v2.py --input $input --output-dir output_full --db
 
 **The second command is not free.** The notebook itself is local, but the pipeline run
 calls OpenRouter for every posting missing from the answer cache (`.cache/llm/`, which
-is not in the repository): about $2 for the full file on a fresh checkout. Run
+is not in the repository): about $2.70 for the full file on a fresh checkout. Run
 `--dry-run` first and stop if the estimate is not zero. Then open the notebook with
 the `.venv` kernel. Helpers are in `notebooks/cluster_eval.py`.
 
@@ -210,8 +218,8 @@ python -m unittest discover -s tests -t . -v
 
 - `tests/test_llm_parallel.py`: ordering, 10 calls at once, one failure does not stop
   the run, a fatal error cancels the queue, re-runs use the cache.
-- `tests/test_store.py`: the database end to end, including reuse and roll-back
-  (skipped unless the dataset file `jobs_history_translated.json` is present).
+- `tests/test_store.py`: reusing answers from MySQL (matching rules, batching, and
+  `--db` through the pipeline), with a fake connection instead of a database server.
 - `tests/test_small_groups.py`: empty, single-posting and 8-posting groups, limited
   samples and `--sweep`, with real UMAP/HDBSCAN on synthetic data (no model download).
 
@@ -226,7 +234,7 @@ avjobs/
   embed.py             local sentence-transformer embeddings
   cluster.py           UMAP, HDBSCAN, cluster summaries, labelling worksheet
   validate.py          reference-posting checks
-  store.py, schema.sql pipeline-local SQLite storage
+  store.py             --db: reuse answers already in the team MySQL database
 schema.mysql.sql       earlier pipeline-local MySQL design; integration schema is ../database/schema.mysql.sql
 docker-compose.yml     optional local MySQL
 notebooks/             evidence for the embedding and clustering choices
