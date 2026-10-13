@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+backups/
+operation_logs/
+tests/
+docker-init/
