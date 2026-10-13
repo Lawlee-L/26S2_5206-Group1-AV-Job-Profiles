@@ -1,6 +1,54 @@
 # CITS5206 Group 1 — AV Job Profiles
 
 This repository is the central workspace for the CITS5206 Group 1 project. It is used to organise meeting records, team planning documents, project tasks, and data-collection work.
+## Website maintenance and handover
+
+Start with [the Docker guide](DOCKER.md) to run the website and update its data.
+The React website reads published MySQL data through the Flask API. Collection,
+classification and database import are separate jobs started by an operator;
+there is no scheduled end-to-end data update in the current setup.
+
+| Task | Guide |
+| --- | --- |
+| Start the website, configure credentials, run a weekly update | [Docker guide](DOCKER.md) |
+| Validate/import data, publish a release, back up or recover MySQL | [Database operating guide](database/TEAM_GUIDE.md) |
+| Revert or correct a published data release | [Release revisions](database/RELEASE_REVISIONS.md) |
+| Check the API and database connection | [Backend guide](backend/README.md) |
+| Understand the website filters and charts | [Frontend guide](frontend/README.md) |
+| Open or refresh the separate Tableau workbook | [Dashboard guide](dashboard/README.md) |
+
+### Updating data
+
+1. Collect and classify a dated dataset, or download an existing reviewed pair:
+   `data-collection/deliverables/<date>/jobs_history_translated.json` and its
+   complete classification output folder. Existing output can be imported
+   without rerunning paid classification.
+2. On the machine hosting the website database, use the importer to validate
+   and import the collection and its matching classification, following
+   [the weekly Docker steps](DOCKER.md#weekly-pipeline). Keep the same date and
+   exact source file throughout.
+3. Check QA and its warnings, then publish the approved release. Reload the
+   website and verify the API and pages as described in the Docker guide.
+
+Uploading files to GitHub shares the dataset; it does **not** import it into
+MySQL. Importing into a developer's local database does not update a website
+connected to another database. Keep the Compose project name consistent so
+commands use the intended database and cache volumes.
+
+With Watchtower enabled, new backend/frontend images can update automatically
+when published. This updates application code, not job records, classification,
+or database schema. The separate Tableau `.twbx` workbook contains a saved
+extract and requires its own refresh and save to show newer data.
+
+### Responsibilities at handover
+
+Record the deployed URL, hosting machine, Compose project name, published data
+week/release key and maintenance contact before handing over. Assign an operator
+for data updates, publication, API costs, backups and recovery. Transfer access
+to the hosting account, registry and API services securely; keep passwords and
+API keys out of GitHub. Store database backups outside the container and retain
+a separate copy. Ordinary website visitors do not run these maintenance steps.
+
 ## Team Members
 
 | Name | Student ID | GitHub Username | Role |

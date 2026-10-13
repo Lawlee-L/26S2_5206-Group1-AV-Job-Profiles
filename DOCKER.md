@@ -222,6 +222,49 @@ deliverables. Use a separate Compose project and output date for testing;
 `docker compose down -v` deletes that project’s database and classifier cache.
 Never run it on a project containing data you need to keep.
 
+## Verify a data update and hand over
+
+Run imports against the MySQL database used by this website. Files pushed to
+GitHub are not automatically imported. Use the same Compose project name for
+startup, pipeline jobs and maintenance; if started with `-p avjobs-live`, add
+`-p avjobs-live` to subsequent Compose commands too.
+
+Before `publish-release`, confirm `qa-release` reports `passed`, inspect warnings,
+and obtain the release decision from the responsible operator/team. Keep the
+printed release key and matching week in the handover record.
+
+After publication, check these URLs (replace the host/port for your deployment):
+
+- `http://localhost:8080/api/health`: the API is running.
+- `http://localhost:8080/api/health/db`: the API can reach MySQL.
+- `http://localhost:8080/api/jobs`: returns jobs from the published release.
+- `http://localhost:8080/jobs`: jobs load, filters and job details work.
+- `http://localhost:8080/clusters` and `/trends`: charts load and the expected
+  classified week appears in the historical coverage table.
+
+A successful health check alone does not prove a dataset was published. Confirm
+the selected week/release in `v_weekly_versions` using the database guide, and
+check a known active AV job from the new release in the API and website. Counts
+can differ from the collection total because the website shows active AV jobs.
+
+If something fails, inspect `docker compose ps`, backend logs and importer
+reports under `database/operation_logs/`. Keep input files, outputs and backups;
+do not reset a populated database to troubleshoot. Use
+[the database guide](database/TEAM_GUIDE.md) for backup/restore and
+[release revisions](database/RELEASE_REVISIONS.md) to switch back to a previous
+published release. `docker compose down` retains volumes; `down -v` deletes
+the project's database and classifier cache.
+
+The separate Tableau workbook is a saved snapshot. Updating MySQL does not
+refresh that packaged file; follow [the Dashboard guide](dashboard/README.md)
+to reconnect/refresh, validate and save a new workbook.
+
+At handover, record the website URL, host, Compose project name, published
+week/release key, backup location and maintenance contact. Transfer credentials
+securely, and assign responsibility for running updates and approving API costs
+and publication. Watchtower updates application images only; it does not run
+collection, classification, import or publication, or apply schema migrations.
+
 ## Everyday commands
 
 | Task | Command |
@@ -241,7 +284,7 @@ Never run it on a project containing data you need to keep.
 - The website uses a read-only DB user; the importer uses root for writes and
   `mysqldump` backups.
 - The classifier runs on CPU. A full run mostly waits on the OpenRouter API.
-- The frontend still reads static data from `src/data/jobs.js`; once it calls
-  the API, use relative URLs like `/api/jobs`.
+- The frontend reads published MySQL data through the backend API. nginx
+  proxies relative `/api/...` requests to the backend container.
 - Watchtower is the maintained fork `nickfedor/watchtower`; the original
   project was archived in December 2025.
