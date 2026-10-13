@@ -1,5 +1,71 @@
 # Running AV Job Profiles with Docker
 
+## First-time website setup
+
+These steps are for a new installation after this PR is merged into `main`.
+Use Terminal (macOS/Linux) or PowerShell (Windows). No Python installation,
+Azure/OpenRouter keys, collection or paid classification is needed.
+
+1. Install and start [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+   and install [Git](https://git-scm.com/downloads). Keep Docker Desktop running.
+2. Download the project and enter its folder:
+   ```bash
+   git clone https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles.git
+   cd 26S2_5206-Group1-AV-Job-Profiles
+   cp .env.docker.example .env
+   ```
+   In PowerShell, use `Copy-Item .env.docker.example .env` for the last line.
+   Open `.env` in a text editor and change `MYSQL_ROOT_PASSWORD`,
+   `MYSQL_PASSWORD`, and `BACKEND_DB_PASSWORD` to three different passwords
+   (use letters and numbers). Leave the AI keys empty. Keep this file private.
+3. Build and start the website from the downloaded code:
+   ```bash
+   docker compose up -d --build db backend frontend
+   ```
+   The first build downloads dependencies and may take several minutes.
+4. Load the included collection and analysis snapshots:
+   ```bash
+   docker compose run --rm bootstrap --git-commit $(git rev-parse HEAD)
+   ```
+   This validates both pairs, takes backups, imports them and publishes only
+   after release QA passes. It uses 25 September and 13 October 2026 for
+   historical comparison, with 13 October selected as current. It makes no AI
+   calls. Wait for **Website data is ready** before opening the website.
+   If published data already exists, it skips initialisation without replacing
+   it. If incomplete, unpublished imports exist, it stops for operator review.
+   Always use the same Compose project name for startup and initialisation;
+   if startup uses `-p NAME`, use `docker compose -p NAME run ...` here too.
+5. Open [the website](http://localhost:8080). You should see a data date and
+   a non-zero job count. Open **Jobs**, select a country and open a job.
+   Under **Insights → Historical trends**, both included dates should appear
+   on a fresh installation. This address works on the computer running Docker;
+   customers accessing a server should use the URL supplied by its operator.
+
+### Open it again
+
+Start Docker Desktop, open a terminal in the project folder, then run:
+```bash
+docker compose up -d db backend frontend
+```
+Open http://localhost:8080. Data is retained; initialisation is not required
+again. To stop the website while keeping its data, run `docker compose down`.
+
+### If a step fails
+
+- **Docker cannot connect:** start Docker Desktop and wait until it is ready.
+- **Port already in use:** change `WEB_PORT` to `8081` and/or `DB_HOST_PORT`
+  to `3308` in `.env`, repeat step 3, and use the chosen website port.
+- **Website opens but has no jobs:** complete step 4 and check its final message.
+- **Initialisation fails or reports incomplete imports:** keep the database and
+  backups. Review `database/operation_logs/` and follow the
+  [database guide](database/TEAM_GUIDE.md) to complete the existing import or
+  finalise its draft. If a previous date was published before a later step
+  failed, the website may show that earlier date; do not treat it as completion
+  of both snapshots. Do not delete volumes to retry.
+- **Other startup errors:** run `docker compose ps` and
+  `docker compose logs --tail 50 backend db frontend` and share the error
+  with your project maintenance contact.
+
 Every part of the project runs in a container:
 
 | Service | Folder | What it does | Runs |
@@ -24,23 +90,18 @@ push to main ──► GitHub Actions builds all 5 images ──► ghcr.io (:la
 The workflow is `.github/workflows/docker-publish.yml`. Each image also gets a
 `sha-<commit>` tag so you can roll back.
 
-## One-time setup
+## Registry setup and optional automatic updates (operator)
 
-**GitHub (repo owner):**
-1. Merge these files into `main`.
-2. Settings → Actions → General → Workflow permissions → *Read and write permissions*.
-3. After the first workflow run, make each of the 5 packages public
-   (owner's profile → Packages → package → Package settings → Change visibility).
-
-**Your machine / server:**
+For a centrally hosted installation, the repository owner first enables
+GitHub Actions write permissions, publishes the images after merge, and makes
+all five GHCR packages public. Local first-time setup above does not require
+those images. Once the registry is ready, operators can use:
 ```bash
-git clone https://github.com/Lawlee-L/26S2_5206-Group1-AV-Job-Profiles.git
-cd 26S2_5206-Group1-AV-Job-Profiles
-cp .env.docker.example .env        # set passwords and API keys
-docker compose pull
+docker compose pull backend frontend
 docker compose --profile autoupdate up -d
 ```
-Site: http://localhost:8080 · API check: http://localhost:8080/api/health
+Watchtower updates application images only. Use the weekly pipeline below to
+update data; it is not part of first-time customer setup.
 
 ## Weekly pipeline
 

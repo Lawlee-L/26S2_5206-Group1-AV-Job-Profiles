@@ -82,47 +82,19 @@ It contains **6,044 unique job records**. Validation found:
 
 Earlier dated datasets remain available under `data-collection/deliverables/` for reproducibility and comparison.
 
-## Running the Project
+## Start Using the Project
 
-The project components can be run separately. Refer to the component documentation for complete setup instructions.
+- **Website:** follow [First-time website setup](DOCKER.md#first-time-website-setup).
+  It starts the site and loads the included data; no Azure/OpenRouter keys or
+  new AI classification are needed. Then open http://localhost:8080 on that computer.
+- **Tableau dashboard:** download [AV jobs market analysis_Final.twbx](dashboard/AV%20jobs%20market%20analysis_Final.twbx)
+  (open the file link, then choose **Download raw file**) and open it in Tableau
+  Desktop, Tableau Public Desktop, or Tableau Reader. It includes its data and
+  does not need MySQL. See [dashboard instructions](dashboard/README.md).
 
-### Website
-
-The website requires:
-
-1. a running MySQL database with an approved published release;
-2. the Flask backend API; and
-3. the React frontend.
-
-The backend normally runs at:
-
-```text
-http://127.0.0.1:5000
-```
-
-The frontend normally runs at:
-
-```text
-http://127.0.0.1:5173
-```
-
-Database credentials and API keys must be stored in local `.env` files and must not be committed to GitHub.
-
-For the integrated Docker deployment, follow [the Docker guide](DOCKER.md). The
-website is then available at `http://localhost:8080`, with API requests routed
-through the same nginx origin.
-
-### Tableau Dashboard
-
-Open the following packaged workbook with Tableau Desktop, Tableau Public Desktop, or Tableau Reader:
-
-```text
-dashboard/AV jobs market analysis_Final.twbx
-```
-
-The workbook contains a packaged Hyper extract, so a live MySQL connection is not required for viewing it.
-
-The current dashboard is a fixed snapshot based on the **25 September 2026** classified release. Updating MySQL does not automatically refresh the packaged workbook.
+The website initially uses the 13 October 2026 snapshot; the separate Tableau
+workbook uses 25 September 2026. `localhost` is a local address, not a public
+website link. To use a hosted deployment, obtain its URL from the project operator.
 
 ## Website Maintenance and Handover
 

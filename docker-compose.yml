@@ -135,6 +135,15 @@ services:
       db:
         condition: service_healthy
 
+  # First-time website data setup, built from this checkout so the script and
+  # tracked snapshots match. No collector/classifier or AI keys are needed.
+  bootstrap:
+    extends:
+      service: importer
+    image: avjobs-website-bootstrap:local
+    pull_policy: build
+    entrypoint: ["python3.12", "database/bootstrap_website.py"]
+
   # Polls the registry and restarts backend/frontend when GitHub Actions
   # publishes a new image. Only started with:  --profile autoupdate
   watchtower:
