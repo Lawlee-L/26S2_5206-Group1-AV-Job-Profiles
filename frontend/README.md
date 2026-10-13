@@ -1,5 +1,10 @@
 # Student job portal: local setup and integrated filters
 
+For the complete website/data handoff and Docker integration checklist, see
+[the integration runbook](../docs/integration/README.md). It includes Windows
+and macOS/Linux startup commands, publication checks and the fixes required
+in the checked Docker PR; it does not claim unexecuted container validation.
+
 ## What this website does
 
 The React portal reads **active, AV-relevant jobs from the published MySQL release**
