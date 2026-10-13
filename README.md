@@ -63,4 +63,4 @@ Team members are expected to:
 
 ## Current Project Stage
 
-The project has progressed from initial investigation to implementation and integration. The team is developing and testing the data collection, translation, data cleaning, job classification, database, and dashboard components. The current focus is on connecting these components into a reliable end-to-end workflow, validating data quality, refining the MVP, and incorporating feedback from the client and facilitators.
+The project has progressed from initial investigation to implementation and integration. The team is developing and testing the data collection, translation, data cleaning, job classification, database, and dashboard components. The current focus is on connecting these components into a reliable end-to-end workflow, validating data quality, refining the MVP, and incorporating feedback from the client and facilitators. For local MySQL setup and the exact data import/publication workflow, use the [database team operating guide](database/TEAM_GUIDE.md).
