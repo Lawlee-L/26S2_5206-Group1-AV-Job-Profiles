@@ -174,10 +174,10 @@ should appear in `/trends`; `--historical` preserves the newer current release.
 
 Local verification on 13 October 2026 (`avjobs-live` Compose project):
 6,044 inputs → 849 duplicates removed → 5,195 postings; 4,517 MySQL answers
-reused and 678 remaining, estimated US$0.4242 with `openai/gpt-6-luna`.
-The estimate excludes hidden reasoning tokens and actual output can vary.
-Use `docker compose -p avjobs-live ...` to access this local database/cache;
-a different project name selects different volumes. No paid run was started.
+reused and 678 model calls completed with `openai/gpt-6-luna`. The recorded
+classification cost was US$0.449236. Use
+`docker compose -p avjobs-live ...` to access this local database/cache; a
+different project name selects different volumes.
 
 ### 1. Collect and translate
 
