@@ -1,0 +1,54 @@
+{
+  "input": "input/2026-10-13/jobs_history_translated.json",
+  "n_input_rows": 6044,
+  "n_after_dedupe": 5195,
+  "n_duplicates_removed": 849,
+  "limit": null,
+  "n_records": 5195,
+  "n_llm_failures": 0,
+  "model": "openai/gpt-6-luna",
+  "prompt_version": "p5-72e4e4cb",
+  "temperature": 0.0,
+  "n_api_postings": 678,
+  "n_cached": 4517,
+  "prompt_tokens": 1782845,
+  "output_tokens": 666156,
+  "cost_usd": 0.449236,
+  "n_reused_from_db": 4517,
+  "embedding_model": "thenlper/gte-base",
+  "chunk_words": 350,
+  "embedded_text": "role_summary+responsibilities+skills",
+  "cluster_params": {
+    "av_relevant": {
+      "umap_n_neighbors": 15,
+      "umap_components": 10,
+      "min_cluster_size": 30,
+      "min_samples": 1
+    },
+    "not_av_relevant": {
+      "umap_n_neighbors": 50,
+      "umap_components": 5,
+      "min_cluster_size": 20,
+      "min_samples": 1
+    }
+  },
+  "groups": {
+    "av_relevant": {
+      "n_postings": 3317,
+      "n_clusters": 29,
+      "n_noise": 439
+    },
+    "not_av_relevant": {
+      "n_postings": 1878,
+      "n_clusters": 26,
+      "n_noise": 235
+    }
+  },
+  "languages": {
+    "English": 5193,
+    "English and German": 1,
+    "German": 1
+  },
+  "started_at": "2026-10-13T15:01:50+00:00",
+  "runtime_seconds": 1764.2
+}
