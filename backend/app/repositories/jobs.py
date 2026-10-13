@@ -3,8 +3,15 @@ import math
 from collections import defaultdict
 from datetime import date, datetime
 from decimal import Decimal
+from threading import Lock
+from time import monotonic
+from flask import current_app
 
 from app.db import fetch_all, fetch_one
+from app.display import display_text
+from app.salary import salary_from_row, matches_salary
+from app.facets import FacetIndex
+from app.locations import project_location, location_predicate, aggregate_locations, VERSION as LOCATION_ALIAS_VERSION
 
 
 VIEWS = {
@@ -19,6 +26,8 @@ VIEWS = {
 class JobRepository:
     def __init__(self):
         self.views = VIEWS
+        self._facet_lock = Lock()
+        self._facet_cache = None
 
 
 
@@ -75,6 +84,14 @@ class JobRepository:
         city=None,
         remote_type=None,
         seniority=None,
+        skill=None,
+        posted_after=None,
+        has_salary=None,
+        salary_currency=None,
+        salary_period=None,
+        salary_min=None,
+        salary_max=None,
+        sort="newest",
     ):
 
         jobs_view = self.views["jobs"]
@@ -87,12 +104,33 @@ class JobRepository:
             city=city,
             remote_type=remote_type,
             seniority=seniority,
+            skill=skill,
+            posted_after=posted_after,
+            has_salary=has_salary,
+            salary_currency=salary_currency, salary_period=salary_period,
+            salary_min=salary_min, salary_max=salary_max,
+        )
+
+        # Only fixed, server-owned SQL expressions may be used for ordering.
+        order_sql = {
+            "newest": "COALESCE(j.date_posted, TIMESTAMP(j.last_seen_date)) DESC, j.job_id DESC",
+            "oldest": "COALESCE(j.date_posted, TIMESTAMP(j.last_seen_date)) ASC, j.job_id ASC",
+            "title": "j.advertised_job_title ASC, j.job_id ASC",
+            "company": "j.company_name ASC, j.advertised_job_title ASC, j.job_id ASC",
+        }[sort]
+
+        # The published views unpack frozen JSON. Prevent MySQL from merging
+        # the jobs view into a skills-driven plan and unpacking it once per
+        # matching skill row. LIMIT is a non-merging boundary, not a row cap.
+        jobs_source = (
+            f"(SELECT * FROM {jobs_view} LIMIT 18446744073709551615)"
+            if join_sql else jobs_view
         )
 
         count_row = fetch_one(
             f"""
             SELECT COUNT(*) AS total
-            FROM {jobs_view} AS j
+            FROM {jobs_source} AS j
             {join_sql}
             {where_sql}
             """,
@@ -104,12 +142,10 @@ class JobRepository:
         rows = fetch_all(
             f"""
             SELECT {self.JOB_COLUMNS}
-            FROM {jobs_view} AS j
+            FROM {jobs_source} AS j
             {join_sql}
             {where_sql}
-            ORDER BY
-              COALESCE(j.date_posted, TIMESTAMP(j.last_seen_date)) DESC,
-              j.job_id DESC
+            ORDER BY {order_sql}
             LIMIT %s OFFSET %s
             """,
             tuple(params + [page_size, offset]),
@@ -315,6 +351,7 @@ class JobRepository:
         result.update(
             {
                 "description": details["job_description"],
+                "descriptionDisplay": display_text(details["job_description"]),
                 "roleSummary": details["role_summary"],
                 "responsibilities": _detail_array(
                     details["responsibilities_json"]
@@ -342,6 +379,13 @@ class JobRepository:
         city,
         remote_type,
         seniority,
+        skill=None,
+        posted_after=None,
+        has_salary=None,
+        salary_currency=None,
+        salary_period=None,
+        salary_min=None,
+        salary_max=None,
     ):
         join_sql = ""
 
@@ -355,7 +399,8 @@ class JobRepository:
         query = (search or "").strip()
 
         if query:
-            pattern = f"%{query}%"
+            # Search text is literal, including C_ and %; facets use the same rule.
+            pattern = "%" + query.replace("=", "==").replace("%", "=%").replace("_", "=_") + "%"
 
             skills_view = self.views["job_skills"]
 
@@ -365,7 +410,7 @@ class JobRepository:
                         dashboard_release_id,
                         job_id
                     FROM {skills_view}
-                    WHERE skill_name LIKE %s
+                    WHERE skill_name LIKE %s ESCAPE '='
                 ) AS skill_matches
                 ON skill_matches.dashboard_release_id =
                         j.dashboard_release_id
@@ -378,10 +423,10 @@ class JobRepository:
             clauses.append(
                 """
                 (
-                    j.advertised_job_title LIKE %s
-                    OR j.generic_job_title LIKE %s
-                    OR j.company_name LIKE %s
-                    OR j.location_raw LIKE %s
+                    j.advertised_job_title LIKE %s ESCAPE '='
+                    OR j.generic_job_title LIKE %s ESCAPE '='
+                    OR j.company_name LIKE %s ESCAPE '='
+                    OR j.location_raw LIKE %s ESCAPE '='
                     OR skill_matches.job_id IS NOT NULL
                 )
                 """
@@ -402,16 +447,14 @@ class JobRepository:
             params.append(country.upper())
 
         if state_region:
-            clauses.append(
-                "j.state_region = %s"
-            )
-            params.append(state_region)
+            condition, variants = location_predicate(country, "state_region", state_region)
+            clauses.append(condition)
+            params.extend(variants)
 
         if city:
-            clauses.append(
-                "j.city = %s"
-            )
-            params.append(city)
+            condition, variants = location_predicate(country, "city", city)
+            clauses.append(condition)
+            params.extend(variants)
 
         if remote_type:
             clauses.append(
@@ -424,6 +467,45 @@ class JobRepository:
                 "j.seniority_code = %s"
             )
             params.append(seniority)
+
+        if skill:
+            # Exact skill selection is separate from the general text search.
+            # Materialise matching release/job pairs once, rather than repeatedly
+            # evaluating the frozen skills view for every candidate job.
+            join_sql += f"""
+                INNER JOIN (
+                    SELECT DISTINCT dashboard_release_id, job_id
+                    FROM {self.views['job_skills']}
+                    WHERE skill_name = %s
+                ) AS selected_skill
+                ON selected_skill.dashboard_release_id = j.dashboard_release_id
+                AND selected_skill.job_id = j.job_id
+            """
+            params.insert(1 if query else 0, skill)
+
+        if posted_after:
+            # This filter means advertised date, not collection/import date.
+            clauses.append("j.date_posted >= %s")
+            params.append(posted_after)
+
+        if has_salary is not None:
+            salary_known = "(NULLIF(TRIM(j.salary_raw), '') IS NOT NULL OR j.salary_min IS NOT NULL OR j.salary_max IS NOT NULL)"
+            clauses.append(salary_known if has_salary else f"NOT {salary_known}")
+
+        if any(value is not None for value in (salary_currency, salary_period, salary_min, salary_max)):
+            pairs = [[row["dashboard_release_id"], row["job_id"]] for row in self._salary_rows()
+                     if matches_salary(salary_from_row(row), currency=salary_currency,
+                                       period=salary_period, minimum=salary_min, maximum=salary_max)]
+            # Parse before pagination, then join bound release/job pairs. Filtering
+            # only a page would produce wrong totals and miss matching later jobs.
+            join_sql += """
+                INNER JOIN JSON_TABLE(%s, '$[*]' COLUMNS(
+                    release_id BIGINT PATH '$[0]', job_id BIGINT PATH '$[1]'
+                )) AS salary_matches
+                ON salary_matches.release_id = j.dashboard_release_id
+                AND salary_matches.job_id = j.job_id
+            """
+            params.insert(int(bool(query)) + int(bool(skill)), json.dumps(pairs))
 
         where_sql = (
             "WHERE "
@@ -477,6 +559,9 @@ class JobRepository:
 
     @staticmethod
     def _job_to_api(row, skills):
+        original = row
+        row = project_location(row)
+        salary = salary_from_row(row)
         return {
             "id": row["source_key"],
             "jobId": row["job_id"],
@@ -487,15 +572,20 @@ class JobRepository:
             "genericTitle": row["generic_job_title"],
             "jobUrl": row["job_url"],
             "location": row["location_raw"],
+            "locationDisplay": display_text(row["location_raw"]),
             "city": row["city"],
             "stateRegion": row["state_region"],
+            "locationSourceFields": {"city": original["city"], "stateRegion": original["state_region"], "countryCode": original["country_code"]},
+            "locationAliasVersion": LOCATION_ALIAS_VERSION,
             "countryCode": row["country_code"],
             "remoteType": row["remote_type"],
             "salary": row["salary_raw"],
-            "salaryMin": _json_value(row["salary_min"]),
-            "salaryMax": _json_value(row["salary_max"]),
-            "salaryCurrency": row["salary_currency"],
-            "salaryPeriod": row["salary_period"],
+            "salaryDisplay": display_text(row["salary_raw"]),
+            "salaryMin": salary.minimum,
+            "salaryMax": salary.maximum,
+            "salaryCurrency": salary.currency,
+            "salaryPeriod": salary.period,
+            "salaryNormalization": salary.to_api(),
             "postedDate": _json_value(row["date_posted"]),
             "firstSeenDate": _json_value(row["first_seen_date"]),
             "lastSeenDate": _json_value(row["last_seen_date"]),
@@ -516,6 +606,55 @@ class JobRepository:
             },
             "skills": skills,
         }
+
+    def _salary_rows(self):
+        return fetch_all(f"""
+            SELECT dashboard_release_id, job_id, salary_raw,
+                   salary_min, salary_max, salary_currency, salary_period
+            FROM {self.views['jobs']}
+            WHERE is_active = TRUE AND av_relevant = TRUE
+              AND (salary_raw IS NOT NULL OR salary_min IS NOT NULL OR salary_max IS NOT NULL)
+        """)
+
+    def list_salary_options(self):
+        counts = defaultdict(int)
+        numeric = comparable = 0
+        for row in self._salary_rows():
+            salary = salary_from_row(row)
+            if salary.minimum is not None or salary.maximum is not None:
+                numeric += 1
+                if salary.currency and salary.period:
+                    comparable += 1
+                    counts[(salary.currency, salary.period)] += 1
+        return {"options": [{"currency": c, "period": p, "jobCount": n}
+                            for (c, p), n in sorted(counts.items())],
+                "numericJobCount": numeric, "comparableJobCount": comparable}
+
+    def list_facets(self, **filters):
+        # Poll the release identity before using a short-lived in-process cache.
+        # Never reuse an index across databases, view modes or activated releases.
+        def identity():
+            rows = fetch_all(f"""SELECT DISTINCT dashboard_release_id, release_key,
+                (SELECT w.week_date FROM v_weekly_versions w WHERE w.dashboard_release_id=j.dashboard_release_id LIMIT 1) AS snapshot_date
+                FROM (SELECT DISTINCT dashboard_release_id, release_key FROM {self.views['jobs']}) j""")
+            return tuple(sorted((row["dashboard_release_id"], row["release_key"], str(row["snapshot_date"]) if row.get("snapshot_date") else None) for row in rows))
+        releases = identity()
+        key = (current_app.config["DB_HOST"], current_app.config["DB_PORT"], current_app.config["DB_NAME"],
+               self.views["jobs"], self.views["job_skills"], releases)
+        with self._facet_lock:
+            cached = self._facet_cache
+            if cached and cached[0] == key and monotonic() - cached[1] < 15:
+                index = cached[2]
+            else:
+                rows = fetch_all(f"SELECT {self.JOB_COLUMNS} FROM {self.views['jobs']} AS j WHERE j.is_active=TRUE AND j.av_relevant=TRUE")
+                skills = fetch_all(f"SELECT dashboard_release_id, job_id, skill_name, skill_type FROM {self.views['job_skills']}")
+                if identity() != releases:
+                    raise RuntimeError("Published release changed while loading filter options; retry the request")
+                index = FacetIndex(rows, skills)
+                self._facet_cache = (key, monotonic(), index)
+        return {**index.options(filters), "releaseIds": [item[0] for item in releases],
+                "snapshotDate": releases[0][2] if len(releases) == 1 else None,
+                "releaseKey": releases[0][1] if len(releases) == 1 else None}
 
     def list_locations(self):
         jobs_view = self.views["jobs"]
@@ -592,15 +731,7 @@ class JobRepository:
         return {
             "releaseId": release_id,
             "releaseKey": release_key,
-            "locations": [
-                {
-                    "countryCode": row["country_code"],
-                    "stateRegion": row["state_region"],
-                    "city": row["city"],
-                    "jobCount": int(row["job_count"]),
-                }
-                for row in location_rows
-            ],
+            "locations": aggregate_locations(location_rows),
             "workArrangements": [
                 {
                     "value": row["remote_type"],

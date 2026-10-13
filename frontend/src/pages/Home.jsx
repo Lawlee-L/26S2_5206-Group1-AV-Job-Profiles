@@ -1,260 +1,45 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Bot,
-  BriefcaseBusiness,
-  BrainCircuit,
-  Building2,
-  History,
-} from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, ChartNoAxesCombined } from "lucide-react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import CompanyLogo from "../components/CompanyLogo";
+import { getJobs, getCompanies, getFacets, getLocations } from "../api/jobs";
 
 export default function Home() {
-  const companies = [
-    { name: "NVIDIA", className: "nvidia-logo" },
-    { name: "mobileye", className: "mobileye-logo" },
-    { name: "Motional", className: "motional-logo" },
-    { name: "pony.ai", className: "pony-logo" },
-    { name: "nuro", className: "nuro-logo" },
-    { name: "Momenta", className: "momenta-logo" },
-    { name: "Plus", className: "plus-logo" },
-  ];
-
-  const features = [
-    {
-      icon: <BriefcaseBusiness size={19} />,
-      title: "Latest AV Jobs",
-      description:
-        "Find the newest job openings from top AV companies.",
-    },
-    {
-      icon: <BrainCircuit size={19} />,
-      title: "Skill Insights",
-      description:
-        "Discover the most in-demand skills in the autonomous vehicle industry.",
-    },
-    {
-      icon: <Building2 size={19} />,
-      title: "Company Insights",
-      description:
-        "Explore AV companies and their latest opportunities.",
-    },
-    {
-      icon: <History size={19} />,
-      title: "Historical Tracking",
-      description:
-        "Track job trends and market changes over time.",
-    },
-  ];
-
-  const skills = [
-    "Programming",
-    "AI / Machine Learning",
-    "Robotics",
-    "Perception",
-    "Planning",
-    "Cloud / DevOps",
-    "Data Science",
-  ];
-
-  return (
-    <div className="website">
-      {/* NAVIGATION */}
-      <header className="navbar">
-        <Link to="/" className="logo">
-          <span className="logo-circle">
-            <Bot size={16} />
-          </span>
-          <span>AV Job Tracker</span>
-        </Link>
-
-        <nav className="nav-menu">
-          <Link className="active" to="/">
-            Home
-          </Link>
-
-          <Link to="/jobs">Jobs</Link>
-
-          <a href="#companies">Companies</a>
-
-          <a href="#insights">Insights</a>
-
-          <a href="#about">About</a>
-        </nav>
-
-        <Link to="/jobs" className="nav-button">
-          View Jobs
-        </Link>
-      </header>
-
-      {/* HERO */}
-<section className="hero-section">
-
-  <div className="hero-content">
-    <h1>
-      Discover Autonomous
-      <br />
-      Vehicle Jobs.
-      <br />
-      Track Skills. Grow Your
-      <br />
-      Future.
-    </h1>
-
-    <p>
-      A centralized platform for AV job opportunities, skill
-      <br />
-      demand insights, and industry trends.
-    </p>
-
-    <div className="hero-buttons">
-      <Link to="/jobs" className="btn-primary">
-        Browse Jobs
-      </Link>
-
-      <a href="#insights" className="btn-outline">
-        View Insights
-      </a>
-    </div>
-  </div>
-
-  <div className="hero-image">
-    <img
-      src="/av-car.png"
-      alt="Autonomous vehicle in a smart city"
-      className="hero-car-image"
-    />
-  </div>
-
-</section>
-
-      {/* OPPORTUNITIES */}
-      <section className="home-section opportunities">
-        <h2>Explore Opportunities in AV</h2>
-
-        <div className="feature-grid">
-          {features.map((feature) => (
-            <div className="feature-card" key={feature.title}>
-              <div className="feature-icon">{feature.icon}</div>
-
-              <h3>{feature.title}</h3>
-
-              <p>{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* COMPANIES */}
-      <section
-        className="home-section company-section"
-        id="companies"
-      >
-        <h2>Top Companies Hiring</h2>
-
-        <div className="company-grid">
-          {companies.map((company) => (
-            <div className="company-box" key={company.name}>
-              <div className={`company-name ${company.className}`}>
-                {company.name}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* MARKET */}
-      <section className="market-section" id="insights">
-        <h2>AV Job Market at a Glance</h2>
-
-        <div className="market-stats">
-          <div>
-            <strong>2,500+</strong>
-            <span>Active Jobs</span>
-          </div>
-
-          <div>
-            <strong>100+</strong>
-            <span>Companies</span>
-          </div>
-
-          <div>
-            <strong>50+</strong>
-            <span>Skills Tracked</span>
-          </div>
-
-          <div>
-            <strong>7</strong>
-            <span>Countries</span>
-          </div>
-        </div>
-      </section>
-
-      {/* SKILLS */}
-      <section className="skills-section">
-        <h2>Popular Skill Categories</h2>
-
-        <div className="skill-list">
-          {skills.map((skill) => (
-            <span key={skill}>{skill}</span>
-          ))}
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="footer" id="about">
-        <div className="footer-content">
-          <div className="footer-about">
-            <div className="footer-logo">
-              <span>
-                <Bot size={15} />
-              </span>
-
-              AV Job Tracker
-            </div>
-
-            <p>
-              Empowering the future of
-              <br />
-              Autonomous Vehicles.
-            </p>
-          </div>
-
-          <div className="footer-column">
-            <h4>Explore</h4>
-            <Link to="/jobs">Jobs</Link>
-            <a href="#companies">Companies</a>
-            <a href="#insights">Insights</a>
-            <a href="#about">About</a>
-          </div>
-
-          <div className="footer-column">
-            <h4>Resources</h4>
-            <a href="#skills">Skill Trends</a>
-            <a href="#reports">Reports</a>
-            <a href="#methodology">Methodology</a>
-            <a href="#api">API</a>
-          </div>
-
-          <div className="footer-column">
-            <h4>Contact</h4>
-
-            <a href="mailto:team@avjobtracker.com">
-              team@avjobtracker.com
-            </a>
-
-            <div className="social-icons">
-              <span>in</span>
-              <span>◎</span>
-              <span>◉</span>
-              <span>⌘</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="copyright">
-          © 2026 AV Job Tracker. All rights reserved.
-        </div>
-      </footer>
-    </div>
-  );
+  const [data, setData] = useState(null);
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    setError("");
+    Promise.all([getJobs({ page: 1, pageSize: 1 }), getCompanies(), getFacets(), getLocations()])
+      .then(([jobs, companies, facets, locations]) => {
+        if (!cancelled) setData({ jobs: jobs.pagination?.total ?? 0, companies, skills: (facets.skill || [])
+          .filter(item => !(facets.skillTypes?.[item.value] || []).includes("qualification")).slice(0, 8),
+          countries: new Set(locations.locations.map(item => item.countryCode).filter(Boolean)).size,
+          date: facets.snapshotDate });
+      }).catch(() => { if (!cancelled) setError("Live data is unavailable. Start the backend and check the published release."); });
+    return () => { cancelled = true; };
+  }, [attempt]);
+  return <div className="app-shell"><Header /><main className="container-xl product-home">
+    <section className="product-hero"><div><span className="eyebrow">AUTONOMOUS VEHICLE CAREERS</span>
+      <h1>Discover Autonomous Vehicle Jobs.</h1><p>Find a role that matches your skills. Explore what AV employers need.</p>
+      <div className="d-flex flex-wrap gap-2"><Link className="btn btn-primary" to="/jobs"><BriefcaseBusiness size={17} />Browse Jobs<ArrowRight size={16} /></Link>
+        <Link className="btn btn-outline-primary" to="/clusters"><ChartNoAxesCombined size={17} />View Insights</Link></div>
+    </div><img src="/av-car.png" alt="Autonomous vehicle in a smart city" /></section>
+    {error && <div className="alert alert-warning" role="alert">{error}<button className="btn btn-sm btn-outline-primary ms-2" onClick={() => setAttempt(value => value + 1)}>Retry</button></div>}
+    <div className="home-quick-stats"><span><strong>{data?.jobs.toLocaleString() ?? "—"}</strong> active AV jobs</span>
+      <span><strong>{data?.companies.length ?? "—"}</strong> companies</span><span><strong>{data?.countries ?? "—"}</strong> known countries</span>
+      <span className="data-freshness">Dataset: {data?.date || "Version unavailable"}</span></div>
+    <section className="home-skill-section"><h2>Popular skills in the published jobs</h2><p>Select a skill to find matching opportunities.</p>
+      <div className="home-skills">{data?.skills.map(skill => <Link to={`/jobs?skill=${encodeURIComponent(skill.value)}`} key={skill.value}>
+        {skill.value}<span>{skill.count.toLocaleString()}</span><ArrowRight size={13} /></Link>)}</div>
+    </section>
+    <section className="company-section"><div className="section-heading"><h2>Featured AV Companies</h2><Link to="/jobs">Explore all jobs<ArrowRight size={14} /></Link></div>
+      <div className="company-grid">{data?.companies.slice(0, 6).map(company => <Link key={company.name} to={`/jobs?company=${encodeURIComponent(company.name)}`} className="company-box">
+        <CompanyLogo company={company.name} /><span className="featured-company-name">{company.name}</span><small>{company.jobCount.toLocaleString()} active jobs</small></Link>)}</div>
+    </section>
+    <p className="home-data-note">Listings reflect a dated snapshot, not a live vacancy check. Confirm availability on the original company website before applying.</p>
+  </main><Footer /></div>;
 }

@@ -1,0 +1,107 @@
+.company-logo { display: grid; place-items: center; overflow: hidden; }
+.company-logo-image { width: 100%; height: 100%; max-width: 64px; max-height: 64px; object-fit: contain; }
+.company-logo-fallback { display: grid; place-items: center; color: #183a7a; font-weight: 700; background: #edf2fa; border-radius: 9px; }
+.nav-links { gap: 18px; }
+.company-section .company-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.company-section .company-box { min-height: 150px; height: auto; padding: 18px 10px; display: flex; flex-direction: column; justify-content: center; gap: 7px; color: #53627b; }
+.company-section .company-logo { width: 48px; height: 48px; padding: 6px; }
+.featured-company-name { font-size: 12px; font-weight: 650; text-align: center; }
+.company-box small { color: #8793a6; font-size: 10px; }
+.company-section .company-box:hover { border-color: #bdcce0; box-shadow: 0 3px 14px #0b1e3c08; }
+.insights-page { max-width: 1120px; padding-left: 24px; padding-right: 24px; min-height: 70vh; }
+.insights-nav { display: flex; gap: 8px; border-bottom: 1px solid #dce3ec; margin: 28px 0; padding-bottom: 12px; }
+.insights-nav a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 15px; border-radius: 8px; font-size: 13px; color: #64748b; }
+.insights-nav a.active { color: #183a7a; background: #e6edf8; font-weight: 650; }
+.insight-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.insight-metrics .card { padding: 22px; box-shadow: 0 3px 16px #0b1e3c08; border-radius: 12px; }
+.metric-label { font-size: 12px; color: #64748b; }
+.insight-metrics strong { font-size: 32px; font-weight: 750; color: #06123b; letter-spacing: -.03em; line-height: 1.4; }
+.insight-metrics small { font-size: 10px; color: #8793a6; }
+.insight-method-note { padding: 18px 22px; background: #edf2fa; border-left: 3px solid #cba34f; border-radius: 0 10px 10px 0; color: #53627b; }
+.insight-method-note strong { font-size: 13px; color: #183a7a; }
+.insight-method-note p { font-size: 12px; line-height: 1.8; margin: 4px 0 8px; }
+.insight-method-note small { font-size: 11px; }
+.insight-method-note code, .snapshot-provenance code { overflow-wrap: anywhere; color: #53627b; }
+.insight-chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.insight-chart-card { padding: 24px; border-radius: 14px; min-width: 0; box-shadow: 0 3px 16px #0b1e3c06; }
+.insights-page h2 { font-size: 18px; font-weight: 650; color: #12213d; margin-bottom: 8px; }
+.chart-description { color: #73839c; font-size: 12px; min-height: 38px; line-height: 1.6; margin: 0 0 20px; }
+.insight-chart-container { height: 330px; width: 100%; position: relative; }
+.chart-data { margin-top: 16px; font-size: 11px; }
+.chart-data summary { color: #536f9a; cursor: pointer; padding: 6px 0; }
+.chart-data table { font-size: 11px; margin-top: 10px; }
+.cluster-directory-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin: 32px 0 20px; }
+.cluster-directory-header p { color: #73839c; font-size: 12px; margin: 0; }
+.cluster-controls { display: flex; gap: 8px; max-width: 440px; }
+.cluster-controls .input-group { min-width: 160px; }
+.cluster-controls .input-group-text { background: #fff; color: #73839c; border-right: 0; padding: 8px; }
+.cluster-controls input { border-left: 0; font-size: 12px; padding-left: 0; }
+.cluster-controls > select { width: 145px; font-size: 12px; flex-shrink: 0; }
+.cluster-directory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 14px; }
+.cluster-card { min-width: 0; padding: 22px; border: 1px solid #e3e9f1; background: #fff; border-radius: 12px; }
+.cluster-card summary { display: flex; justify-content: space-between; gap: 14px; cursor: pointer; list-style: none; }
+.cluster-card summary::-webkit-details-marker { display: none; }
+.cluster-card summary:focus-visible { outline: 2px solid #5775a9; outline-offset: 5px; border-radius: 4px; }
+.cluster-card summary::after { content: "+"; color: #74849d; align-self: center; font-size: 22px; }
+.cluster-card[open] summary::after { content: "−"; }
+.cluster-card-title { flex: 1; min-width: 0; }
+.cluster-id { display: block; font-size: 9px; letter-spacing: .12em; font-weight: 650; color: #7f8da3; margin-bottom: 6px; }
+.cluster-card h3 { font-size: 15px; font-weight: 650; margin: 0 0 7px; line-height: 1.5; overflow-wrap: anywhere; }
+.cluster-status { font-size: 9px; color: #64748b; border-radius: 4px; padding: 2px 6px; background: #f1f4f8; }
+.cluster-status.provisional { background: #fbf5e7; color: #8f691a; }
+.cluster-card-count { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; }
+.cluster-card-count strong { font-size: 23px; font-weight: 700; color: #183a7a; line-height: 1.5; }
+.cluster-card-count span { font-size: 10px; color: #8793a6; }
+.cluster-preview-skills { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 14px; }
+.cluster-preview-skills span { font-size: 10px; color: #637a9d; background: #f1f5fb; border-radius: 4px; padding: 3px 6px; }
+.cluster-expanded { border-top: 1px solid #edf0f5; margin-top: 18px; padding-top: 16px; }
+.cluster-expanded h4 { font-size: 12px; color: #183a7a; font-weight: 650; margin-bottom: 10px; }
+.cluster-expanded p, .cluster-expanded small { font-size: 11px; color: #8793a6; }
+.cluster-skill-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 14px; margin-bottom: 10px; }
+.cluster-skill-list a { font-size: 11px; color: #536f9a; display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px solid #f1f4f8; overflow-wrap: anywhere; }
+.cluster-examples { list-style: none; margin: 0; padding: 0; }
+.cluster-examples li { margin-top: 9px; }
+.cluster-examples a { display: inline-flex; align-items: center; gap: 5px; color: #3e5b8a; font-size: 12px; }
+.cluster-examples svg { flex-shrink: 0; }
+.cluster-examples small { display: block; font-size: 10px; }
+.noise-cluster { border-color: #ddd6c5; }
+.skill-trend-controls { padding: 22px 24px; border-radius: 14px; }
+.skill-trend-controls p { color: #73839c; font-size: 12px; margin: 0; }
+.skill-trend-controls select { width: 245px; font-size: 12px; }
+.skill-trend-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.skill-trend-choices label { display: inline-flex; align-items: center; gap: 6px; padding: 7px 9px; background: #f7f9fc; border: 1px solid #e3e9f1; border-radius: 6px; color: #64748b; font-size: 11px; cursor: pointer; }
+.skill-trend-choices label.selected { border-color: #b6c9e3; background: #edf2fa; color: #183a7a; }
+.skill-trend-choices input { accent-color: #183a7a; }
+.snapshot-coverage { padding: 24px; border-radius: 14px; }
+.snapshot-coverage p { font-size: 12px; color: #73839c; }
+.snapshot-coverage table { font-size: 12px; white-space: nowrap; }
+.snapshot-coverage th { color: #53627b; font-size: 11px; }
+.snapshot-coverage td small { font-size: 10px; }
+.coverage-badge { border-radius: 5px; padding: 4px 7px; font-size: 10px; }
+.coverage-badge.ready { background: #e9f5f1; color: #307d6b; }
+.coverage-badge.pending { background: #fbf5e7; color: #8f691a; }
+.snapshot-provenance { font-size: 11px; color: #64748b; }
+.snapshot-provenance > div { padding-top: 16px; }
+.snapshot-provenance dl { margin: 8px 0; display: grid; grid-template-columns: 90px minmax(0,1fr); }
+.insight-loading { padding: 40px 0; color: #64748b; }
+@media (max-width: 900px) {
+  .insight-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .insight-chart-grid, .cluster-directory { grid-template-columns: minmax(0, 1fr); }
+  .cluster-directory-header { align-items: stretch; flex-direction: column; gap: 14px; }
+  .cluster-controls { max-width: none; }
+}
+@media (max-width: 600px) {
+  .insights-page { padding-left: 16px; padding-right: 16px; }
+  .insight-metrics { gap: 10px; }
+  .insight-metrics .card { padding: 16px; }
+  .insight-metrics strong { font-size: 28px; }
+  .metric-label { font-size: 11px; }
+  .insights-nav a { font-size: 12px; padding: 9px 10px; }
+  .insight-chart-card, .snapshot-coverage, .skill-trend-controls { padding: 18px; }
+  .insight-chart-container { height: 310px; }
+  .cluster-card { padding: 18px; }
+  .cluster-controls > select { width: 132px; }
+  .cluster-controls .input-group { min-width: 0; }
+  .cluster-card h3 { font-size: 14px; }
+  .insight-method-note { padding: 15px; }
+}
