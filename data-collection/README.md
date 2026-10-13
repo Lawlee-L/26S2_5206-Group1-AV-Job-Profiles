@@ -412,6 +412,6 @@ data/translation/
 
 Reviewed English datasets under dated `deliverables/` folders are intended for
 GitHub. The latest official dataset is
-`deliverables/2026-10-10/jobs_history_translated.json`. It contains 5,916 unique
+`deliverables/2026-10-13/jobs_history_translated.json`. It contains 6,044 unique
 jobs. Output checks found no missing or duplicate `source_key` values and no
 remaining detected non-English fields.
