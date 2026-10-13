@@ -98,10 +98,20 @@ services:
     profiles: ["jobs"]
     environment:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      # Reuse matching classifications already imported into MySQL. The
+      # classifier only reads these tables; it never writes to the database.
+      AVDB_HOST: db
+      AVDB_PORT: 3306
+      AVDB_NAME: av_job_profiles
+      AVDB_USER: ${MYSQL_USER:-avjobs}
+      AVDB_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ./data-collection/deliverables:/app/input:ro
       - ./classification pipeline/output:/app/output
-      - classifier-cache:/app/.cache          # cached LLM replies: re-runs cost nothing
+      - classifier-cache:/app/.cache          # local cache; --db also reuses imported answers
+    depends_on:
+      db:
+        condition: service_healthy
 
   # 3. Load collection + classification results into MySQL, QA and publish
   importer:
@@ -118,6 +128,7 @@ services:
     volumes:
       - ./data-collection/deliverables:/repo/data-collection/deliverables:ro
       - ./classification pipeline/output:/repo/classification pipeline/output:ro
+      - ./classification pipeline/output_full:/repo/classification pipeline/output_full:ro
       - ./database/backups:/repo/database/backups
       - ./database/operation_logs:/repo/database/operation_logs
     depends_on:
