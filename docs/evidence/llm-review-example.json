@@ -1,0 +1,104 @@
+{
+  "input": {
+    "source_key": "greenhouse|may mobility|id:8746085002",
+    "company": "May Mobility",
+    "advertised_job_title": "Senior Accountant",
+    "job_description": "[…]\nJob Summary\nMay Mobility is entering an exciting phase of growth and our team is expanding quickly. We are looking for a Senior Accountant to add to our Finance team. We are looking for a candidate that can build new processes, maximize the use of our ERP system, and work cross-functionally.  This role reports to the Accounting Manager.\nEssential Responsibilities\nReview accounts for discrepancies and reconcile differences through proper documentation to ensure integrity of accounting information\nResearch unique transactions and demonstrate the ability to independently determine proper accounting treatment and considerations\nPrepare and manage month end close accruals, adjusting journal entries, and account reconciliations and ability to present the results to management\nPartner directly with vendors as part of monthly invoicing coordination and onboarding of new vendors as needed\nDemonstrate working knowledge of accounts payable, accounts receivable, and payroll processes to provide cross-functional support to those functions.\nCollaborate and plan with supply chain and engineering teams to ensure proper inventory and bill of materials tracking for  vehicle builds\nAssist the Accounting team with financial statement preparation and audits, including preparation of footnote disclosures, related support and tie out support\nDemonstrate an understanding of accounting standards (specifically ASC 606) to come to an accounting treatment and ability to document and present such conclusions to the Accounting Manager\nDemonstrate an independent understanding of Company’s expense policies and ability to manage and coordinate with employees to uphold compliance and reporting\nProvide creative alternatives and recommendations to reduce costs and improve financial performance\nSupport new system implementations and internal controls documentation as needed\nProvide analytical, forecasting, reporting, and project support to the Accounting Manager  and other Finance team members\nOther duties as assigned\n[…]\nRequired\nBachelor’s degree in Accounting, Finance, Economics, or related field\n4+ years working in corporate finance or public accounting\nStrong understanding of US GAAP\n[…]\nStrong working knowledge of Excel\n[…]\nDesirable\nMBA or Master of Accounting\nCPA preferred\nNetSuite experience\nInventory and Fixed Asset experience\nExperience using Google Suite\n[…]"
+  },
+  "llm_output": {
+    "role_summary": "Reviews and reconciles accounts, researches transactions, and prepares month-end accruals, journal entries, reconciliations, and financial reporting. Coordinates vendor invoicing and supports inventory tracking, audits, internal controls, and accounting system implementations.",
+    "responsibilities": [
+      "Review accounts for discrepancies and reconcile differences through proper documentation",
+      "Research unique transactions and determine proper accounting treatment",
+      "Prepare and manage month end close accruals, adjusting journal entries, and account reconciliations",
+      "Coordinate monthly invoicing and onboarding of new vendors",
+      "Provide cross-functional support to accounts payable, accounts receivable, and payroll processes",
+      "Collaborate with supply chain and engineering teams on inventory and bill of materials tracking for vehicle builds",
+      "Assist with financial statement preparation and audits",
+      "Document and present accounting treatment conclusions, including for ASC 606",
+      "Manage and coordinate employee compliance with expense policies",
+      "Provide recommendations to reduce costs and improve financial performance",
+      "Support new system implementations and internal controls documentation",
+      "Provide analytical, forecasting, reporting, and project support"
+    ],
+    "requirements": [
+      "Bachelor’s degree in Accounting, Finance, Economics, or related field",
+      "4+ years working in corporate finance or public accounting",
+      "Strong understanding of US GAAP",
+      "Strong working knowledge of Excel",
+      "Exceptional problem-solving skills",
+      "Strong analytical and data mining skills"
+    ],
+    "skills": {
+      "tools": [
+        {
+          "name": "Excel",
+          "evidence": "Strong working knowledge of Excel"
+        },
+        {
+          "name": "NetSuite",
+          "evidence": "NetSuite experience"
+        },
+        {
+          "name": "Google Suite",
+          "evidence": "Experience using Google Suite"
+        }
+      ],
+      "domain": [
+        {
+          "name": "Accounting",
+          "evidence": "Strong understanding of US GAAP"
+        },
+        {
+          "name": "Month-end close",
+          "evidence": "Prepare and manage month end close accruals"
+        },
+        {
+          "name": "Accounts payable",
+          "evidence": "working knowledge of accounts payable"
+        },
+        {
+          "name": "Accounts receivable",
+          "evidence": "working knowledge of accounts receivable"
+        },
+        {
+          "name": "Payroll",
+          "evidence": "working knowledge of accounts payable, accounts receivable, and payroll processes"
+        },
+        {
+          "name": "Inventory accounting",
+          "evidence": "proper inventory and bill of materials tracking"
+        },
+        {
+          "name": "ASC 606",
+          "evidence": "accounting standards (specifically ASC 606)"
+        },
+        {
+          "name": "Financial reporting",
+          "evidence": "financial statement preparation"
+        }
+      ],
+      "qualifications": [
+        {
+          "name": "Bachelor's degree",
+          "evidence": "Bachelor’s degree in Accounting, Finance, Economics, or related field"
+        },
+        {
+          "name": "Master's degree",
+          "evidence": "MBA or Master of Accounting"
+        },
+        {
+          "name": "CPA",
+          "evidence": "CPA preferred"
+        }
+      ]
+    },
+    "seniority": "Senior",
+    "experience_min": 4,
+    "experience_max": null,
+    "language_of_posting": "English",
+    "relevance_reason": "The role includes hands-on coordination with supply chain and engineering teams to track inventory and bills of materials for vehicle builds, connecting its accounting work directly to vehicle production.",
+    "av_relevant": true,
+    "relevance_confidence": "High"
+  }
+}
